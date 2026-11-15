@@ -2,7 +2,8 @@ import { engineOf } from "../../lib/narration/geminiVoices";
 import { narrationInputFor, parseAnyScript, scriptLineFor } from "../../lib/narration/resolveSegments";
 import { ErrorLine } from "../ui/ErrorLine";
 import { plainError } from "../../lib/plainError";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { voicedSpeaker } from "../../lib/narration/characterVoice";
 import { useProjectStore } from "../../store/useProjectStore";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import { useVoicesStore } from "../../store/useVoicesStore";
@@ -25,7 +26,9 @@ const LANGUAGES = [
  * saves what that box reads.
  */
 export default function NarrationPanel() {
-  const speakers = useProjectStore((s) => s.speakers);
+  // as they will sound: a drawn character's own voice unless this project overrides it
+  const storeSpeakers = useProjectStore((s) => s.speakers);
+  const speakers = useMemo(() => storeSpeakers.map(voicedSpeaker), [storeSpeakers]);
   const updateSpeaker = useProjectStore((s) => s.updateSpeaker);
   const script = useProjectStore((s) => s.script);
   const setScript = useProjectStore((s) => s.setScript);
@@ -141,8 +144,8 @@ export default function NarrationPanel() {
 
     if (segments.length === 0) {
       setGenError(
-        "No line matched a character. Write each line as \"Name: words\" using the names from the Cast step, " +
-          "or start each line with the character's opening phrase (set in Cast → Character)."
+        "No line matched a character. Write each line as \"Name: words\" using the names from the Characters step, " +
+          "or start each line with the character's opening phrase (set in Characters → Character)."
       );
       setGenerating(false);
       return;
@@ -196,7 +199,7 @@ export default function NarrationPanel() {
     setRemakeNote(null);
     setRemakeError(null);
     if (!sp) {
-      setRemakeError(`The speaker "${seg.speakerLabel}" is not in the Cast any more, so there is no voice to make this line with.`);
+      setRemakeError(`The speaker "${seg.speakerLabel}" is not among the characters any more, so there is no voice to make this line with.`);
       return;
     }
     if (sp.ttsEngine === "dramabox") {
@@ -300,7 +303,7 @@ export default function NarrationPanel() {
               {unmatchedLines.length} line(s) didn't match a speaker and were skipped:
               <ul className="list-disc pl-5 mt-1">
                 {unmatchedLines.map((l, i) => (
-                  <li data-tip="A line that starts with a name no speaker has. Change the name to match a speaker in the Cast, or remove the line." key={i}>{l}</li>
+                  <li data-tip="A line that starts with a name no speaker has. Change the name to match one of the characters, or remove the line." key={i}>{l}</li>
                 ))}
               </ul>
             </div>

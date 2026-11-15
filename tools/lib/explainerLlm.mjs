@@ -21,13 +21,29 @@ export const PROVIDERS = {
   openai: { label: "OpenAI", base: "https://api.openai.com/v1", hint: ["gpt-5.5", "gpt-5"] },
   groq: { label: "Groq", base: "https://api.groq.com/openai/v1", hint: ["kimi-k2", "llama-3.3"] },
   mistral: { label: "Mistral", base: "https://api.mistral.ai/v1", hint: ["mistral-large", "mistral-medium"] },
+  // Any OpenAI-compatible server the user runs or reaches: OmniRoute, FreeLLMAPI,
+  // LM Studio, Ollama, llama.cpp, vLLM... Its address is saved beside the key
+  // ("custom-url") and set here by the main process with setCustomBase().
+  custom: { label: "Your own server", base: "", hint: ["gemini-3.6-flash", "gemini-3-flash-preview", "gemini-3.5-flash", "gpt-oss-120b", "qwen3", "llama", "mistral", "gemma"] },
+};
+
+/** "http://host:port/v1" for the custom server; anything else clears it. */
+export function setCustomBase(url) {
+  const u = String(url ?? "").trim().replace(/\/+$/, "");
+  PROVIDERS.custom.base = /^https?:\/\/[^\s/]+/i.test(u) ? (/\/v\d+$/.test(u) ? u : u + "/v1") : "";
+  return PROVIDERS.custom.base;
+}
+const baseOf = (provider) => {
+  const b = PROVIDERS[provider]?.base;
+  if (!b) throw new Error(provider === "custom" ? "Your own server has no address yet. Add it in Settings, under Your own server." : `unknown provider ${provider}`);
+  return b;
 };
 
 /** Model ids the key can use, as the provider lists them. */
 export async function listModels(provider, key) {
   const p = PROVIDERS[provider];
   if (!p) throw new Error(`unknown provider ${provider}`);
-  const res = await fetch(`${p.base}/models`, { headers: { authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(20000) });
+  const res = await fetch(`${baseOf(provider)}/models`, { headers: { authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(20000) });
   if (!res.ok) throw new Error(`${p.label} would not list models (HTTP ${res.status})`);
   const data = await res.json();
   return (data.data ?? []).map((m) => String(m.id).replace(/^models\//, ""));
@@ -53,7 +69,7 @@ export async function chat({ provider, key, model, messages, json = false, maxTo
   for (const wait of [0, 4000, 12000]) {
     if (wait) await new Promise((r) => setTimeout(r, wait));
     const ctl = AbortSignal.any([AbortSignal.timeout(timeoutMs), ...(signal ? [signal] : [])]);
-    res = await fetch(`${p.base}/chat/completions`, {
+    res = await fetch(`${baseOf(provider)}/chat/completions`, {
       method: "POST",
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify(body),

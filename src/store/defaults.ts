@@ -45,7 +45,11 @@ export const defaultProject: ProjectState = {
   //
   // This is what cel animation has always done — mouths cut. The control is
   // still in the Scene panel for anyone who wants it.
-  visemeFadeMs: 0,
+  // 11 Nov 2026, Ak chose the 70 ms fade for picture puppets after a side-by-side test against
+  // the cut (the measurement above notwithstanding: fading is the best pictures can do).
+  // Drawn characters never use this: their mouths MORPH (lib/motion/drawnFace.ts).
+  visemeFadeMs: 70,
+  fadeMigrated: true,
   idleMotion: 0.7,
   fps: 30,
   speakers: [],

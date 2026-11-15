@@ -1,0 +1,342 @@
+{
+ "restMouth": {
+  "happy": 9,
+  "sad": 13,
+  "angry": 13,
+  "surprised": 14,
+  "worried": 17
+ },
+ "reactMouth": {
+  "happy": 15,
+  "sad": 13,
+  "angry": 16,
+  "surprised": 14,
+  "worried": 17
+ },
+ "talkRest": {
+  "happy": 9,
+  "sad": 13,
+  "angry": 13,
+  "worried": 17
+ },
+ "open": {
+  "0": 0,
+  "1": 1,
+  "2": 0.5,
+  "3": 0.8,
+  "4": 0.4,
+  "5": 0,
+  "6": 0.3,
+  "7": 0.6,
+  "8": 0.5,
+  "9": 0,
+  "10": 0.6,
+  "11": 0.5,
+  "12": 0.3,
+  "13": 0,
+  "14": 0,
+  "15": 0,
+  "16": 0,
+  "17": 0
+ },
+ "body": {
+  "open": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "chest": [
+    0,
+    0
+   ],
+   "shrug": 0,
+   "arm": 0,
+   "fist": 0.15,
+   "breath": [
+    1.2,
+    0.28
+   ],
+   "sway": [
+    1.2,
+    0.18
+   ],
+   "tremble": 0
+  },
+  "closed": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "chest": [
+    0,
+    0
+   ],
+   "shrug": 0,
+   "arm": 0,
+   "fist": 0.15,
+   "breath": [
+    1.2,
+    0.28
+   ],
+   "sway": [
+    1.2,
+    0.18
+   ],
+   "tremble": 0
+  },
+  "half": {
+   "head": [
+    5,
+    0,
+    2
+   ],
+   "chest": [
+    3,
+    0
+   ],
+   "shrug": -2,
+   "arm": -1,
+   "fist": 0.15,
+   "breath": [
+    1.5,
+    0.2
+   ],
+   "sway": [
+    1,
+    0.12
+   ],
+   "tremble": 0
+  },
+  "worried": {
+   "head": [
+    7,
+    -6,
+    5
+   ],
+   "chest": [
+    7,
+    0
+   ],
+   "shrug": 10,
+   "arm": -3,
+   "fist": 0.5,
+   "breath": [
+    1.4,
+    0.9
+   ],
+   "sway": [
+    1,
+    0.6
+   ],
+   "tremble": 0.5
+  },
+  "happy": {
+   "head": [
+    -5,
+    0,
+    4
+   ],
+   "chest": [
+    -4,
+    0
+   ],
+   "shrug": 3,
+   "arm": 4,
+   "fist": 0,
+   "breath": [
+    1.2,
+    0.5
+   ],
+   "sway": [
+    4,
+    0.9
+   ],
+   "tremble": 0
+  },
+  "angry": {
+   "head": [
+    9,
+    0,
+    0
+   ],
+   "chest": [
+    8,
+    0
+   ],
+   "shrug": 8,
+   "arm": 7,
+   "fist": 1,
+   "breath": [
+    2,
+    0.8
+   ],
+   "sway": [
+    0,
+    0
+   ],
+   "tremble": 0.7
+  },
+  "surprised": {
+   "head": [
+    -11,
+    0,
+    0
+   ],
+   "chest": [
+    -8,
+    0
+   ],
+   "shrug": 15,
+   "arm": 9,
+   "fist": -0.4,
+   "breath": [
+    1,
+    0.6
+   ],
+   "sway": [
+    0,
+    0
+   ],
+   "tremble": 0.3
+  },
+  "sad": {
+   "head": [
+    17,
+    0,
+    -4
+   ],
+   "chest": [
+    11,
+    0
+   ],
+   "shrug": -7,
+   "arm": -3,
+   "fist": 0.3,
+   "breath": [
+    2.2,
+    0.22
+   ],
+   "sway": [
+    1,
+    0.15
+   ],
+   "tremble": 0
+  }
+ },
+ "pet": {
+  "open": {
+   "pitch": 0,
+   "roll": 0,
+   "squash": 1,
+   "bob": [
+    0,
+    0
+   ],
+   "sway": [
+    1.5,
+    0.4
+   ],
+   "tremble": 0
+  },
+  "closed": {
+   "pitch": 0,
+   "roll": 0,
+   "squash": 1,
+   "bob": [
+    0,
+    0
+   ],
+   "sway": [
+    1.5,
+    0.4
+   ],
+   "tremble": 0
+  },
+  "half": {
+   "pitch": 5,
+   "roll": 2,
+   "squash": 0.98,
+   "bob": [
+    0,
+    0
+   ],
+   "sway": [
+    1.5,
+    0.4
+   ],
+   "tremble": 0
+  },
+  "worried": {
+   "pitch": 6,
+   "roll": 0,
+   "squash": 0.93,
+   "bob": [
+    0,
+    0
+   ],
+   "sway": [
+    1,
+    0.8
+   ],
+   "tremble": 0.8
+  },
+  "happy": {
+   "pitch": -5,
+   "roll": 0,
+   "squash": 1.04,
+   "bob": [
+    0.035,
+    2.2
+   ],
+   "sway": [
+    5,
+    1.1
+   ],
+   "tremble": 0
+  },
+  "angry": {
+   "pitch": 9,
+   "roll": 0,
+   "squash": 0.94,
+   "bob": [
+    0,
+    0
+   ],
+   "sway": [
+    0,
+    0
+   ],
+   "tremble": 1
+  },
+  "surprised": {
+   "pitch": -10,
+   "roll": 0,
+   "squash": 1.12,
+   "bob": [
+    0,
+    0
+   ],
+   "sway": [
+    0,
+    0
+   ],
+   "tremble": 0.3
+  },
+  "sad": {
+   "pitch": 14,
+   "roll": -3,
+   "squash": 0.9,
+   "bob": [
+    0,
+    0
+   ],
+   "sway": [
+    1,
+    0.2
+   ],
+   "tremble": 0
+  }
+ }
+}

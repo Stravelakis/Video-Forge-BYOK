@@ -16,6 +16,7 @@
 // ---------------------------------------------------------------------------
 
 import { activeCard } from "../../characters/core/index.mjs";
+import { pictureTag } from "../../src/lib/motion/popTracks";
 import path from "node:path";
 import fsp from "node:fs/promises";
 import os from "node:os";
@@ -317,6 +318,22 @@ export async function renderVideo(
       return prepared;
     };
 
+    // Script stickers ([pop emoji dog-face]): only the ones this video uses
+    for (const seg of job.narrationSegments ?? []) {
+      for (const tag of seg.tags ?? []) {
+        const rel = pictureTag(tag);
+        if (!rel) continue;
+        const to = path.join(publicDir, "shelf", rel);
+        await fsp.mkdir(path.dirname(to), { recursive: true });
+        await fsp.copyFile(path.join(process.env.VIDEOFORGE_SHELVES || path.join(os.homedir(), "Tools", "assets", "_shelves"), rel), to).catch(() => warnings.push(`[video-forge] Sticker not found: ${tag}`));
+      }
+    }
+
+    // 3D characters: their models, faces and motions ride along in the render folder
+    if (job.speakers.some((sp) => sp.kenney)) {
+      await fsp.cp(path.join(projectRoot, "characters", "samples", "kenney", "builder"), path.join(publicDir, "kenney"), { recursive: true });
+    }
+
     const speakers: RenderSpeaker[] = [];
     for (const sp of job.speakers) {
       // The puppet wins when both are set — same precedence as the preview.
@@ -354,6 +371,8 @@ export async function renderVideo(
         puppetFiles: prepared?.files ?? {},
         // the one rule for which form shows (characters/core/profile.mjs)
         character: activeCard(sp) ?? null,
+        kenney: sp.kenney ?? null,
+        kenneyFraming: sp.kenneyFraming,
       });
     }
 
@@ -541,7 +560,7 @@ export async function renderVideo(
       backgroundCrossfadeMs: job.backgroundCrossfadeMs ?? 0,
       subtitles: job.subtitles,
       subtitleFont,
-      visemeFadeMs: job.visemeFadeMs ?? 0,
+      visemeFadeMs: job.visemeFadeMs ?? 70, // picture mouths fade (Ak, 11 Nov 2026)
       idleMotion: job.idleMotion ?? 0,
       narrationSegments: job.narrationSegments ?? [],
       narrationPauses: job.narrationPauses ?? [],
@@ -718,6 +737,8 @@ export async function renderVideo(
     // A Stop leaves no half-made video behind.
     if (ctx.signal?.aborted && partialOutput) await fsp.rm(partialOutput, { force: true }).catch(() => {});
     // Best-effort: a leftover temp dir must never fail an otherwise good render.
-    await fsp.rm(publicDir, { recursive: true, force: true }).catch(() => {});
+    // VIDEOFORGE_KEEP_RENDER=1 keeps the work folder for debugging a render (its path is logged)
+    if (process.env.VIDEOFORGE_KEEP_RENDER === "1") console.log(`[video-forge] render work folder kept: ${publicDir}`);
+    else await fsp.rm(publicDir, { recursive: true, force: true }).catch(() => {});
   }
 }

@@ -9,6 +9,8 @@ import { contextBridge, ipcRenderer } from "electron";
 const api = {
   keys: {
     list: (): Promise<string[]> => ipcRenderer.invoke("keys:list"),
+    /** How many Gemini keys are saved, main plus extras (never the keys). */
+    geminiCount: (): Promise<number> => ipcRenderer.invoke("keys:geminiCount"),
     set: (provider: string, value: string): Promise<boolean> =>
       ipcRenderer.invoke("keys:set", provider, value),
     remove: (provider: string): Promise<boolean> =>
@@ -49,6 +51,19 @@ const api = {
     download: (id: string, url: string): Promise<string> =>
       ipcRenderer.invoke("media:download", id, url),
     autoBackgrounds: (opts: unknown) => ipcRenderer.invoke("media:autoBackgrounds", opts),
+    /** A shelf picture as a looping background clip the size of the video. */
+    stillClip: (rel: string, width: number, height: number): Promise<string> => ipcRenderer.invoke("media:stillClip", rel, width, height),
+    /** Free photos from Pixabay and Pexels. */
+    searchPhotos: (query: string, orientation?: "portrait" | "landscape"): Promise<{ hits: { id: string; provider: "pixabay" | "pexels"; url: string; thumbUrl: string; width: number; height: number; author: string; pageUrl: string; tags: string }[]; problems: string[] }> => ipcRenderer.invoke("media:searchPhotos", query, orientation),
+    /** A photo, your own picture, or a picture made from a description, as a background clip. */
+    photoClip: (url: string, width: number, height: number): Promise<string> => ipcRenderer.invoke("media:photoClip", url, width, height),
+    fileClip: (file: string, width: number, height: number): Promise<string> => ipcRenderer.invoke("media:fileClip", file, width, height),
+    savePicture: (dataUrl: string, name: string): Promise<string> => ipcRenderer.invoke("media:savePicture", dataUrl, name),
+    /** A presentation (PDF, PowerPoint via LibreOffice, Google Slides link) as PDF bytes. */
+    slidesFile: (file: string): Promise<Uint8Array> => ipcRenderer.invoke("slides:file", file),
+    slidesGoogle: (url: string): Promise<Uint8Array> => ipcRenderer.invoke("slides:google", url),
+    slidesCanOffice: (): Promise<boolean> => ipcRenderer.invoke("slides:canOffice"),
+    makePicture: (prompt: string, width: number, height: number): Promise<{ picture: string; clip: string; by: string }> => ipcRenderer.invoke("media:makePicture", prompt, width, height),
     /** Everything already downloaded to this machine. */
     library: (): Promise<{
       fileName: string; filePath: string; kind: "video" | "audio";
@@ -134,6 +149,8 @@ const api = {
       ipcRenderer.invoke("tts:synthesizePiper", pythonPath, onnxPath, text),
 
     /** The voices on the saved ElevenLabs account. Empty when there is no key. */
+    /** One line in a Gemini voice, to hear it (free). */
+    testVoice: (line: { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number }): Promise<ArrayBuffer> => ipcRenderer.invoke("tts:testVoice", line),
     listElevenVoices: (): Promise<{ id: string; name: string; labels?: string }[]> =>
       ipcRenderer.invoke("tts:listElevenVoices"),
 
@@ -213,6 +230,12 @@ const api = {
     fromPicture: (req: unknown): Promise<any> => ipcRenderer.invoke("character:fromPicture", req),
     suggest: (req: unknown): Promise<any> => ipcRenderer.invoke("character:suggest", req),
     cancel: (): Promise<boolean> => ipcRenderer.invoke("character:cancel"),
+    /** The character creator: every brand's character files, and saving one (checked in main). */
+    listFiles: (): Promise<any> => ipcRenderer.invoke("character:listFiles"),
+    /** The AI box: the models a provider's key can use, and asking for changes to the open fields. */
+    models: (provider: string): Promise<{ models: string[]; usual: string }> => ipcRenderer.invoke("character:models", provider),
+    askParts: (req: unknown): Promise<any> => ipcRenderer.invoke("character:askParts", req),
+    saveFile: (brand: string, character: unknown): Promise<any> => ipcRenderer.invoke("character:saveFile", brand, character),
   },
 
   forge: {
@@ -252,6 +275,14 @@ const api = {
       tone?: string;
       characters?: string[];
     }): Promise<string> => ipcRenderer.invoke("llm:draftScript", opts),
+    /** AI directing: Gemini's JSON answer to a prompt from src/lib/direct/suggest.ts. */
+    suggestDirections: (system: string, user: string, provider?: string, model?: string): Promise<{ text: string; by: string }> => ipcRenderer.invoke("direct:suggest", system, user, provider, model),
+    /** The AIs that can direct: providers with a saved key, best first. */
+    directBrains: (): Promise<{ id: string; label: string }[]> => ipcRenderer.invoke("direct:brains"),
+    /** A new set drawn from a description: the AI's JSON answer. */
+    makeSet: (system: string, user: string): Promise<{ text: string; by: string }> => ipcRenderer.invoke("sets:make", system, user),
+    /** Text models a provider offers, for the model picker. */
+    directModels: (provider: string): Promise<string[]> => ipcRenderer.invoke("direct:models", provider),
   },
 };
 

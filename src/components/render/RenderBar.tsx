@@ -1,3 +1,4 @@
+import { withDirections } from "../../lib/direct/directions";
 // ---------------------------------------------------------------------------
 // Render controls.
 //
@@ -127,7 +128,7 @@ export function RenderBar() {
       setAttachedAudio({ filePath: p, analysis: null });
       setError(
         `Attached the audio, but couldn't analyse it (${e instanceof Error ? e.message : String(e)}). ` +
-          "It will still play; the sound bars just won't follow it. 16-bit PCM WAV analyses reliably."
+          "It will still play; the sound waves just won't follow it. 16-bit PCM WAV analyses reliably."
       );
     } finally {
       setAnalyzing(false);
@@ -183,6 +184,8 @@ export function RenderBar() {
           // a drawn character is JSON; it shows when the speaker's form is drawn
           // (formOf, characters/core/profile.mjs — the one rule everywhere)
           character: activeCard(sp) ?? undefined,
+          kenney: sp.kenney,
+          kenneyFraming: sp.kenneyFraming,
         })),
         width: o.width ?? (draft ? even(render.width / 3) : render.width),
         height: o.height ?? (draft ? even(render.height / 3) : render.height),
@@ -214,7 +217,7 @@ export function RenderBar() {
         // nothing to do with those scene boundaries.
         backgrounds: audioPath
           ? []
-          : backgrounds
+          : backgrounds.map((b) => (b.endMs > b.startMs ? b : { ...b, endMs: Math.round((narSec ?? effectiveDuration) * 1000) }))
               .filter((b) => b.filePath)
               .map((b) => ({
                 startMs: b.startMs,
@@ -235,7 +238,7 @@ export function RenderBar() {
         idleMotion,
         // Same reasoning: subtitles are only meaningful against the narration
         // whose timings produced them.
-        narrationSegments: o.nar ? o.nar.segments : audioPath ? [] : narration?.segments ?? [],
+        narrationSegments: o.nar ? o.nar.segments : audioPath ? [] : withDirections(narration?.segments ?? [], useProjectStore.getState().directions),
       });
 
       if (res.ok) {
@@ -251,7 +254,7 @@ export function RenderBar() {
       setError(res.error ?? "Render failed.");
       return null;
     } catch (e) {
-      setError(plainError(e, "Press Render to try again. If it keeps failing, check the Cast and Script steps."));
+      setError(plainError(e, "Press Render to try again. If it keeps failing, check the Characters and Script steps."));
       return null;
     } finally {
       if (!o.inLoop) setBusy(false);
@@ -285,7 +288,7 @@ export function RenderBar() {
       setNote(`Done — ${langs.length * shapes.length} videos`);
       void autoClean();
     } catch (e) {
-      setError(plainError(e, "Press Render to try again. If it keeps failing, check the Cast and Script steps."));
+      setError(plainError(e, "Press Render to try again. If it keeps failing, check the Characters and Script steps."));
     } finally {
       setBusy(false);
     }

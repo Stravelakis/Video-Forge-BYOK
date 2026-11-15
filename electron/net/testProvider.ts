@@ -179,8 +179,10 @@ export async function testProvider(
       case "groq":
       case "cerebras":
       case "openai":
-      case "mistral": {
+      case "mistral":
+      case "custom": {
         const base = PROVIDERS[providerId].base;
+        if (!base) return { ok: false, message: "Add the server's address first, then press Test." };
         const r = await request(`${base}/models`, { headers: { Authorization: `Bearer ${key}` } });
         return interpret(r.status, r.body);
       }

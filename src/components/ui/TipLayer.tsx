@@ -81,6 +81,7 @@ export function TipLayer() {
     };
     const point = (target: Element | null) => {
       if (target?.closest?.(".forge-tip")) return; // inside the bubble itself
+      if (target?.closest?.(".flow-popon")) return; // the big pop-out already explains it
       const el = target?.closest?.("[data-tip],[title]") ?? null;
       if (el === current) return;
       current = el;

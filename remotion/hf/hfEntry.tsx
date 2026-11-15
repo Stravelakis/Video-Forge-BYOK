@@ -12,6 +12,7 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { VideoComposition } from "../VideoComposition";
 import { FrameRoot, allLoaded, type VideoConfig } from "./remotionShim";
+import { buildStaging, cameraCss } from "../../src/lib/direct/directions";
 import type { RenderProps } from "../types";
 
 declare global {
@@ -29,8 +30,13 @@ const { props, config } = window.__VF__;
 const root = createRoot(document.getElementById("vf-react")!);
 let frame = 0;
 
+// the camera moves the background footage too, which lives outside React here
+const staging = buildStaging((props.narrationSegments ?? []) as never, (props.speakers ?? []).map((s) => ({ id: s.id, label: s.label, x: s.x, y: s.y, size: s.size })));
+const bgLayer = () => document.getElementById("vf-bg")?.parentElement ?? null;
 const draw = (f: number) => {
   frame = Math.max(0, Math.min(config.durationInFrames - 1, f));
+  const bg = bgLayer();
+  if (bg && !staging.empty) { bg.style.transformOrigin = "0 0"; bg.style.transform = cameraCss(staging.camera((frame / config.fps) * 1000), config.width, config.height); }
   flushSync(() =>
     root.render(
       <FrameRoot frame={frame} config={config}>

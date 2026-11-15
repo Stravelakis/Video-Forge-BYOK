@@ -216,6 +216,65 @@ export const SETS = {
     },
     seats: (n, W, H) => [{ x: W * 0.17, y: H * 0.82, h: H * 1.05, face: "right" }, { x: W * 0.6, y: H * 0.86, h: H * 0.95, face: "left" }, { x: W * 0.85, y: H * 0.86, h: H * 0.95, face: "left" }].slice(0, n),
   },
+
+  court: {
+    label: "Supreme Court",
+    help: "Nine justices at the bench behind (smaller), two lawyers facing each other at lecterns in front (bigger).",
+    max: 11,
+    back(ctx, W, H) {
+      // marble hall
+      ctx.fillStyle = lin(ctx, 0, 0, 0, H, [[0, "#efe7d8"], [0.6, "#d9ccb4"], [1, "#b9a98d"]]); ctx.fillRect(0, 0, W, H);
+      // red curtain behind the bench
+      ctx.fillStyle = lin(ctx, 0, H * 0.04, 0, H * 0.5, [[0, "#7a1622"], [1, "#4d0c14"]]); ctx.fillRect(W * 0.2, H * 0.04, W * 0.6, H * 0.5);
+      ctx.strokeStyle = "rgba(0,0,0,0.18)"; ctx.lineWidth = Math.max(1, W * 0.003);
+      for (let i = 0; i < 24; i++) { const x = W * (0.21 + i * 0.025); ctx.beginPath(); ctx.moveTo(x, H * 0.05); ctx.quadraticCurveTo(x + W * 0.006, H * 0.3, x, H * 0.54); ctx.stroke(); }
+      // gold valance
+      ctx.fillStyle = lin(ctx, 0, H * 0.03, 0, H * 0.08, [[0, "#e7c873"], [1, "#a8822d"]]); ctx.fillRect(W * 0.19, H * 0.03, W * 0.62, H * 0.05);
+      // columns on both sides
+      for (const x of [0.04, 0.12, 0.84, 0.92]) {
+        ctx.fillStyle = lin(ctx, W * x, 0, W * (x + 0.05), 0, [[0, "#c9bca4"], [0.45, "#fbf6ec"], [1, "#b3a58a"]]); ctx.fillRect(W * x, H * 0.06, W * 0.05, H * 0.9);
+        ctx.fillStyle = "#e8dcc5"; ctx.fillRect(W * (x - 0.008), H * 0.03, W * 0.066, H * 0.04); ctx.fillRect(W * (x - 0.008), H * 0.93, W * 0.066, H * 0.04);
+        ctx.strokeStyle = "rgba(120,100,70,0.25)"; for (let k = 1; k < 5; k++) { ctx.beginPath(); ctx.moveTo(W * (x + k * 0.01), H * 0.07); ctx.lineTo(W * (x + k * 0.01), H * 0.93); ctx.stroke(); }
+      }
+      // the seal above the bench
+      ctx.fillStyle = rad(ctx, W / 2, H * 0.14, H * 0.07, [[0, "#f4dc8f"], [1, "#b0862f"]]); ctx.beginPath(); ctx.arc(W / 2, H * 0.14, H * 0.06, 0, 6.3); ctx.fill();
+      ctx.strokeStyle = "#7a5a1a"; ctx.lineWidth = Math.max(1, W * 0.002); ctx.beginPath(); ctx.arc(W / 2, H * 0.14, H * 0.045, 0, 6.3); ctx.stroke();
+      // nine high-backed chairs behind the bench
+      for (let i = 0; i < 9; i++) {
+        const x = W * (0.26 + i * 0.06);
+        ctx.fillStyle = lin(ctx, x, H * 0.24, x, H * 0.5, [[0, "#3b2416"], [1, "#22140b"]]);
+        rr(ctx, x - W * 0.022, H * 0.24, W * 0.044, H * 0.26, W * 0.012); ctx.fill();
+      }
+      // floor
+      ctx.fillStyle = lin(ctx, 0, H * 0.78, 0, H, [[0, "#8b6a45"], [1, "#5a4128"]]); ctx.fillRect(0, H * 0.78, W, H * 0.22);
+      ctx.fillStyle = "rgba(255,255,255,0.06)"; for (let i = 0; i < 12; i++) ctx.fillRect(W * i / 12, H * 0.78, W * 0.002, H * 0.22);
+    },
+    front(ctx, W, H) {
+      // the bench: hides the justices from the chest down, stops short of the lawyers
+      const top = H * 0.44;
+      ctx.fillStyle = lin(ctx, 0, top, 0, H * 0.66, [[0, "#6b4528"], [1, "#3e2615"]]);
+      ctx.beginPath(); ctx.moveTo(W * 0.22, top); ctx.lineTo(W * 0.78, top); ctx.lineTo(W * 0.8, H * 0.66); ctx.lineTo(W * 0.2, H * 0.66); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#8a5c34"; ctx.fillRect(W * 0.215, top - H * 0.012, W * 0.57, H * 0.016);
+      ctx.strokeStyle = "rgba(0,0,0,0.25)"; ctx.lineWidth = Math.max(1, W * 0.002);
+      for (let i = 1; i < 6; i++) { ctx.beginPath(); ctx.moveTo(W * (0.22 + i * 0.093), top + H * 0.03); ctx.lineTo(W * (0.22 + i * 0.093), H * 0.64); ctx.stroke(); }
+      // two lecterns, angled towards each other
+      for (const [x, dir] of [[0.15, 1], [0.85, -1]]) {
+        ctx.fillStyle = lin(ctx, W * (x - 0.06), 0, W * (x + 0.06), 0, [[0, "#5b3a22"], [1, "#7e5432"]]);
+        ctx.beginPath(); ctx.moveTo(W * (x - 0.07), H * 0.8); ctx.lineTo(W * (x + 0.07), H * 0.8 - dir * H * 0.015); ctx.lineTo(W * (x + 0.055), H); ctx.lineTo(W * (x - 0.055), H); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#a07444"; ctx.fillRect(W * (x - 0.075), H * 0.785, W * 0.15, H * 0.02);
+      }
+    },
+    // lawyers first (front, big, facing each other), then the justices, the chief in the middle
+    seats: (n, W, H) => {
+      const order = [4, 3, 5, 2, 6, 1, 7, 0, 8];
+      const all = [
+        { x: W * 0.15, y: H * 0.88, h: H * 1.12, face: "right" },
+        { x: W * 0.85, y: H * 0.88, h: H * 1.12, face: "left" },
+        ...order.map((k) => ({ x: W * (0.26 + k * 0.06), y: H * 0.5, h: H * 0.42, face: "camera" })),
+      ];
+      return all.slice(0, n);
+    },
+  },
 };
 
 export const SET_IDS = Object.keys(SETS);

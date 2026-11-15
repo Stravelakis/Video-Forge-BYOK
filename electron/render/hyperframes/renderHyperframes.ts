@@ -94,7 +94,9 @@ function run(cmd: string, args: string[], opts: { env?: NodeJS.ProcessEnv; onLin
 }
 
 /** Output tags that say "ordinary video" (bt709), for every clip we build. */
-const SDR_TAGS = ["-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709"];
+// "-color_range tv": a picture made into a clip (JPEG, full range) otherwise comes out as
+// full-range yuvj420p, which the frame capture dropped: the background rendered black (10 Nov 2026).
+const SDR_TAGS = ["-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", "-color_range", "tv"];
 
 // ---- background track --------------------------------------------------------
 async function buildBackgroundTrack(input: HyperframesInput): Promise<{ file: string; startSec: number; durSec: number } | null> {
@@ -111,7 +113,7 @@ async function buildBackgroundTrack(input: HyperframesInput): Promise<{ file: st
     const d = (slot.durationInFrames / fps).toFixed(4);
     // object-fit: cover, at the composition's own size and frame rate
     chains.push(
-      `[${i}:v]fps=${fps},scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,` +
+      `[${i}:v]fps=${fps},scale=${W}:${H}:force_original_aspect_ratio=increase:out_range=tv,crop=${W}:${H},setsar=1,` +
         `trim=duration=${d},setpts=PTS-STARTPTS,format=yuv420p[v${i}]`
     );
   });

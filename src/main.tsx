@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { installWheelNumbers } from "./lib/ui/wheelNumbers";
 import "./index.css";
 // Side-effect import: defines window.DecoNoir. Imported here rather than in a
 // <script> tag so it goes through the bundler and ships inside the packaged
@@ -13,7 +14,11 @@ import "@fontsource/sora/400.css";
 import "@fontsource/sora/500.css";
 import "@fontsource/sora/600.css";
 import "./styles/forge.css";
+import "./styles/creator.css";
+import "./styles/flow.css";
 import "./styles/lines.css";
+
+installWheelNumbers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

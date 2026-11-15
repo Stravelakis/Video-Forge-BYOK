@@ -74,3 +74,9 @@ characters/samples/motion-library.html
 characters/samples/natural-movement.html
 characters/samples/redflag-cast.html
 characters/samples/redflag.html
+
+# Mixamo-derived motion data: Adobe does not allow redistributing it (see docs/IMPORT-MOTIONS.md)
+characters/samples/kenney/builder/models/animated/*.glb
+characters/samples/kenney/builder/motions.json
+# the character creator keeps the old version of a character here before each save
+brands/*/characters/.backup/

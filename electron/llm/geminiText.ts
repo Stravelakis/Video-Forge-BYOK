@@ -19,22 +19,24 @@
 // the first that answers is kept for the rest of the run.
 // ---------------------------------------------------------------------------
 
-import * as keyStore from "../keyStore";
+import { withGeminiKey } from "../geminiKeys";
 
 const MODELS = ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-3.5-flash"];
 const API = "https://generativelanguage.googleapis.com/v1beta/models";
 
 let working: string | null = null;
 
+/** Every saved Gemini key in turn: one that's used up hands over to the next. */
 export async function geminiJson(system: string, user: string): Promise<string> {
-  const key = await keyStore.getKey("gemini");
-  if (!key) {
-    throw new Error("No Gemini key saved (Settings → Gemini), so Gemini cannot plan the footage.");
-  }
+  return withGeminiKey((key) => geminiJsonWith(key, system, user));
+}
+
+async function geminiJsonWith(key: string, system: string, user: string): Promise<string> {
+  let quota = false;
 
   const order = working ? [working, ...MODELS.filter((m) => m !== working)] : MODELS;
   let lastProblem = "";
-  for (const model of order) {
+  for (const model of order) for (let attempt = 0; attempt < 2; attempt++) {
     try {
       const res = await fetch(`${API}/${model}:generateContent`, {
         method: "POST",
@@ -51,21 +53,26 @@ export async function geminiJson(system: string, user: string): Promise<string> 
         candidates?: { content?: { parts?: { text?: string }[] } }[];
         error?: { message?: string };
       };
+      // 503 = "high demand right now": one more try after a breath, then the next model
+      if (res.status === 503 && attempt === 0) { await new Promise((r) => setTimeout(r, 1500)); continue; }
+      if (res.status === 429 || res.status === 402 || res.status === 403) quota = true;
       if (!res.ok) {
         lastProblem = `${model}: HTTP ${res.status} ${String(data.error?.message ?? "").slice(0, 120)}`;
-        continue;
+        break; // next model
       }
       const text = (data.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? "").join("");
       if (!text.trim()) {
         lastProblem = `${model} returned nothing`;
-        continue;
+        break;
       }
       if (working !== model) console.log(`[video-forge] Gemini text model: ${model}`);
       working = model;
       return text;
     } catch (e: any) {
       lastProblem = `${model}: ${String(e?.message ?? e).slice(0, 120)}`;
+      break;
     }
   }
-  throw new Error(`Gemini did not answer — ${lastProblem}`);
+  // "quota" in the message tells the key ring to try the next key
+  throw new Error(`Gemini did not answer${quota ? " (quota used up on this key)" : ""} — ${lastProblem}`);
 }

@@ -95,5 +95,15 @@ This project was designed and engineered in collaboration with AI systems:
 - Hermes Agent — automation
 - Google Flow — media workflow support
 - Human direction & product vision: Stravelakis.
+
+## 💚 Thank you, Kenney
+The 3D characters, pets and furniture in the Kenney cast tests (Mini Characters,
+Cube Pets, Animated Characters, Furniture Kit) are by
+**Kenney** — [kenney.nl](https://kenney.nl) — released as CC0. Thank you for giving
+so much to everyone who makes things. If these help you too, consider
+[supporting Kenney](https://kenney.nl/donate). Plan: [docs/KENNEY-BUILDER-PLAN.md](docs/KENNEY-BUILDER-PLAN.md).
+
 ## 📄 License
 No licence: all rights reserved (since 26 Oct 2026). Copies taken before that date keep the MIT licence they came with.
+
+Props also come from [Quaternius](https://quaternius.com). Thank you.

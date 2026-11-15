@@ -21,19 +21,21 @@ export const GEMINI_MODELS: GeminiModelChoice[] = [
 export const DEFAULT_GEMINI_MODEL = GEMINI_MODELS[0].id;
 export const DEFAULT_GEMINI_VOICE = "Kore";
 
-/** Google's prebuilt voices, by how they come across (Google's own words). */
-export const GEMINI_VOICES: { name: string; feel: string }[] = [
-  { name: "Kore", feel: "firm" }, { name: "Aoede", feel: "breezy" }, { name: "Leda", feel: "youthful" },
-  { name: "Zephyr", feel: "bright" }, { name: "Callirrhoe", feel: "easy-going" }, { name: "Autonoe", feel: "bright" },
-  { name: "Despina", feel: "smooth" }, { name: "Erinome", feel: "clear" }, { name: "Laomedeia", feel: "upbeat" },
-  { name: "Achernar", feel: "soft" }, { name: "Gacrux", feel: "mature" }, { name: "Pulcherrima", feel: "forward" },
-  { name: "Vindemiatrix", feel: "gentle" }, { name: "Sulafat", feel: "warm" },
-  { name: "Puck", feel: "upbeat" }, { name: "Charon", feel: "informative" }, { name: "Fenrir", feel: "excitable" },
-  { name: "Orus", feel: "firm" }, { name: "Enceladus", feel: "breathy" }, { name: "Iapetus", feel: "clear" },
-  { name: "Umbriel", feel: "easy-going" }, { name: "Algieba", feel: "smooth" }, { name: "Algenib", feel: "gravelly" },
-  { name: "Rasalgethi", feel: "informative" }, { name: "Alnilam", feel: "firm" }, { name: "Schedar", feel: "even" },
-  { name: "Achird", feel: "friendly" }, { name: "Zubenelgenubi", feel: "casual" }, { name: "Sadachbia", feel: "lively" },
-  { name: "Sadaltager", feel: "knowledgeable" },
+/** Google's prebuilt voices, by how they come across (Google's own words). Male or female from
+ *  Google's Chirp 3 HD voice list (cloud.google.com/text-to-speech/docs/chirp3-hd, read 11 Nov 2026);
+ *  Google offers no intersex voice. */
+export const GEMINI_VOICES: { name: string; gender: "male" | "female"; feel: string }[] = [
+  { name: "Kore", gender: "female", feel: "firm" }, { name: "Aoede", gender: "female", feel: "breezy" }, { name: "Leda", gender: "female", feel: "youthful" },
+  { name: "Zephyr", gender: "female", feel: "bright" }, { name: "Callirrhoe", gender: "female", feel: "easy-going" }, { name: "Autonoe", gender: "female", feel: "bright" },
+  { name: "Despina", gender: "female", feel: "smooth" }, { name: "Erinome", gender: "female", feel: "clear" }, { name: "Laomedeia", gender: "female", feel: "upbeat" },
+  { name: "Achernar", gender: "female", feel: "soft" }, { name: "Gacrux", gender: "female", feel: "mature" }, { name: "Pulcherrima", gender: "female", feel: "forward" },
+  { name: "Vindemiatrix", gender: "female", feel: "gentle" }, { name: "Sulafat", gender: "female", feel: "warm" },
+  { name: "Puck", gender: "male", feel: "upbeat" }, { name: "Charon", gender: "male", feel: "informative" }, { name: "Fenrir", gender: "male", feel: "excitable" },
+  { name: "Orus", gender: "male", feel: "firm" }, { name: "Enceladus", gender: "male", feel: "breathy" }, { name: "Iapetus", gender: "male", feel: "clear" },
+  { name: "Umbriel", gender: "male", feel: "easy-going" }, { name: "Algieba", gender: "male", feel: "smooth" }, { name: "Algenib", gender: "male", feel: "gravelly" },
+  { name: "Rasalgethi", gender: "male", feel: "informative" }, { name: "Alnilam", gender: "male", feel: "firm" }, { name: "Schedar", gender: "male", feel: "even" },
+  { name: "Achird", gender: "male", feel: "friendly" }, { name: "Zubenelgenubi", gender: "male", feel: "casual" }, { name: "Sadachbia", gender: "male", feel: "lively" },
+  { name: "Sadaltager", gender: "male", feel: "knowledgeable" },
 ];
 
 export function geminiModeOf(modelId: string | undefined): GeminiMode {

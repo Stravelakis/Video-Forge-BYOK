@@ -1,0 +1,3182 @@
+{
+ "credit": "3D models by Kenney (kenney.nl), CC0",
+ "sets": {
+  "mini": {
+   "label": "Mini Characters",
+   "eyes": "atlas_eyes_people.png",
+   "items": [
+    {
+     "id": "character-alien",
+     "label": "Alien",
+     "file": "models/mini/character-alien.glb",
+     "thumb": "thumbs/mini-character-alien.png",
+     "colours": [
+      {
+       "hex": "#7850c8",
+       "area": 0.1716
+      },
+      {
+       "hex": "#404048",
+       "area": 0.1696
+      },
+      {
+       "hex": "#484850",
+       "area": 0.136
+      },
+      {
+       "hex": "#8860d0",
+       "area": 0.1359
+      },
+      {
+       "hex": "#383840",
+       "area": 0.1353
+      },
+      {
+       "hex": "#d0d0e0",
+       "area": 0.1197
+      },
+      {
+       "hex": "#a070e0",
+       "area": 0.1179
+      },
+      {
+       "hex": "#9090c0",
+       "area": 0.1028
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-female-a",
+     "label": "Female A",
+     "file": "models/mini/character-female-a.glb",
+     "thumb": "thumbs/mini-character-female-a.png",
+     "colours": [
+      {
+       "hex": "#a05840",
+       "area": 0.2263
+      },
+      {
+       "hex": "#404048",
+       "area": 0.2094
+      },
+      {
+       "hex": "#383840",
+       "area": 0.1909
+      },
+      {
+       "hex": "#484850",
+       "area": 0.1761
+      },
+      {
+       "hex": "#905840",
+       "area": 0.1677
+      },
+      {
+       "hex": "#383838",
+       "area": 0.1569
+      },
+      {
+       "hex": "#885840",
+       "area": 0.1546
+      },
+      {
+       "hex": "#a86040",
+       "area": 0.1495
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-female-b",
+     "label": "Female B",
+     "file": "models/mini/character-female-b.glb",
+     "thumb": "thumbs/mini-character-female-b.png",
+     "colours": [
+      {
+       "hex": "#e0a880",
+       "area": 0.1478
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      },
+      {
+       "hex": "#f0b890",
+       "area": 0.1166
+      },
+      {
+       "hex": "#e8c078",
+       "area": 0.1153
+      },
+      {
+       "hex": "#d08860",
+       "area": 0.115
+      },
+      {
+       "hex": "#e89068",
+       "area": 0.1148
+      },
+      {
+       "hex": "#f0d088",
+       "area": 0.1137
+      },
+      {
+       "hex": "#b86848",
+       "area": 0.1041
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-female-c",
+     "label": "Female C",
+     "file": "models/mini/character-female-c.glb",
+     "thumb": "thumbs/mini-character-female-c.png",
+     "colours": [
+      {
+       "hex": "#686890",
+       "area": 0.2123
+      },
+      {
+       "hex": "#b86848",
+       "area": 0.1696
+      },
+      {
+       "hex": "#d88058",
+       "area": 0.1669
+      },
+      {
+       "hex": "#e89068",
+       "area": 0.1556
+      },
+      {
+       "hex": "#c87850",
+       "area": 0.1312
+      },
+      {
+       "hex": "#f86840",
+       "area": 0.1142
+      },
+      {
+       "hex": "#5868c8",
+       "area": 0.1137
+      },
+      {
+       "hex": "#d05850",
+       "area": 0.101
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-female-d",
+     "label": "Female D",
+     "file": "models/mini/character-female-d.glb",
+     "thumb": "thumbs/mini-character-female-d.png",
+     "colours": [
+      {
+       "hex": "#686890",
+       "area": 0.2267
+      },
+      {
+       "hex": "#606088",
+       "area": 0.1824
+      },
+      {
+       "hex": "#e0a880",
+       "area": 0.1478
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      },
+      {
+       "hex": "#e89068",
+       "area": 0.1363
+      },
+      {
+       "hex": "#605880",
+       "area": 0.1249
+      },
+      {
+       "hex": "#f0b890",
+       "area": 0.1166
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.116
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-female-e",
+     "label": "Female E",
+     "file": "models/mini/character-female-e.glb",
+     "thumb": "thumbs/mini-character-female-e.png",
+     "colours": [
+      {
+       "hex": "#383840",
+       "area": 0.3268
+      },
+      {
+       "hex": "#404048",
+       "area": 0.3208
+      },
+      {
+       "hex": "#484850",
+       "area": 0.2094
+      },
+      {
+       "hex": "#383838",
+       "area": 0.1999
+      },
+      {
+       "hex": "#e0a880",
+       "area": 0.1537
+      },
+      {
+       "hex": "#d0d0e0",
+       "area": 0.1405
+      },
+      {
+       "hex": "#404040",
+       "area": 0.1399
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-female-f",
+     "label": "Female F",
+     "file": "models/mini/character-female-f.glb",
+     "thumb": "thumbs/mini-character-female-f.png",
+     "colours": [
+      {
+       "hex": "#985840",
+       "area": 0.2401
+      },
+      {
+       "hex": "#905840",
+       "area": 0.1854
+      },
+      {
+       "hex": "#404048",
+       "area": 0.1751
+      },
+      {
+       "hex": "#885840",
+       "area": 0.168
+      },
+      {
+       "hex": "#383840",
+       "area": 0.1591
+      },
+      {
+       "hex": "#a86040",
+       "area": 0.1524
+      },
+      {
+       "hex": "#e0a880",
+       "area": 0.1457
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-knight",
+     "label": "Knight",
+     "file": "models/mini/character-knight.glb",
+     "thumb": "thumbs/mini-character-knight.png",
+     "colours": [
+      {
+       "hex": "#b0b0d8",
+       "area": 0.2715
+      },
+      {
+       "hex": "#9090c0",
+       "area": 0.2686
+      },
+      {
+       "hex": "#9898c8",
+       "area": 0.2672
+      },
+      {
+       "hex": "#7870a8",
+       "area": 0.2166
+      },
+      {
+       "hex": "#8888b8",
+       "area": 0.1223
+      },
+      {
+       "hex": "#a098c8",
+       "area": 0.0861
+      },
+      {
+       "hex": "#686890",
+       "area": 0.0856
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.0829
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-male-a",
+     "label": "Male A",
+     "file": "models/mini/character-male-a.glb",
+     "thumb": "thumbs/mini-character-male-a.png",
+     "colours": [
+      {
+       "hex": "#905840",
+       "area": 0.179
+      },
+      {
+       "hex": "#404048",
+       "area": 0.1755
+      },
+      {
+       "hex": "#885840",
+       "area": 0.1696
+      },
+      {
+       "hex": "#a86040",
+       "area": 0.1576
+      },
+      {
+       "hex": "#a05840",
+       "area": 0.1474
+      },
+      {
+       "hex": "#484850",
+       "area": 0.1372
+      },
+      {
+       "hex": "#383840",
+       "area": 0.1325
+      },
+      {
+       "hex": "#985840",
+       "area": 0.1228
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-male-b",
+     "label": "Male B",
+     "file": "models/mini/character-male-b.glb",
+     "thumb": "thumbs/mini-character-male-b.png",
+     "colours": [
+      {
+       "hex": "#e0a880",
+       "area": 0.1407
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1405
+      },
+      {
+       "hex": "#b86848",
+       "area": 0.1312
+      },
+      {
+       "hex": "#d08860",
+       "area": 0.1264
+      },
+      {
+       "hex": "#e05848",
+       "area": 0.1198
+      },
+      {
+       "hex": "#f06048",
+       "area": 0.1143
+      },
+      {
+       "hex": "#f0b890",
+       "area": 0.1051
+      },
+      {
+       "hex": "#f86840",
+       "area": 0.0994
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-male-c",
+     "label": "Male C",
+     "file": "models/mini/character-male-c.glb",
+     "thumb": "thumbs/mini-character-male-c.png",
+     "colours": [
+      {
+       "hex": "#383840",
+       "area": 0.3246
+      },
+      {
+       "hex": "#404048",
+       "area": 0.3002
+      },
+      {
+       "hex": "#404040",
+       "area": 0.1486
+      },
+      {
+       "hex": "#e0a880",
+       "area": 0.1469
+      },
+      {
+       "hex": "#6088d0",
+       "area": 0.1396
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      },
+      {
+       "hex": "#d08860",
+       "area": 0.1299
+      },
+      {
+       "hex": "#f0b890",
+       "area": 0.1279
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-male-d",
+     "label": "Male D",
+     "file": "models/mini/character-male-d.glb",
+     "thumb": "thumbs/mini-character-male-d.png",
+     "colours": [
+      {
+       "hex": "#404048",
+       "area": 0.461
+      },
+      {
+       "hex": "#383840",
+       "area": 0.2999
+      },
+      {
+       "hex": "#404040",
+       "area": 0.15
+      },
+      {
+       "hex": "#e0a880",
+       "area": 0.1469
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      },
+      {
+       "hex": "#f0b890",
+       "area": 0.1166
+      },
+      {
+       "hex": "#d08860",
+       "area": 0.115
+      },
+      {
+       "hex": "#484850",
+       "area": 0.0968
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-male-e",
+     "label": "Male E",
+     "file": "models/mini/character-male-e.glb",
+     "thumb": "thumbs/mini-character-male-e.png",
+     "colours": [
+      {
+       "hex": "#e0a880",
+       "area": 0.1457
+      },
+      {
+       "hex": "#d0d0e0",
+       "area": 0.1449
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      },
+      {
+       "hex": "#905840",
+       "area": 0.1373
+      },
+      {
+       "hex": "#a86040",
+       "area": 0.136
+      },
+      {
+       "hex": "#e8b868",
+       "area": 0.1146
+      },
+      {
+       "hex": "#985840",
+       "area": 0.1131
+      },
+      {
+       "hex": "#e8c070",
+       "area": 0.1048
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-male-f",
+     "label": "Male F",
+     "file": "models/mini/character-male-f.glb",
+     "thumb": "thumbs/mini-character-male-f.png",
+     "colours": [
+      {
+       "hex": "#d88058",
+       "area": 0.2647
+      },
+      {
+       "hex": "#b86848",
+       "area": 0.2605
+      },
+      {
+       "hex": "#e89068",
+       "area": 0.2444
+      },
+      {
+       "hex": "#404048",
+       "area": 0.1923
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.1553
+      },
+      {
+       "hex": "#383840",
+       "area": 0.1489
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1485
+      },
+      {
+       "hex": "#484850",
+       "area": 0.144
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-male-g",
+     "label": "Male G",
+     "file": "models/mini/character-male-g.glb",
+     "thumb": "thumbs/mini-character-male-g.png",
+     "colours": [
+      {
+       "hex": "#d89870",
+       "area": 0.2268
+      },
+      {
+       "hex": "#e0a880",
+       "area": 0.2075
+      },
+      {
+       "hex": "#605880",
+       "area": 0.1584
+      },
+      {
+       "hex": "#d88058",
+       "area": 0.154
+      },
+      {
+       "hex": "#686890",
+       "area": 0.142
+      },
+      {
+       "hex": "#d08860",
+       "area": 0.1264
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.1163
+      },
+      {
+       "hex": "#8888b8",
+       "area": 0.1066
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-raider",
+     "label": "Raider",
+     "file": "models/mini/character-raider.glb",
+     "thumb": "thumbs/mini-character-raider.png",
+     "colours": [
+      {
+       "hex": "#383840",
+       "area": 0.2586
+      },
+      {
+       "hex": "#484850",
+       "area": 0.2084
+      },
+      {
+       "hex": "#404048",
+       "area": 0.1966
+      },
+      {
+       "hex": "#383838",
+       "area": 0.1846
+      },
+      {
+       "hex": "#e0a880",
+       "area": 0.1542
+      },
+      {
+       "hex": "#d89870",
+       "area": 0.1384
+      },
+      {
+       "hex": "#d08860",
+       "area": 0.1299
+      },
+      {
+       "hex": "#f0b890",
+       "area": 0.1279
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-robot",
+     "label": "Robot",
+     "file": "models/mini/character-robot.glb",
+     "thumb": "thumbs/mini-character-robot.png",
+     "colours": [
+      {
+       "hex": "#9090c0",
+       "area": 0.2355
+      },
+      {
+       "hex": "#b0b0d8",
+       "area": 0.2222
+      },
+      {
+       "hex": "#7870a8",
+       "area": 0.2155
+      },
+      {
+       "hex": "#8880b8",
+       "area": 0.1755
+      },
+      {
+       "hex": "#9898c8",
+       "area": 0.1692
+      },
+      {
+       "hex": "#a0a0d0",
+       "area": 0.1041
+      },
+      {
+       "hex": "#e8c078",
+       "area": 0.0736
+      },
+      {
+       "hex": "#a8a8d0",
+       "area": 0.0671
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-soldier",
+     "label": "Soldier",
+     "file": "models/mini/character-soldier.glb",
+     "thumb": "thumbs/mini-character-soldier.png",
+     "colours": [
+      {
+       "hex": "#48b080",
+       "area": 0.2902
+      },
+      {
+       "hex": "#e89068",
+       "area": 0.2899
+      },
+      {
+       "hex": "#208868",
+       "area": 0.286
+      },
+      {
+       "hex": "#d88058",
+       "area": 0.204
+      },
+      {
+       "hex": "#38a078",
+       "area": 0.1925
+      },
+      {
+       "hex": "#309878",
+       "area": 0.1802
+      },
+      {
+       "hex": "#40a878",
+       "area": 0.1573
+      },
+      {
+       "hex": "#58c888",
+       "area": 0.1533
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-worker",
+     "label": "Worker",
+     "file": "models/mini/character-worker.glb",
+     "thumb": "thumbs/mini-character-worker.png",
+     "colours": [
+      {
+       "hex": "#5868c8",
+       "area": 0.22
+      },
+      {
+       "hex": "#f0c878",
+       "area": 0.2048
+      },
+      {
+       "hex": "#6080d0",
+       "area": 0.2003
+      },
+      {
+       "hex": "#a05840",
+       "area": 0.1836
+      },
+      {
+       "hex": "#905840",
+       "area": 0.179
+      },
+      {
+       "hex": "#e0b060",
+       "area": 0.1761
+      },
+      {
+       "hex": "#885840",
+       "area": 0.1696
+      },
+      {
+       "hex": "#6078d0",
+       "area": 0.1622
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    },
+    {
+     "id": "character-zombie",
+     "label": "Zombie",
+     "file": "models/mini/character-zombie.glb",
+     "thumb": "thumbs/mini-character-zombie.png",
+     "colours": [
+      {
+       "hex": "#38a078",
+       "area": 0.1669
+      },
+      {
+       "hex": "#404048",
+       "area": 0.165
+      },
+      {
+       "hex": "#484850",
+       "area": 0.136
+      },
+      {
+       "hex": "#40b080",
+       "area": 0.135
+      },
+      {
+       "hex": "#383840",
+       "area": 0.1325
+      },
+      {
+       "hex": "#686890",
+       "area": 0.1313
+      },
+      {
+       "hex": "#9090c0",
+       "area": 0.1028
+      },
+      {
+       "hex": "#208868",
+       "area": 0.087
+      }
+     ],
+     "anims": [
+      "attack-kick-left",
+      "attack-kick-right",
+      "attack-melee-left",
+      "attack-melee-right",
+      "crouch",
+      "die",
+      "drive",
+      "emote-no",
+      "emote-yes",
+      "fall",
+      "holding-both",
+      "holding-both-shoot",
+      "holding-left",
+      "holding-left-shoot",
+      "holding-right",
+      "holding-right-shoot",
+      "idle",
+      "interact-left",
+      "interact-right",
+      "jump",
+      "pick-up",
+      "sit",
+      "sprint",
+      "static",
+      "walk",
+      "wheelchair-look-left",
+      "wheelchair-look-right",
+      "wheelchair-move-back",
+      "wheelchair-move-forward",
+      "wheelchair-move-left",
+      "wheelchair-move-right",
+      "wheelchair-sit"
+     ]
+    }
+   ]
+  },
+  "pets": {
+   "label": "Cube Pets",
+   "eyes": "atlas_eye_pet.png",
+   "items": [
+    {
+     "id": "animal-beaver",
+     "label": "Beaver",
+     "file": "models/pets/animal-beaver.glb",
+     "thumb": "thumbs/pet-animal-beaver.png",
+     "colours": [
+      {
+       "hex": "#d08058",
+       "area": 1.7226
+      },
+      {
+       "hex": "#e89068",
+       "area": 1.591
+      },
+      {
+       "hex": "#b86848",
+       "area": 1.5203
+      },
+      {
+       "hex": "#d07858",
+       "area": 1.5011
+      },
+      {
+       "hex": "#e09060",
+       "area": 0.7226
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.5744
+      },
+      {
+       "hex": "#905840",
+       "area": 0.5099
+      },
+      {
+       "hex": "#c06848",
+       "area": 0.4833
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-bee",
+     "label": "Bee",
+     "file": "models/pets/animal-bee.glb",
+     "thumb": "thumbs/pet-animal-bee.png",
+     "colours": [
+      {
+       "hex": "#484858",
+       "area": 3.8163
+      },
+      {
+       "hex": "#ffc058",
+       "area": 1.5981
+      },
+      {
+       "hex": "#ffc858",
+       "area": 1.4291
+      },
+      {
+       "hex": "#404850",
+       "area": 1.2153
+      },
+      {
+       "hex": "#ffb850",
+       "area": 1.123
+      },
+      {
+       "hex": "#ffd060",
+       "area": 1.123
+      },
+      {
+       "hex": "#485058",
+       "area": 0.8944
+      },
+      {
+       "hex": "#ffc050",
+       "area": 0.7324
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump",
+      "fly"
+     ],
+     "mouth": "mouth"
+    },
+    {
+     "id": "animal-bunny",
+     "label": "Bunny",
+     "file": "models/pets/animal-bunny.glb",
+     "thumb": "thumbs/pet-animal-bunny.png",
+     "colours": [
+      {
+       "hex": "#e89068",
+       "area": 1.8945
+      },
+      {
+       "hex": "#d07858",
+       "area": 1.8023
+      },
+      {
+       "hex": "#d08058",
+       "area": 1.675
+      },
+      {
+       "hex": "#b86848",
+       "area": 1.6396
+      },
+      {
+       "hex": "#e09060",
+       "area": 0.8035
+      },
+      {
+       "hex": "#e08860",
+       "area": 0.7193
+      },
+      {
+       "hex": "#c07050",
+       "area": 0.6188
+      },
+      {
+       "hex": "#d88058",
+       "area": 0.5516
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-cat",
+     "label": "Cat",
+     "file": "models/pets/animal-cat.glb",
+     "thumb": "thumbs/pet-animal-cat.png",
+     "colours": [
+      {
+       "hex": "#787890",
+       "area": 2.2094
+      },
+      {
+       "hex": "#707088",
+       "area": 1.8171
+      },
+      {
+       "hex": "#686880",
+       "area": 1.465
+      },
+      {
+       "hex": "#686878",
+       "area": 1.141
+      },
+      {
+       "hex": "#808098",
+       "area": 1.107
+      },
+      {
+       "hex": "#808898",
+       "area": 1.0174
+      },
+      {
+       "hex": "#707080",
+       "area": 0.5347
+      },
+      {
+       "hex": "#8088a0",
+       "area": 0.3927
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-caterpillar",
+     "label": "Caterpillar",
+     "file": "models/pets/animal-caterpillar.glb",
+     "thumb": "thumbs/pet-animal-caterpillar.png",
+     "colours": [
+      {
+       "hex": "#38a078",
+       "area": 1.6615
+      },
+      {
+       "hex": "#ffc858",
+       "area": 1.5722
+      },
+      {
+       "hex": "#40a880",
+       "area": 1.0325
+      },
+      {
+       "hex": "#58c088",
+       "area": 0.9204
+      },
+      {
+       "hex": "#289070",
+       "area": 0.8039
+      },
+      {
+       "hex": "#50b880",
+       "area": 0.7983
+      },
+      {
+       "hex": "#40a878",
+       "area": 0.7378
+      },
+      {
+       "hex": "#208868",
+       "area": 0.7306
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "mouth"
+    },
+    {
+     "id": "animal-chick",
+     "label": "Chick",
+     "file": "models/pets/animal-chick.glb",
+     "thumb": "thumbs/pet-animal-chick.png",
+     "colours": [
+      {
+       "hex": "#ffc858",
+       "area": 1.8162
+      },
+      {
+       "hex": "#ffc058",
+       "area": 1.6514
+      },
+      {
+       "hex": "#ffd060",
+       "area": 1.292
+      },
+      {
+       "hex": "#ffb850",
+       "area": 1.2044
+      },
+      {
+       "hex": "#ffc050",
+       "area": 0.9569
+      },
+      {
+       "hex": "#ffd058",
+       "area": 0.8365
+      },
+      {
+       "hex": "#e89048",
+       "area": 0.5395
+      },
+      {
+       "hex": "#ffa038",
+       "area": 0.3918
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump",
+      "fly"
+     ],
+     "mouth": "beak"
+    },
+    {
+     "id": "animal-cow",
+     "label": "Cow",
+     "file": "models/pets/animal-cow.glb",
+     "thumb": "thumbs/pet-animal-cow.png",
+     "colours": [
+      {
+       "hex": "#d8d8e8",
+       "area": 1.6254
+      },
+      {
+       "hex": "#e0e0f0",
+       "area": 1.4291
+      },
+      {
+       "hex": "#f8f8f8",
+       "area": 1.1408
+      },
+      {
+       "hex": "#c0c0d8",
+       "area": 1.0123
+      },
+      {
+       "hex": "#d0d0e0",
+       "area": 0.929
+      },
+      {
+       "hex": "#e0e0e8",
+       "area": 0.7647
+      },
+      {
+       "hex": "#f0f0f8",
+       "area": 0.515
+      },
+      {
+       "hex": "#c8c8d8",
+       "area": 0.4507
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-crab",
+     "label": "Crab",
+     "file": "models/pets/animal-crab.glb",
+     "thumb": "thumbs/pet-animal-crab.png",
+     "colours": [
+      {
+       "hex": "#f86840",
+       "area": 4.105
+      },
+      {
+       "hex": "#e86048",
+       "area": 2.9271
+      },
+      {
+       "hex": "#e06048",
+       "area": 1.5743
+      },
+      {
+       "hex": "#d85850",
+       "area": 1.3308
+      },
+      {
+       "hex": "#f06848",
+       "area": 1.2647
+      },
+      {
+       "hex": "#f06048",
+       "area": 0.7164
+      },
+      {
+       "hex": "#b84040",
+       "area": 0.6684
+      },
+      {
+       "hex": "#a84038",
+       "area": 0.63
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump",
+      "crab-walk",
+      "claw-snap"
+     ],
+     "mouth": "mouth"
+    },
+    {
+     "id": "animal-deer",
+     "label": "Deer",
+     "file": "models/pets/animal-deer.glb",
+     "thumb": "thumbs/pet-animal-deer.png",
+     "colours": [
+      {
+       "hex": "#d08058",
+       "area": 1.7713
+      },
+      {
+       "hex": "#d07858",
+       "area": 1.4573
+      },
+      {
+       "hex": "#e89068",
+       "area": 1.1408
+      },
+      {
+       "hex": "#e0b088",
+       "area": 0.7568
+      },
+      {
+       "hex": "#b86848",
+       "area": 0.7062
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.629
+      },
+      {
+       "hex": "#905840",
+       "area": 0.6222
+      },
+      {
+       "hex": "#a86040",
+       "area": 0.5427
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-dog",
+     "label": "Dog",
+     "file": "models/pets/animal-dog.glb",
+     "thumb": "thumbs/pet-animal-dog.png",
+     "colours": [
+      {
+       "hex": "#d08058",
+       "area": 1.8309
+      },
+      {
+       "hex": "#b86848",
+       "area": 1.6624
+      },
+      {
+       "hex": "#d07858",
+       "area": 1.6087
+      },
+      {
+       "hex": "#e89068",
+       "area": 1.6035
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.7682
+      },
+      {
+       "hex": "#e09060",
+       "area": 0.717
+      },
+      {
+       "hex": "#d88058",
+       "area": 0.5153
+      },
+      {
+       "hex": "#c06848",
+       "area": 0.481
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-elephant",
+     "label": "Elephant",
+     "file": "models/pets/animal-elephant.glb",
+     "thumb": "thumbs/pet-animal-elephant.png",
+     "colours": [
+      {
+       "hex": "#98a0c0",
+       "area": 1.6064
+      },
+      {
+       "hex": "#b8c0e8",
+       "area": 1.2665
+      },
+      {
+       "hex": "#a0a8d0",
+       "area": 1.1007
+      },
+      {
+       "hex": "#8088a0",
+       "area": 0.7812
+      },
+      {
+       "hex": "#808098",
+       "area": 0.7306
+      },
+      {
+       "hex": "#c0c8f0",
+       "area": 0.7231
+      },
+      {
+       "hex": "#a0a8c8",
+       "area": 0.6892
+      },
+      {
+       "hex": "#9090b0",
+       "area": 0.6669
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "mouth"
+    },
+    {
+     "id": "animal-fish",
+     "label": "Fish",
+     "file": "models/pets/animal-fish.glb",
+     "thumb": "thumbs/pet-animal-fish.png",
+     "colours": [
+      {
+       "hex": "#e08848",
+       "area": 1.9192
+      },
+      {
+       "hex": "#e89048",
+       "area": 1.8973
+      },
+      {
+       "hex": "#e08040",
+       "area": 1.3042
+      },
+      {
+       "hex": "#485058",
+       "area": 1.0669
+      },
+      {
+       "hex": "#484858",
+       "area": 1.0337
+      },
+      {
+       "hex": "#e07840",
+       "area": 0.9389
+      },
+      {
+       "hex": "#e89848",
+       "area": 0.8085
+      },
+      {
+       "hex": "#f0a050",
+       "area": 0.7376
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump",
+      "swim"
+     ],
+     "mouth": "mouth"
+    },
+    {
+     "id": "animal-fox",
+     "label": "Fox",
+     "file": "models/pets/animal-fox.glb",
+     "thumb": "thumbs/pet-animal-fox.png",
+     "colours": [
+      {
+       "hex": "#e89048",
+       "area": 3.0449
+      },
+      {
+       "hex": "#e08848",
+       "area": 2.0549
+      },
+      {
+       "hex": "#e08040",
+       "area": 1.4699
+      },
+      {
+       "hex": "#e89848",
+       "area": 1.0217
+      },
+      {
+       "hex": "#f0a050",
+       "area": 0.6986
+      },
+      {
+       "hex": "#e07840",
+       "area": 0.6149
+      },
+      {
+       "hex": "#e08048",
+       "area": 0.5347
+      },
+      {
+       "hex": "#c0c0d8",
+       "area": 0.461
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-giraffe",
+     "label": "Giraffe",
+     "file": "models/pets/animal-giraffe.glb",
+     "thumb": "thumbs/pet-animal-giraffe.png",
+     "colours": [
+      {
+       "hex": "#ffb850",
+       "area": 1.4968
+      },
+      {
+       "hex": "#ffb048",
+       "area": 1.4846
+      },
+      {
+       "hex": "#ff9830",
+       "area": 1.0123
+      },
+      {
+       "hex": "#ffc858",
+       "area": 0.7967
+      },
+      {
+       "hex": "#ffa038",
+       "area": 0.7831
+      },
+      {
+       "hex": "#ffa840",
+       "area": 0.7523
+      },
+      {
+       "hex": "#ffb848",
+       "area": 0.6971
+      },
+      {
+       "hex": "#ffd060",
+       "area": 0.6723
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-hog",
+     "label": "Hog",
+     "file": "models/pets/animal-hog.glb",
+     "thumb": "thumbs/pet-animal-hog.png",
+     "colours": [
+      {
+       "hex": "#b86848",
+       "area": 3.1529
+      },
+      {
+       "hex": "#d08058",
+       "area": 1.8125
+      },
+      {
+       "hex": "#d07858",
+       "area": 1.6943
+      },
+      {
+       "hex": "#e89068",
+       "area": 1.6648
+      },
+      {
+       "hex": "#c87050",
+       "area": 1.4825
+      },
+      {
+       "hex": "#c06848",
+       "area": 1.1035
+      },
+      {
+       "hex": "#c07050",
+       "area": 0.9496
+      },
+      {
+       "hex": "#e09060",
+       "area": 0.7051
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-koala",
+     "label": "Koala",
+     "file": "models/pets/animal-koala.glb",
+     "thumb": "thumbs/pet-animal-koala.png",
+     "colours": [
+      {
+       "hex": "#787890",
+       "area": 2.4687
+      },
+      {
+       "hex": "#707088",
+       "area": 2.0772
+      },
+      {
+       "hex": "#808098",
+       "area": 1.8282
+      },
+      {
+       "hex": "#686880",
+       "area": 1.2869
+      },
+      {
+       "hex": "#808898",
+       "area": 1.2323
+      },
+      {
+       "hex": "#8088a0",
+       "area": 0.79
+      },
+      {
+       "hex": "#707080",
+       "area": 0.6097
+      },
+      {
+       "hex": "#686878",
+       "area": 0.5494
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-lion",
+     "label": "Lion",
+     "file": "models/pets/animal-lion.glb",
+     "thumb": "thumbs/pet-animal-lion.png",
+     "colours": [
+      {
+       "hex": "#ffb048",
+       "area": 1.5701
+      },
+      {
+       "hex": "#ffb850",
+       "area": 1.5245
+      },
+      {
+       "hex": "#ff9830",
+       "area": 1.1774
+      },
+      {
+       "hex": "#e08860",
+       "area": 1.0499
+      },
+      {
+       "hex": "#b86848",
+       "area": 0.9202
+      },
+      {
+       "hex": "#c07050",
+       "area": 0.8625
+      },
+      {
+       "hex": "#e89068",
+       "area": 0.8447
+      },
+      {
+       "hex": "#ffa840",
+       "area": 0.8387
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-monkey",
+     "label": "Monkey",
+     "file": "models/pets/animal-monkey.glb",
+     "thumb": "thumbs/pet-animal-monkey.png",
+     "colours": [
+      {
+       "hex": "#e89068",
+       "area": 2.1107
+      },
+      {
+       "hex": "#b86848",
+       "area": 1.8782
+      },
+      {
+       "hex": "#d08058",
+       "area": 1.7309
+      },
+      {
+       "hex": "#d07858",
+       "area": 1.3389
+      },
+      {
+       "hex": "#e8b890",
+       "area": 1.1378
+      },
+      {
+       "hex": "#e08860",
+       "area": 0.9334
+      },
+      {
+       "hex": "#e09060",
+       "area": 0.7891
+      },
+      {
+       "hex": "#c87050",
+       "area": 0.7554
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-panda",
+     "label": "Panda",
+     "file": "models/pets/animal-panda.glb",
+     "thumb": "thumbs/pet-animal-panda.png",
+     "colours": [
+      {
+       "hex": "#d8d8e8",
+       "area": 1.8253
+      },
+      {
+       "hex": "#e0e0f0",
+       "area": 1.5221
+      },
+      {
+       "hex": "#484858",
+       "area": 1.4541
+      },
+      {
+       "hex": "#505860",
+       "area": 1.4101
+      },
+      {
+       "hex": "#404050",
+       "area": 1.202
+      },
+      {
+       "hex": "#404850",
+       "area": 0.8844
+      },
+      {
+       "hex": "#f0f0f8",
+       "area": 0.8248
+      },
+      {
+       "hex": "#d0d0e0",
+       "area": 0.8141
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-parrot",
+     "label": "Parrot",
+     "file": "models/pets/animal-parrot.glb",
+     "thumb": "thumbs/pet-animal-parrot.png",
+     "colours": [
+      {
+       "hex": "#e06048",
+       "area": 1.7832
+      },
+      {
+       "hex": "#f86840",
+       "area": 1.6743
+      },
+      {
+       "hex": "#d85850",
+       "area": 1.4383
+      },
+      {
+       "hex": "#e86048",
+       "area": 1.4036
+      },
+      {
+       "hex": "#d05850",
+       "area": 0.641
+      },
+      {
+       "hex": "#f06048",
+       "area": 0.5485
+      },
+      {
+       "hex": "#e05848",
+       "area": 0.4819
+      },
+      {
+       "hex": "#ffb848",
+       "area": 0.4531
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump",
+      "fly"
+     ],
+     "mouth": "beak"
+    },
+    {
+     "id": "animal-penguin",
+     "label": "Penguin",
+     "file": "models/pets/animal-penguin.glb",
+     "thumb": "thumbs/pet-animal-penguin.png",
+     "colours": [
+      {
+       "hex": "#505860",
+       "area": 1.9206
+      },
+      {
+       "hex": "#485058",
+       "area": 1.4961
+      },
+      {
+       "hex": "#484858",
+       "area": 1.38
+      },
+      {
+       "hex": "#404050",
+       "area": 1.1508
+      },
+      {
+       "hex": "#505060",
+       "area": 1.1113
+      },
+      {
+       "hex": "#c0c0d8",
+       "area": 0.5737
+      },
+      {
+       "hex": "#d0d0e0",
+       "area": 0.5608
+      },
+      {
+       "hex": "#e89048",
+       "area": 0.5395
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "beak"
+    },
+    {
+     "id": "animal-pig",
+     "label": "Pig",
+     "file": "models/pets/animal-pig.glb",
+     "thumb": "thumbs/pet-animal-pig.png",
+     "colours": [
+      {
+       "hex": "#e890b8",
+       "area": 1.681
+      },
+      {
+       "hex": "#d88098",
+       "area": 1.6105
+      },
+      {
+       "hex": "#e088b0",
+       "area": 1.5463
+      },
+      {
+       "hex": "#e088a8",
+       "area": 1.0018
+      },
+      {
+       "hex": "#e080a0",
+       "area": 0.864
+      },
+      {
+       "hex": "#f098d0",
+       "area": 0.7886
+      },
+      {
+       "hex": "#e090b8",
+       "area": 0.6968
+      },
+      {
+       "hex": "#e898c8",
+       "area": 0.5709
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-polar",
+     "label": "Polar",
+     "file": "models/pets/animal-polar.glb",
+     "thumb": "thumbs/pet-animal-polar.png",
+     "colours": [
+      {
+       "hex": "#f8f8f8",
+       "area": 1.6556
+      },
+      {
+       "hex": "#d8d8e8",
+       "area": 1.6516
+      },
+      {
+       "hex": "#e0e0f0",
+       "area": 1.4867
+      },
+      {
+       "hex": "#c0c0d8",
+       "area": 1.0294
+      },
+      {
+       "hex": "#d0d0e0",
+       "area": 0.9019
+      },
+      {
+       "hex": "#f0f0f8",
+       "area": 0.8689
+      },
+      {
+       "hex": "#e0e0e8",
+       "area": 0.6873
+      },
+      {
+       "hex": "#c8c8d8",
+       "area": 0.508
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    },
+    {
+     "id": "animal-tiger",
+     "label": "Tiger",
+     "file": "models/pets/animal-tiger.glb",
+     "thumb": "thumbs/pet-animal-tiger.png",
+     "colours": [
+      {
+       "hex": "#e89048",
+       "area": 2.4805
+      },
+      {
+       "hex": "#e08848",
+       "area": 1.6303
+      },
+      {
+       "hex": "#484858",
+       "area": 1.1895
+      },
+      {
+       "hex": "#e08040",
+       "area": 1.1351
+      },
+      {
+       "hex": "#404050",
+       "area": 0.9176
+      },
+      {
+       "hex": "#e89848",
+       "area": 0.817
+      },
+      {
+       "hex": "#e07840",
+       "area": 0.8016
+      },
+      {
+       "hex": "#f0a050",
+       "area": 0.6904
+      }
+     ],
+     "anims": [
+      "dance",
+      "eat",
+      "gesture-negative",
+      "gesture-positive",
+      "idle",
+      "run",
+      "static",
+      "walk"
+     ],
+     "moves": [
+      "jump"
+     ],
+     "mouth": "muzzle"
+    }
+   ]
+  },
+  "animated": {
+   "label": "Animated Characters",
+   "eyes": "atlas_eyes_people.png",
+   "items": [
+    {
+     "id": "criminalMaleA",
+     "label": "Criminalmale",
+     "file": "models/animated/animated.glb",
+     "skin": "skins/criminalMaleA.png",
+     "thumb": "thumbs/anim-criminalMaleA.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#f0f0f0",
+       "area": 5574
+      },
+      {
+       "hex": "#f09070",
+       "area": 3108
+      },
+      {
+       "hex": "#200000",
+       "area": 2190
+      },
+      {
+       "hex": "#f08060",
+       "area": 1816
+      },
+      {
+       "hex": "#202020",
+       "area": 1158
+      },
+      {
+       "hex": "#009070",
+       "area": 500
+      },
+      {
+       "hex": "#101010",
+       "area": 292
+      },
+      {
+       "hex": "#e0e0e0",
+       "area": 115
+      }
+     ]
+    },
+    {
+     "id": "cyborgFemaleA",
+     "label": "Cyborgfemale",
+     "file": "models/animated/animated-f.glb",
+     "skin": "skins/cyborgFemaleA.png",
+     "thumb": "thumbs/anim-cyborgFemaleA.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#202020",
+       "area": 3536
+      },
+      {
+       "hex": "#f09070",
+       "area": 2423
+      },
+      {
+       "hex": "#101010",
+       "area": 1284
+      },
+      {
+       "hex": "#e04020",
+       "area": 1180
+      },
+      {
+       "hex": "#b0c0d0",
+       "area": 974
+      },
+      {
+       "hex": "#80a0b0",
+       "area": 904
+      },
+      {
+       "hex": "#7090b0",
+       "area": 532
+      },
+      {
+       "hex": "#105070",
+       "area": 451
+      }
+     ]
+    },
+    {
+     "id": "skaterFemaleA",
+     "label": "Skaterfemale",
+     "file": "models/animated/animated-f.glb",
+     "skin": "skins/skaterFemaleA.png",
+     "thumb": "thumbs/anim-skaterFemaleA.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#f09070",
+       "area": 3010
+      },
+      {
+       "hex": "#200000",
+       "area": 2300
+      },
+      {
+       "hex": "#202020",
+       "area": 2231
+      },
+      {
+       "hex": "#f08060",
+       "area": 1726
+      },
+      {
+       "hex": "#101010",
+       "area": 1722
+      },
+      {
+       "hex": "#e03030",
+       "area": 1185
+      },
+      {
+       "hex": "#e07030",
+       "area": 768
+      },
+      {
+       "hex": "#d02020",
+       "area": 752
+      }
+     ],
+     "eyesAtlas": "atlas_eyes_people_oneeye.png"
+    },
+    {
+     "id": "skaterMaleA",
+     "label": "Skatermale",
+     "file": "models/animated/animated.glb",
+     "skin": "skins/skaterMaleA.png",
+     "thumb": "thumbs/anim-skaterMaleA.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#f09070",
+       "area": 2606
+      },
+      {
+       "hex": "#401000",
+       "area": 2287
+      },
+      {
+       "hex": "#f08060",
+       "area": 1608
+      },
+      {
+       "hex": "#f0f0f0",
+       "area": 1372
+      },
+      {
+       "hex": "#f06040",
+       "area": 1267
+      },
+      {
+       "hex": "#e07030",
+       "area": 768
+      },
+      {
+       "hex": "#104060",
+       "area": 620
+      },
+      {
+       "hex": "#f05040",
+       "area": 612
+      }
+     ]
+    },
+    {
+     "id": "survivorFemaleA",
+     "label": "Survivorfemale",
+     "file": "models/animated/animated-f.glb",
+     "skin": "skins/survivorFemaleA.png",
+     "thumb": "thumbs/anim-survivorFemaleA.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#802010",
+       "area": 3931
+      },
+      {
+       "hex": "#200000",
+       "area": 2286
+      },
+      {
+       "hex": "#f0f0f0",
+       "area": 1911
+      },
+      {
+       "hex": "#d0e0f0",
+       "area": 1119
+      },
+      {
+       "hex": "#e07030",
+       "area": 712
+      },
+      {
+       "hex": "#c0e0f0",
+       "area": 611
+      },
+      {
+       "hex": "#706050",
+       "area": 510
+      },
+      {
+       "hex": "#701010",
+       "area": 432
+      }
+     ]
+    },
+    {
+     "id": "survivorMaleB",
+     "label": "Survivormale",
+     "file": "models/animated/animated.glb",
+     "skin": "skins/survivorMaleB.png",
+     "thumb": "thumbs/anim-survivorMaleB.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#f09070",
+       "area": 3026
+      },
+      {
+       "hex": "#a06040",
+       "area": 2338
+      },
+      {
+       "hex": "#c0d0e0",
+       "area": 2172
+      },
+      {
+       "hex": "#f0f0f0",
+       "area": 1675
+      },
+      {
+       "hex": "#f08060",
+       "area": 1605
+      },
+      {
+       "hex": "#101010",
+       "area": 1247
+      },
+      {
+       "hex": "#202020",
+       "area": 1138
+      },
+      {
+       "hex": "#706050",
+       "area": 428
+      }
+     ]
+    },
+    {
+     "id": "zombieA",
+     "label": "Zombie",
+     "file": "models/animated/animated.glb",
+     "skin": "skins/zombieA.png",
+     "thumb": "thumbs/anim-zombieA.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#708090",
+       "area": 3459
+      },
+      {
+       "hex": "#a0b0c0",
+       "area": 2913
+      },
+      {
+       "hex": "#f0f0f0",
+       "area": 1439
+      },
+      {
+       "hex": "#908070",
+       "area": 1310
+      },
+      {
+       "hex": "#f0a060",
+       "area": 727
+      },
+      {
+       "hex": "#204040",
+       "area": 510
+      },
+      {
+       "hex": "#807060",
+       "area": 426
+      },
+      {
+       "hex": "#a0b0b0",
+       "area": 405
+      }
+     ]
+    },
+    {
+     "id": "zombieC",
+     "label": "Zombiec",
+     "file": "models/animated/animated.glb",
+     "skin": "skins/zombieC.png",
+     "thumb": "thumbs/anim-zombieC.png",
+     "anims": [
+      "idle",
+      "talk",
+      "walk",
+      "sit"
+     ],
+     "colours": [
+      {
+       "hex": "#a0b0c0",
+       "area": 3218
+      },
+      {
+       "hex": "#200000",
+       "area": 2183
+      },
+      {
+       "hex": "#f0f0f0",
+       "area": 2001
+      },
+      {
+       "hex": "#002030",
+       "area": 1546
+      },
+      {
+       "hex": "#708090",
+       "area": 1305
+      },
+      {
+       "hex": "#f0a060",
+       "area": 728
+      },
+      {
+       "hex": "#001020",
+       "area": 564
+      },
+      {
+       "hex": "#a0b0b0",
+       "area": 465
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

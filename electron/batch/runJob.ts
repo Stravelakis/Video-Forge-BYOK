@@ -1,3 +1,5 @@
+import { pictureToClip } from "../media/stillClip";
+import { withDirections } from "../../src/lib/direct/directions";
 // ---------------------------------------------------------------------------
 // One video, start to finish, with no window and nobody clicking.
 //
@@ -52,6 +54,7 @@ import {
   defaultLogo,
   type TrackWaveform,
 } from "../../src/store/types";
+import { withCharacterColor } from "../../src/store/characterColor";
 
 /** One member of the cast, as a job file describes them.
  *
@@ -77,7 +80,9 @@ export interface JobSpeaker {
   sheetPath?: string;
   puppetPath?: string;
   /** A drawn character (characters/core); wins over both. */
-  character?: CharacterCard;
+  kenney?: import("../../src/lib/kenney/actor").KenneyCard;
+    kenneyFraming?: "body" | "bust" | "face";
+    character?: CharacterCard;
   engine: "piper" | "dramabox" | "elevenlabs" | "gemini" | "fish";
   /** Gemini: `live` (default — unlimited free, checked word by word) or `tts`
    *  (10 a day free). Model and voice default to Ak's picks (docs/V2-NEEDS.md). */
@@ -116,6 +121,8 @@ export interface JobSpeaker {
 
 export interface BatchJob {
   /** The set the speakers sit in (characters/sets/sets.mjs); none if absent. */
+  /** Stage directions per line, as the Direct step makes them (src/lib/direct/directions.ts). */
+  directions?: import("../../src/lib/direct/directions").Directions;
   scene?: { id: string; title?: string; names?: string[] } | null;
   /** "Made with Video Forge" (remotion/AiBadge.tsx). On unless false. */
   aiLabel?: boolean;
@@ -178,6 +185,8 @@ export interface BatchJob {
    *  over the flat background, which is faster and needs no API keys — the
    *  right choice when you are testing timing rather than looks. */
   backgrounds?: "auto" | "none";
+  /** One picture or clip behind the whole video (a Kenney room, a photo). Overrides "backgrounds". */
+  backgroundFile?: string;
   /** A music bed. A path to one file, or "auto" to take one from the library
    *  in `music/` — which is what a batch wants, since it gives every lesson a
    *  bed without naming one 72 times. "none" or absent is silence. */
@@ -383,13 +392,16 @@ export async function runBatchJob(
   const speakers: SpeakerConfig[] = job.cast.map((c, i) => {
     const s = slot(i);
     const fromPreset = preset.speakers?.[i];
-    return {
+    // a drawn character's main colour is their speaker colour, as in the app (src/store/characterColor.ts)
+    return withCharacterColor({
       ...(fromPreset ?? {}),
       id: `s${i + 1}`,
       label: c.label,
       sheetPath: c.sheetPath ?? fromPreset?.sheetPath,
       puppetPath: c.puppetPath ?? fromPreset?.puppetPath,
       character: c.character ?? fromPreset?.character,
+      kenney: c.kenney ?? fromPreset?.kenney,
+      kenneyFraming: c.kenneyFraming ?? fromPreset?.kenneyFraming,
       borderColor: c.borderColor ?? fromPreset?.borderColor ?? "#ff9a3c",
       surface: s?.surface ?? fromPreset?.surface,
       bgColor: fromPreset?.bgColor ?? "#000000",
@@ -405,7 +417,7 @@ export async function runBatchJob(
       size: s?.size ?? fromPreset?.size ?? 0.34,
       ttsEngine: c.engine,
       voiceId: c.piperOnnxPath,
-    } as SpeakerConfig;
+    } as SpeakerConfig);
   });
 
   // ONE STYLE FOR EVERY SPEAKER, when the job asks for it. Comparing looks is
@@ -746,7 +758,12 @@ export async function runBatchJob(
   const portrait = height > width;
 
   let backgrounds: RenderJob["backgrounds"] = [];
-  if ((job.backgrounds ?? "auto") === "auto") {
+  if (job.backgroundFile) {
+    const src = path.resolve(job.backgroundFile);
+    const filePath = /\.(mp4|mov|webm)$/i.test(src) ? src : await pictureToClip(src, ctx.mediaDir, width, height);
+    // past the last word: the video runs on a moment after it, and that moment was black (11 Nov 2026)
+    backgrounds = [{ startMs: 0, endMs: endMs + 3000, filePath, sourceSec: 12, query: path.basename(src) }];
+  } else if ((job.backgrounds ?? "auto") === "auto") {
     onProgress(14, "Planning backgrounds…");
 
     // CACHED FOR THE SAME REASON THE NARRATION IS, and it turned out to matter
@@ -858,6 +875,8 @@ export async function runBatchJob(
       sheetPath: sp.sheetPath,
       puppetPath: sp.puppetPath,
       character: sp.character,
+      kenney: sp.kenney,
+      kenneyFraming: sp.kenneyFraming,
     })),
     musicColor: preset.musicColor ?? defaultProject.musicColor,
     width,
@@ -900,7 +919,7 @@ export async function runBatchJob(
     musicWaveform: { ...defaultProject.musicWaveform, ...preset.musicWaveform },
     visemeFadeMs: job.visemeFadeMs ?? (lesson ? 130 : defaultProject.visemeFadeMs),
     idleMotion: defaultProject.idleMotion,
-    narrationSegments: narration.segments,
+    narrationSegments: withDirections(narration.segments, job.directions),
     narrationPauses: narration.pauses ?? [],
     crf: job.crf,
     introPath: job.introPath ?? (await clipInTurn(job.introDir, job)) ?? undefined,

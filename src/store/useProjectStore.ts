@@ -16,6 +16,8 @@ import {
 import type { ProjectPreset, SpeakerSlot } from "./templatesTypes";
 import { defaultProject } from "./defaults";
 import { defaultTrackWaveform } from "../lib/waveform/buildTracks";
+import { withCharacterColor } from "./characterColor";
+
 
 const SPEAKER_COLORS = ["#e8a24a", "#4ac2e8"]; // speaker1 / speaker2 from tailwind theme
 
@@ -57,10 +59,18 @@ function applySlots(
   return snap.speakers ?? current;
 }
 
+/** Older projects cut picture mouths (0). Ak, 11 Nov 2026: they fade now, once.
+ *  Coded characters morph whatever this says (lib/motion/drawnFace.ts). */
+export function migrateFade<T extends { visemeFadeMs?: number; fadeMigrated?: boolean }>(p: T): T {
+  if (p.fadeMigrated) return p;
+  return { ...p, visemeFadeMs: !p.visemeFadeMs ? defaultProject.visemeFadeMs : p.visemeFadeMs, fadeMigrated: true };
+}
+
 function migrateSpeaker(sp: SpeakerConfig, i: number): SpeakerConfig {
   const size = sp.size > 1 ? Math.min(1, sp.size / LEGACY_AUTHORED_WIDTH) : sp.size;
   const lane = i === 0 ? 0 : i % 2 === 1 ? 1 : -1;
-  return {
+  // a drawn character's main colour is their speaker colour (store/characterColor.ts)
+  return withCharacterColor({
     ...sp,
     size,
     outlineShape: sp.outlineShape ?? "circle",
@@ -74,7 +84,7 @@ function migrateSpeaker(sp: SpeakerConfig, i: number): SpeakerConfig {
     // missing waveform on a project that used to have one. Confirmed against a
     // real pre-branch autosave shape.
     waveform: migrateTrack({ ...defaultTrackWaveform(lane), ...(sp.waveform ?? {}) }),
-  };
+  });
 }
 
 /** A saved waveform, read in today's terms.
@@ -119,6 +129,8 @@ interface Actions {
   setFps: (fps: Fps) => void;
   setScene: (scene: ProjectState["scene"]) => void;
   setScript: (text: string) => void;
+  /** One line's directions; null removes them. */
+  setLineDirections: (key: string, d: import("../lib/direct/directions").LineDirections | null) => void;
   setLanguage: (lang: string) => void;
   setNarration: (n: NarrationResult | null) => void;
   setAttachedAudio: (a: ProjectState["attachedAudio"]) => void;
@@ -189,6 +201,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
   setScene: (scene) => set({ scene }),
 
   setScript: (text) => set({ script: text }),
+  setLineDirections: (key, d) => set((s) => { const next = { ...(s.directions ?? {}) }; if (d && d.items.length) next[key] = d; else delete next[key]; return { directions: next }; }),
 
   setLanguage: (lang) => set({ language: lang }),
 
@@ -281,12 +294,12 @@ export const useProjectStore = create<ProjectState & Actions>()(
       return {
         speakers: [
           ...s.speakers,
-          {
+          withCharacterColor({
             ...preset,
             id: crypto.randomUUID(),
             x: n % 2 === 0 ? 0.3 : 0.7,
             y: 0.6,
-          },
+          }),
         ],
       };
     }),
@@ -297,7 +310,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
   updateSpeaker: (id, patch) =>
     set((s) => ({
       speakers: s.speakers.map((sp) =>
-        sp.id === id ? { ...sp, ...patch } : sp
+        sp.id === id ? withCharacterColor({ ...sp, ...patch }) : sp
       ),
     })),
 
@@ -335,7 +348,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
   loadProject: (p) => {
     set(() => ({
       ...defaultProject,
-      ...p,
+      ...migrateFade(p),
       // Nested objects get merged over the defaults rather than replacing them,
       // so a project saved before a field existed still opens with that field
       // at its default instead of undefined. Same shallow-merge trap that made
@@ -380,10 +393,12 @@ export const useProjectStore = create<ProjectState & Actions>()(
         pauseSameMs: s.pauseSameMs,
         pauseTurnMs: s.pauseTurnMs,
         visemeFadeMs: s.visemeFadeMs,
+        fadeMigrated: s.fadeMigrated,
         idleMotion: s.idleMotion,
         fps: s.fps,
         speakers: s.speakers,
         script: s.script,
+        directions: s.directions,
         language: s.language,
         narration: s.narration
           ? { filePath: s.narration.filePath, segments: s.narration.segments, analysis: null }
@@ -400,7 +415,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
       }),
 
       merge: (persisted, current) => {
-        const p = (persisted ?? {}) as Partial<ProjectState>;
+        const p = migrateFade((persisted ?? {}) as Partial<ProjectState>);
         return {
           ...current,
           ...p,

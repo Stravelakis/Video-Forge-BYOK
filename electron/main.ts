@@ -1,3 +1,7 @@
+import { synthesizeGemini } from "./tts/geminiEngine";
+import { pitchShift } from "./audio/pitchShift";
+import { concatWavBuffers } from "./audio/concatWav";
+import { trimSilence } from "./audio/trimSilence";
 import { app, BrowserWindow, ipcMain, dialog, shell, Menu } from "electron";
 import path from "node:path";
 import fsp from "node:fs/promises";
@@ -13,6 +17,10 @@ import { listPiperVoices, synthesizeWithPiper, shutdownAllPiperServers, setPiper
 import { guard, addReadOnlyRoot, pythonAllowed } from "./security/guard";
 import { OPEN_EXTENSIONS, isAppPage, safeExternalUrl, safeMediaId, safeMediaUrl } from "./security/pathGuard";
 import { pathToFileURL } from "node:url";
+import { registerKenneyScheme, serveKenney, shelfRoot as pictureShelves } from "./kenneyProtocol";
+import { makeStillClip, pictureToClip } from "./media/stillClip";
+import { makePicture, photoClip, searchPhotos } from "./media/pictures";
+import { canConvertOffice, googleSlidesPdf, officeToPdf, readPdf } from "./media/slides";
 import { haveFile } from "./net/partFile";
 import { analyzeNarration } from "./audio/analyzeNarration";
 import { listMusic } from "./audio/musicLibrary";
@@ -24,6 +32,8 @@ import { searchVideos, downloadTo, type MediaProvider } from "./net/mediaSearch"
 import { ensureFont, SUBTITLE_FONTS } from "./net/fonts";
 import { searchSounds } from "./net/soundSearch";
 import { planBackgrounds, pickBackgrounds } from "./llm/backgroundPlanner";
+import { modelsOf, providersWithKeys, suggestWith, syncCustomServer } from "./llm/directBrain";
+import { geminiKeys } from "./geminiKeys";
 import { renderVideo, type RenderJob } from "./render/renderVideo";
 import { cacheStats, cleanUp, touch } from "./media/mediaCache";
 import { installExitHandlers, killAllTracked, reapOrphansFromLastSession } from "./process/childTree";
@@ -227,14 +237,19 @@ ipcMain.handle("keys:set", async (_e, provider: string, value: string) => {
   const result = await keyStore.setKey(provider, value);
   // A refusal (the key file could not be read) reaches the screen as a message.
   if (!result.ok) throw new Error(result.problem ?? "The key could not be saved.");
+  if (provider === "custom-url") await syncCustomServer();
   return result.ok;
 });
 
 ipcMain.handle("keys:delete", async (_e, provider: string) => {
   const result = await keyStore.deleteKey(provider);
   if (!result.ok) throw new Error(result.problem ?? "The key could not be removed.");
+  if (provider === "custom-url") await syncCustomServer();
   return result.ok;
 });
+
+/** How many Gemini keys are saved (the main one plus extras). Never the keys. */
+ipcMain.handle("keys:geminiCount", async () => (await geminiKeys()).length);
 
 ipcMain.handle("keys:encryptionAvailable", async () => {
   return keyStore.encryptionAvailable();
@@ -394,6 +409,58 @@ ipcMain.handle("batch:stopMany", async () => {
 /** Downloaded background clips: how much room they take, and clearing them
  *  (electron/media/mediaCache.ts). `keep` = clips the open project uses. */
 const mediaDir = () => path.join(app.getPath("userData"), "media");
+ipcMain.handle("media:stillClip", async (_e, rel: string, width: number, height: number) => makeStillClip(pictureShelves(), rel, mediaDir(), width, height));
+/** Pictures as backgrounds: a free photo, your own picture (picked in the file dialog), one made from a description. */
+ipcMain.handle("media:searchPhotos", async (_e, query: string, orientation?: "portrait" | "landscape") => searchPhotos(String(query), orientation === "portrait" || orientation === "landscape" ? orientation : undefined));
+ipcMain.handle("media:photoClip", async (_e, url: string, width: number, height: number) => photoClip(String(url), mediaDir(), width, height));
+ipcMain.handle("media:fileClip", async (_e, file: string, width: number, height: number) => pictureToClip(guard().assertRead(String(file)), mediaDir(), width, height));
+ipcMain.handle("media:makePicture", async (_e, prompt: string, width: number, height: number) => {
+  const { file, by } = await makePicture(String(prompt), mediaDir());
+  guard().grantReadFile(file);
+  return { picture: file, clip: await pictureToClip(file, mediaDir(), width, height), by };
+});
+/** A picture the window drew (a Kenney room): saved as a JPEG in the media folder. */
+ipcMain.handle("media:savePicture", async (_e, dataUrl: string, name: string) => {
+  const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl));
+  if (!m || m[1].length > 20_000_000) throw new Error("That picture can't be saved.");
+  await fsp.mkdir(mediaDir(), { recursive: true });
+  const file = path.join(mediaDir(), `room-${String(name).replace(/[^a-z0-9]+/gi, "-").slice(0, 30)}-${Date.now().toString(36)}.jpg`);
+  await fsp.writeFile(file, Buffer.from(m[1], "base64"));
+  guard().grantReadFile(file);
+  return file;
+});
+/** A presentation as the background: every kind becomes PDF bytes; the window draws the pages (pdf.js). */
+ipcMain.handle("slides:file", async (_e, file: string) => {
+  const f = guard().assertRead(String(file));
+  return /\.pdf$/i.test(f) ? readPdf(f) : officeToPdf(f);
+});
+ipcMain.handle("slides:google", async (_e, url: string) => googleSlidesPdf(String(url)));
+ipcMain.handle("slides:canOffice", async () => canConvertOffice());
+/** Characters → Voice → Test: the voice as it is set now, with its pitch and speed, and the
+ *  breath between two lines. Gemini (free, the keys rotate) or Piper (offline). Paid voices are never tested. */
+type VoiceTestLine = { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number };
+ipcMain.handle("tts:testVoice", async (_e, line: VoiceTestLine) => {
+  const text = String(line?.text ?? "").slice(0, 300).trim();
+  if (!text) throw new Error("Type something to say.");
+  // up to two sentences, so the breath between lines can be heard too
+  const parts = (text.match(/[^.!?;]+[.!?;]*/g) ?? [text]).map((x) => x.trim()).filter(Boolean);
+  const lines = parts.length > 1 ? [parts[0], parts.slice(1).join(" ")] : [text];
+  const say = async (t: string): Promise<Buffer> => {
+    if (line.engine === "piper") {
+      if (!line.pythonPath || !line.onnxPath) throw new Error("Pick a free voice first, then test it.");
+      return Buffer.from((await synthesizeWithPiper(String(line.pythonPath), guard().assertRead(String(line.onnxPath)), t)).audioBuffer);
+    }
+    const take = await synthesizeGemini({ text: t, language: String(line.language ?? "el").slice(0, 10), model: String(line.model).slice(0, 80), voice: String(line.voice).slice(0, 40), mode: line.mode as never, persona: line.persona ? String(line.persona).slice(0, 200) : undefined });
+    return Buffer.from(take.audioBuffer);
+  };
+  const pitch = Math.max(-12, Math.min(12, Number(line.pitch) || 0));
+  const speed = Math.max(0.5, Math.min(2, Number(line.speed) || 1));
+  const buffers: Buffer[] = [];
+  for (const t of lines) buffers.push(trimSilence(await pitchShift(await say(t), pitch, speed)).buffer);
+  const breath = Math.max(0, Math.min(2000, Number(line.breathMs ?? 120)));
+  const { buffer } = concatWavBuffers(buffers, buffers.map((_, i) => (i === 0 ? 0 : breath)));
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+});
 ipcMain.handle("media:cacheStats", async () => cacheStats(mediaDir()));
 ipcMain.handle("media:cleanUp", async (_e, limitBytes: number, keep: string[] = []) => cleanUp(mediaDir(), limitBytes, keep));
 
@@ -434,6 +501,22 @@ ipcMain.handle(
     return { look: plan.look, scenes: chosen };
   }
 );
+
+/** AI directing: the window builds the prompt (src/lib/direct/suggest.ts) and
+ *  checks every answer against the Direct step's own choices; main only holds
+ *  the keys and asks the chosen AI (electron/llm/directBrain.ts). Strings only,
+ *  capped, so this is not an open pipe. */
+ipcMain.handle("direct:suggest", async (_e, system: string, user: string, provider?: string, model?: string) => {
+  if (typeof system !== "string" || typeof user !== "string" || system.length > 8000 || user.length > 200000) throw new Error("Bad request");
+  return suggestWith(system, user, typeof provider === "string" ? provider : "auto", typeof model === "string" && model ? model.slice(0, 120) : undefined);
+});
+ipcMain.handle("direct:brains", async () => providersWithKeys());
+/** A new set from a description: the same AI keys; the answer is data the window checks (characters/sets/custom.mjs). */
+ipcMain.handle("sets:make", async (_e, system: string, user: string) => {
+  if (typeof system !== "string" || typeof user !== "string" || system.length > 2000 || user.length > 8000) throw new Error("Bad request");
+  return suggestWith(system, user, "auto");
+});
+ipcMain.handle("direct:models", async (_e, provider: string) => (typeof provider === "string" && provider !== "auto" ? modelsOf(provider) : []));
 
 ipcMain.handle(
   "media:searchVideos",
@@ -757,7 +840,10 @@ installExitHandlers(async () => {
   shutdownAllPiperServers();
 });
 
+registerKenneyScheme();
 app.whenReady().then(async () => {
+  void syncCustomServer().catch(() => {});
+  serveKenney();
   // Before anything is started, take down anything a previous session left
   // behind. Checked against the recorded command line first, so a recycled
   // process id never gets someone else's program killed.

@@ -8,14 +8,14 @@
 // ---------------------------------------------------------------------------
 
 import { useLayoutEffect, useRef } from "react";
-import { SETS } from "../../../characters/sets/sets.mjs";
+import { setFor } from "../../../characters/sets/custom.mjs";
 import type { SceneSetting } from "../../lib/motion/seats";
 
 type SetDef = { back: (ctx: CanvasRenderingContext2D, W: number, H: number, o: object) => void; front: (ctx: CanvasRenderingContext2D, W: number, H: number, o: object) => void };
 
 export function SetLayer({ scene, part, width, height, timeMs }: { scene: SceneSetting | null | undefined; part: "back" | "front"; width: number; height: number; timeMs: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const set = scene ? (SETS as Record<string, SetDef>)[scene.id] : null;
+  const set = setFor(scene) as SetDef | null;
   useLayoutEffect(() => {
     const cv = ref.current;
     if (!cv || !set) return;

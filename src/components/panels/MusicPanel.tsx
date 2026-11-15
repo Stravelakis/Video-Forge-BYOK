@@ -36,14 +36,14 @@ export function MusicPanel() {
       setMusic({ filePath: p, analysis });
       if (!analysis) {
         setMusicNote(
-          "Loaded. It will play, but it couldn't be analysed — the music sound bars " +
+          "Loaded. It will play, but it couldn't be analysed — the music sound waves " +
             "won't follow it and it won't repeat if it's shorter than the video. " +
             "A 16-bit PCM .wav does both."
         );
       }
     } catch (e) {
       setMusic({ filePath: p, analysis: null });
-      setMusicNote(`Loaded, but analysing it failed (${e instanceof Error ? e.message : String(e)}). It will still play; to make the sound bars follow it, pick a 16-bit WAV file.`);
+      setMusicNote(`Loaded, but analysing it failed (${e instanceof Error ? e.message : String(e)}). It will still play; to make the sound waves follow it, pick a 16-bit WAV file.`);
     } finally {
       setMusicBusy(false);
     }
@@ -135,21 +135,21 @@ export function MusicPanel() {
           type="color" value={musicColor}
           onChange={(e) => setMusicColor(e.target.value)}
           className="h-9 w-9 border border-accent/30 bg-transparent p-0"
-          data-tip="The colour of the music's sound bars. Click to pick another."
+          data-tip="The colour of the music's sound waves. Click to pick another."
         />
         <span data-tip="The colour of the little moving picture that dances to the music." className="text-sm text-neutral-400">Music colour</span>
       </div>
       <p className="text-sm text-neutral-500">
         The music track always animates — music doesn't take turns the way
         speakers do. With a track loaded it animates to the music itself;
-        without one it borrows the narration. Its sound bars are on the
+        without one it borrows the narration. Its sound waves are on the
         Sound bars tab.
       </p>
 
       <section className="space-y-3 border-t border-accent/15 pt-4">
-        <div data-tip="The moving picture that dances to the music. Turn it on or change how it looks here." className="label-etched">Music sound bars</div>
+        <div data-tip="The moving picture that dances to the music. Turn it on or change how it looks here." className="label-etched">Music sound waves</div>
         <WaveformControls
-          label="Show music sound bars"
+          label="Show music sound waves"
           value={musicWaveform}
           onChange={setMusicWaveform}
           canAnchorToFace={false}

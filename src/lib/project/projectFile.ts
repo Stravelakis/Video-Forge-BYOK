@@ -28,7 +28,7 @@ export const PROJECT_VERSION = 2;
 export const PLAIN_FIELDS = [
   "render", "fps", "speakers", "script", "language",
   "musicWaveform", "musicColor", "subtitles",
-  "pauseSameMs", "pauseTurnMs", "visemeFadeMs", "idleMotion",
+  "pauseSameMs", "pauseTurnMs", "visemeFadeMs", "fadeMigrated", "idleMotion",
   "cards", "logo",
   "backgrounds", "backgroundDim", "backgroundBlur", "backgroundColorLook", "backgroundCrossfadeMs",
   "musicVolume", "musicDuck", "sfx", "scene",
