@@ -213,7 +213,7 @@ declare global {
         ) => () => void;
       };
       tts: {
-        testVoice: (line: { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number }) => Promise<ArrayBuffer>;
+        testVoice: (line: { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number; character?: unknown; studioSound?: boolean }) => Promise<ArrayBuffer>;
         listPiperVoices: (voicesDir: string) => Promise<{ id: string; name: string; onnxPath: string }[]>;
         synthesizePiper: (
           pythonPath: string,

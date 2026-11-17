@@ -38,6 +38,9 @@ import { spawnTracked } from "../process/childTree";
 import { ffmpegBin } from "../process/ffmpegPath";
 import { buildCues } from "../../src/lib/subtitles/wordTiming";
 import { toSrt, toVtt } from "../../src/lib/subtitles/subtitleFiles";
+import { gradeIsActive, speechIsActive, type PostJob } from "../../src/lib/post/postSettings";
+import { seatsFor } from "../../src/lib/motion/seats";
+import { processSpeech, gradeVideo } from "../post/runPost";
 
 export interface RenderJob {
   musicWaveform: RenderProps["musicWaveform"];
@@ -136,6 +139,10 @@ export interface RenderJob {
     opacity: number;
     margin: number;
   } | null;
+  /** Post-production (electron/post): studio sound, voice characters, voices
+   *  left/right, colour grade. Built by postJobFor() in every caller. Absent or
+   *  null: the video is made exactly as before. */
+  post?: PostJob | null;
 }
 
 export interface RenderContext {
@@ -166,6 +173,15 @@ const STAGE = {
   bundle: { from: 10, to: 30 },
   render: { from: 30, to: 100 },
 };
+
+/** With a set chosen, speakers sit where the set seats them, not at their own
+ *  x: the voices go left/right from the seat (same rule as the picture). */
+function withSeatPlaces(post: PostJob, job: RenderJob): PostJob {
+  const seats = seatsFor(job.scene ?? null, job.speakers.length, job.width, job.height);
+  if (!seats) return post;
+  const xOf = new Map(job.speakers.map((sp, i) => [sp.id, seats[i] ? seats[i].x / job.width : sp.x]));
+  return { ...post, voices: post.voices.map((v) => ({ ...v, x: xOf.get(v.speakerId) ?? v.x })) };
+}
 
 function lerp(stage: { from: number; to: number }, t: number): number {
   return Math.round(stage.from + (stage.to - stage.from) * Math.max(0, Math.min(1, t)));
@@ -213,7 +229,31 @@ export async function renderVideo(
   try {
     stopped();
     if (job.audioFilePath) {
-      await fsp.copyFile(job.audioFilePath, path.join(publicDir, AUDIO_PUBLIC_NAME));
+      const staged = path.join(publicDir, AUDIO_PUBLIC_NAME);
+      // POST-PRODUCTION ON THE SPEECH, before anything else reads it. Only for
+      // the narration (it knows who says what); a hand-attached file may be
+      // music and is left alone. A failure costs the treatment, not the video.
+      const segs = job.narrationSegments ?? [];
+      if (job.post && speechIsActive(job.post) && segs.length) {
+        onProgress(STAGE.browser.from, "Post-production: studio sound and voices…");
+        try {
+          const res = await processSpeech({
+            inputPath: job.audioFilePath,
+            outputPath: staged,
+            job: withSeatPlaces(job.post, job),
+            segments: segs,
+            durationSec: job.analysis?.durationMs ? job.analysis.durationMs / 1000 : null,
+            signal: ctx.signal,
+          });
+          warnings.push(...res.warnings);
+        } catch (e) {
+          stopped();
+          warnings.push(`[video-forge] post-production on the speech failed, so the voices are as made (${e instanceof Error ? e.message : String(e)}).`);
+          await fsp.copyFile(job.audioFilePath, staged);
+        }
+      } else {
+        await fsp.copyFile(job.audioFilePath, staged);
+      }
       audioFileName = AUDIO_PUBLIC_NAME;
     }
 
@@ -629,6 +669,7 @@ export async function renderVideo(
       "bannerVideo",        // copied in, forwarded as `bannerVideo`
       "outroPath",
       "logo",               // copied in and forwarded as `logo` in inputProps
+      "post",               // post-production: the speech before, the grade after
       "projectRoot",
       "outputDir",
       "outputName",
@@ -710,6 +751,14 @@ export async function renderVideo(
       });
     }
 
+    stopped();
+    // THE COLOUR GRADE: the one extra video pass, on the lesson only (the
+    // intro and outro cards are joined after, as they were made).
+    if (job.post && gradeIsActive(job.post.grade)) {
+      onProgress(99, "Post-production: colour grade…");
+      const g = await gradeVideo({ videoPath: outputPath, grade: job.post.grade, crf: job.crf ?? 23, signal: ctx.signal });
+      warnings.push(...g.warnings);
+    }
     stopped();
     for (const w of warnings) onProgress(99, w);
     onProgress(

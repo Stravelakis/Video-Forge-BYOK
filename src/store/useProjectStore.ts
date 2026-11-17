@@ -18,6 +18,7 @@ import { defaultProject } from "./defaults";
 import { defaultTrackWaveform } from "../lib/waveform/buildTracks";
 import { withCharacterColor } from "./characterColor";
 import { autosaveSnapshot, blankProject } from "../lib/project/projectFile";
+import { cleanPost, defaultPost, type PostSettings } from "../lib/post/postSettings";
 
 
 const SPEAKER_COLORS = ["#e8a24a", "#4ac2e8"]; // speaker1 / speaker2 from tailwind theme
@@ -127,6 +128,8 @@ interface Actions {
   setPauses: (p: { sameMs?: number; turnMs?: number }) => void;
   setVisemeFadeMs: (v: number) => void;
   setIdleMotion: (v: number) => void;
+  /** Post-production settings (Render step). Nested parts merge. */
+  setPost: (p: { studioSound?: boolean; stereo?: Partial<PostSettings["stereo"]>; grade?: Partial<PostSettings["grade"]> }) => void;
   setFps: (fps: Fps) => void;
   setScene: (scene: ProjectState["scene"]) => void;
   setScript: (text: string) => void;
@@ -197,6 +200,18 @@ export const useProjectStore = create<ProjectState & Actions>()(
   setVisemeFadeMs: (visemeFadeMs) => set({ visemeFadeMs }),
 
   setIdleMotion: (idleMotion) => set({ idleMotion }),
+
+  setPost: (p) =>
+    set((s) => {
+      const cur = s.post ?? defaultPost();
+      return {
+        post: {
+          studioSound: p.studioSound ?? cur.studioSound,
+          stereo: { ...cur.stereo, ...(p.stereo ?? {}) },
+          grade: { ...cur.grade, ...(p.grade ?? {}) },
+        },
+      };
+    }),
 
   setFps: (fps) => set({ fps }),
   setScene: (scene) => set({ scene }),
@@ -359,6 +374,9 @@ export const useProjectStore = create<ProjectState & Actions>()(
       subtitles: { ...defaultProject.subtitles, ...(p.subtitles ?? {}) },
       musicWaveform: migrateTrack({ ...defaultProject.musicWaveform, ...(p.musicWaveform ?? {}) }),
       speakers: (p.speakers ?? []).map(migrateSpeaker),
+      // An opened file always says (docToProject: missing = all off); a sample
+      // project made in code without it is a new project.
+      post: p.post !== undefined ? cleanPost(p.post) : defaultPost(),
     }));
     wholeProjectHook.fn?.();
   },
@@ -391,6 +409,9 @@ export const useProjectStore = create<ProjectState & Actions>()(
           subtitles: { ...current.subtitles, ...(p.subtitles ?? {}) },
           musicWaveform: { ...current.musicWaveform, ...(p.musicWaveform ?? {}) },
           speakers: (p.speakers ?? current.speakers).map(migrateSpeaker),
+          // An autosave from before post-production existed is an older
+          // project: all off. No autosave at all: the new-project default.
+          post: persisted ? cleanPost(p.post) : current.post,
         };
       },
     }

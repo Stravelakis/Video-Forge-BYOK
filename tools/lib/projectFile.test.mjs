@@ -112,5 +112,5 @@ test("something that is not a project is refused", () => {
 test("unknown fields in a file are ignored, not loaded into the app", () => {
   const opened = docToProject({ kind: "byok-project", version: 2, project: { script: "ok", __proto__x: 1, evil: { a: 1 }, isAdmin: true } });
   assert.equal(opened.ok, true);
-  assert.deepEqual(Object.keys(opened.project).sort(), ["attachedAudio", "music", "narration", "script"]);
+  assert.deepEqual(Object.keys(opened.project).sort(), ["attachedAudio", "music", "narration", "post", "script"]);
 });

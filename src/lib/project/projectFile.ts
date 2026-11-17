@@ -16,10 +16,11 @@
 // A file from a NEWER Video Forge is refused with a message rather than opened
 // half-understood.
 //
-// Type-only imports on purpose: tools/lib/projectFile.test.mjs runs this file.
+// Type-only imports (and .ts-suffixed pure ones) on purpose: tools/lib/projectFile.test.mjs runs this file.
 // ---------------------------------------------------------------------------
 
 import type { ProjectState } from "../../store/types";
+import { cleanPost } from "../post/postSettings.ts";
 
 export const PROJECT_KIND = "byok-project";
 export const PROJECT_VERSION = 2;
@@ -35,6 +36,9 @@ export const PLAIN_FIELDS = [
   // The Direct step's stage directions (17 Nov 2026: Save project used to drop
   // them; a file without them opens with none).
   "directions",
+  // Post-production (17 Nov 2026). A file without it is an older project and
+  // opens with everything off, so its sound and picture do not change.
+  "post",
 ] as const;
 
 type Plain = (typeof PLAIN_FIELDS)[number];
@@ -107,6 +111,8 @@ export function docToProject(raw: unknown): OpenResult {
   // walk them, so a wrong shape would break the screen rather than be ignored.
   // A file without any (older files) leaves the new project's empty default.
   if (src.directions !== undefined) project.directions = cleanDirections(src.directions);
+  // Always set: missing (older file) = all off, never the new-project default.
+  project.post = cleanPost(src.post);
   const pathOnly = (v: unknown) => {
     const f = (v as { filePath?: unknown } | null)?.filePath;
     return typeof f === "string" && f ? { filePath: f, analysis: null } : null;

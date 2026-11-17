@@ -23,6 +23,8 @@ import { Toggle } from "../ui/Toggle";
 import { autoClean } from "../../lib/media/autoClean";
 import { useProjectStore } from "../../store/useProjectStore";
 import { useSettingsStore } from "../../store/useSettingsStore";
+import { postJobFor } from "../../lib/post/postSettings";
+import { PostProduction } from "./PostProduction";
 
 /** More shapes from the same project in one go (Ak, 13 Oct 2026). Positions are
  *  fractions of the frame, so the cast lands in the same places on each. */
@@ -240,6 +242,8 @@ export function RenderBar() {
         // Same reasoning: subtitles are only meaningful against the narration
         // whose timings produced them.
         narrationSegments: o.nar ? o.nar.segments : audioPath ? [] : withDirections(narration?.segments ?? [], useProjectStore.getState().directions),
+        // Post-production, built by the same function the batch uses.
+        post: postJobFor(useProjectStore.getState().post, speakers),
       });
 
       if (res.ok) {
@@ -352,6 +356,8 @@ export function RenderBar() {
           data-tip="A small honest label in a corner of the video, in our look — viewers trust it more, and EU rules ask for AI videos to be marked. Also written into the file's own notes."
         />
       </div>
+
+      <PostProduction />
 
       {busy && (
         <div className="flex flex-col gap-1">

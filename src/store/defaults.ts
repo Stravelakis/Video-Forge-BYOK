@@ -1,5 +1,6 @@
 import { ProjectState, defaultLogo } from "./types";
 import { defaultTrackWaveform } from "../lib/waveform/buildTracks";
+import { defaultPost } from "../lib/post/postSettings";
 
 export const defaultProject: ProjectState = {
   render: {
@@ -76,4 +77,6 @@ export const defaultProject: ProjectState = {
   // that nobody reaches for the volume.
   musicVolume: 0.28,
   musicDuck: 0.7,
+  // Post-production: studio sound on for every new project, the rest off.
+  post: defaultPost(),
 };
