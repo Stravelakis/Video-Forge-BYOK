@@ -150,7 +150,7 @@ const api = {
 
     /** The voices on the saved ElevenLabs account. Empty when there is no key. */
     /** One line in a Gemini voice, to hear it (free). */
-    testVoice: (line: { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number }): Promise<ArrayBuffer> => ipcRenderer.invoke("tts:testVoice", line),
+    testVoice: (line: { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number; character?: unknown; studioSound?: boolean }): Promise<ArrayBuffer> => ipcRenderer.invoke("tts:testVoice", line),
     listElevenVoices: (): Promise<{ id: string; name: string; labels?: string }[]> =>
       ipcRenderer.invoke("tts:listElevenVoices"),
 

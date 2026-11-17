@@ -55,6 +55,7 @@ import {
   type TrackWaveform,
 } from "../../src/store/types";
 import { withCharacterColor } from "../../src/store/characterColor";
+import { postJobFor, type PostSettings, type VoiceCharacter } from "../../src/lib/post/postSettings";
 
 /** One member of the cast, as a job file describes them.
  *
@@ -119,9 +120,15 @@ export interface JobSpeaker {
   expression?: ExpressionOptions;
   /** Outline and waveform colour — they are the same value by construction. */
   borderColor?: string;
+  /** Post-production voice character (src/lib/post/postSettings.ts). */
+  voiceCharacter?: VoiceCharacter;
 }
 
 export interface BatchJob {
+  /** Post-production (studio sound, voices left/right, colour grade). Absent:
+   *  the preset's, else all off — a job file written before this existed makes
+   *  the same video it always did. */
+  post?: PostSettings;
   /** The set the speakers sit in (characters/sets/sets.mjs); none if absent. */
   /** Stage directions per line, as the Direct step makes them (src/lib/direct/directions.ts). */
   directions?: import("../../src/lib/direct/directions").Directions;
@@ -420,6 +427,7 @@ export async function runBatchJob(
       size: s?.size ?? fromPreset?.size ?? 0.34,
       ttsEngine: c.engine,
       voiceId: c.piperOnnxPath,
+      voiceCharacter: c.voiceCharacter ?? fromPreset?.voiceCharacter,
     } as SpeakerConfig);
   });
 
@@ -960,6 +968,8 @@ export async function runBatchJob(
     glass: job.glass ?? null,
     aiLabel: job.aiLabel ?? true,
     scene: job.scene ?? null,
+    // Post-production: the same builder the Render step uses.
+    post: job.post || preset.post ? postJobFor(job.post ?? preset.post, speakers) : null,
   } as RenderJob;
 
   const result = await renderVideo(renderJob, ctx);

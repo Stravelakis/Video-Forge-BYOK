@@ -406,6 +406,10 @@ export interface SpeakerConfig {
   /** Per-character voice settings. `speed` and `style` are v2 ONLY — v3
    *  rejects them, and takes its pace from a tag. `stability` on v3 is three
    *  positions (0 / 0.5 / 1) and is snapped to the nearest. */
+  /** Post-production voice character (src/lib/post/postSettings.ts): a preset
+   *  such as "warm narrator" plus pitch/brightness/sparkle. Changes the sound
+   *  of the voice after it is made, never the acting. Absent = natural. */
+  voiceCharacter?: import("../lib/post/postSettings").VoiceCharacter;
   eleven?: {
     stability?: number;
     similarityBoost?: number;
@@ -532,6 +536,9 @@ export interface SfxClip {
 }
 
 export interface ProjectState {
+  /** Post-production after every render (src/lib/post/postSettings.ts).
+   *  New projects: studio sound on. Older projects open with it all off. */
+  post?: import("../lib/post/postSettings").PostSettings;
   /** The Direct step's stage directions, per line (src/lib/direct/directions.ts). */
   directions?: import("../lib/direct/directions").Directions;
   render: RenderSettings;

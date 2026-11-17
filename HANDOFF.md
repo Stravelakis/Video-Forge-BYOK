@@ -8,6 +8,18 @@
 - Needs a short planning session first: where colour is stored, per-show vs per-project style, side-by-side preview page.
 - Ultra reviews, then commits and merges. Do not commit before that.
 
+## 17 Nov 2026: post-production after every render (branch feat/post-production, PR open, not merged)
+Plan items A4, 1, 1b, 2, 3 (Blacksmith/FORGES-PLAN-2026-11-17.md).
+- Settings, presets and panning maths: `src/lib/post/postSettings.ts`. Filter graphs (pure, tested): `electron/post/postGraph.ts`. Running them: `electron/post/runPost.ts`.
+- Where it runs: inside `renderVideo`, so the Render step, Many videos and `--job` all get it. The narration is processed before the frames (audio only, two quick passes: measure, then apply). The colour grade is the one extra video encode, after the frames and before the intro/outro are joined, and only when a grade is on.
+- Studio sound: high-pass 80 Hz, gentle compressor, light de-ess, two-pass loudnorm to -14 LUFS / -1 dBTP. Speech only (needs narration lines); a hand-attached audio file is left alone. Music and effects are mixed after, untouched, so the final mix can sit a little above -14.
+- Voice characters per speaker (Cast > Voice): natural, chibi/bubbly, bright and young, warm narrator, deep and dramatic, radio, plus Pitch / Brightness / Sparkle. Heard in "Test the voice" through the same graph (`tts:testVoice` takes `character` and `studioSound`).
+- Voices left/right: balance from each speaker's x (or their seat in a set), far side down by at most 30%. Off with one speaker.
+- Colour grade: a user-picked `.cube` (path-guarded like every other job file) + contrast + saturation via `lut3d` + `eq`.
+- Saved: `post` is in PLAIN_FIELDS (file + autosave); `voiceCharacter` rides on each speaker. New projects: studio sound on. Older files and autosaves: all off. Batch job files: `post` field, else the preset's (Many videos carries the project's), else off.
+- ffmpeg: the app prefers a full ffmpeg on PATH (gyan 8.1 here: has rubberband, so formant shifts work). Remotion's bundled copy has none of highpass/acompressor/deesser/EQ/chorus/aecho/rubberband/lut3d/eq: pitch falls back to asetrate+atempo, the rest is skipped with a warning. Shipping a full ffmpeg is a packaging decision.
+- Tests: `tools/lib/postProduction.test.mjs` (in `npm test`), incl. a real check that every preset's graph runs on both ffmpegs on a 3 s tone. Not heard by a person yet; the grade was checked on a 32 px test clip only.
+
 ## 17 Nov 2026: save/restore holes and hostile project files (branch fix/save-and-render-safety, not merged, awaiting review)
 From the 16 Nov review (Blacksmith/reviews-2026-11-16/VIDEO-FORGE-REVIEW.md), all confirmed in code first.
 - Save project now keeps the Direct step's directions (`directions` added to PLAIN_FIELDS; this also gives directions undo and the unsaved-work warning, review S2). Directions read from a file are shape-checked (`cleanDirections`). Older files open as before, with no directions.

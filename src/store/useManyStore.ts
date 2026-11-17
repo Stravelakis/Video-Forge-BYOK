@@ -143,6 +143,7 @@ export const useManyStore = create<ManyState>((set, get) => ({
       breathMs: s.breathMs,
       elevenVoiceId: s.elevenVoiceId,
       borderColor: s.borderColor,
+      voiceCharacter: s.voiceCharacter,
     }));
     // The project's own look, carried as a preset — speakers included, so
     // positions, frames and waveforms are exactly as on screen.
@@ -157,6 +158,8 @@ export const useManyStore = create<ManyState>((set, get) => ({
       backgroundBlur: project.backgroundBlur,
       scene: project.scene,
       backgroundCrossfadeMs: project.backgroundCrossfadeMs,
+      // post-production goes with the look, so every video gets it
+      post: project.post,
     };
     const list = rows
       .map((row, i) => ({ row, ok: checks[i]?.ok }))

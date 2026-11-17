@@ -58,6 +58,9 @@ export interface ProjectPreset {
   /** Dark band at the top behind the subtitles. See RenderProps.topScrim. */
   topScrim?: { height: number; opacity: number } | null;
   backgroundCrossfadeMs?: number;
+  /** Post-production settings. Carried by the Many videos look so a batch gets
+   *  what the project has; absent = off. */
+  post?: import("../lib/post/postSettings").PostSettings;
   /** Layout and dress, one entry per speaker, applied by position.
    *
    *  Supersedes `speakers` above for everything a preset should own. `speakers`

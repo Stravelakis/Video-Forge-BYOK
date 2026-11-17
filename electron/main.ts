@@ -43,6 +43,8 @@ import { buildNarration, estimatePaid, type BuiltNarration, type NarrationInput 
 import { describePaid, type PaidPolicy } from "./tts/paidVoice";
 import { remakeLine } from "./tts/remakeLine";
 import { runBatchJob, type BatchJob } from "./batch/runJob";
+import { processVoiceTest } from "./post/runPost";
+import { cleanVoiceCharacter } from "../src/lib/post/postSettings";
 import { makeSfxEleven } from "./audio/makeSfxEleven";
 import { getSfxFreesound } from "./audio/getSfxFreesound";
 import { addOutros } from "./render/addOutros";
@@ -439,7 +441,7 @@ ipcMain.handle("slides:google", async (_e, url: string) => googleSlidesPdf(Strin
 ipcMain.handle("slides:canOffice", async () => canConvertOffice());
 /** Characters → Voice → Test: the voice as it is set now, with its pitch and speed, and the
  *  breath between two lines. Gemini (free, the keys rotate) or Piper (offline). Paid voices are never tested. */
-type VoiceTestLine = { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number };
+type VoiceTestLine = { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number; character?: unknown; studioSound?: boolean };
 ipcMain.handle("tts:testVoice", async (_e, line: VoiceTestLine) => {
   const text = String(line?.text ?? "").slice(0, 300).trim();
   if (!text) throw new Error("Type something to say.");
@@ -459,7 +461,10 @@ ipcMain.handle("tts:testVoice", async (_e, line: VoiceTestLine) => {
   const buffers: Buffer[] = [];
   for (const t of lines) buffers.push(trimSilence(await pitchShift(await say(t), pitch, speed)).buffer);
   const breath = Math.max(0, Math.min(2000, Number(line.breathMs ?? 120)));
-  const { buffer } = concatWavBuffers(buffers, buffers.map((_, i) => (i === 0 ? 0 : breath)));
+  const { buffer: joined } = concatWavBuffers(buffers, buffers.map((_, i) => (i === 0 ? 0 : breath)));
+  // The speaker's voice character and the project's studio sound, through the
+  // render's own post-production graph, so the test sounds like the video.
+  const buffer = await processVoiceTest(joined, cleanVoiceCharacter(line.character), line.studioSound === true);
   return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 });
 ipcMain.handle("media:cacheStats", async () => cacheStats(mediaDir()));

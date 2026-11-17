@@ -38,6 +38,7 @@ import { builtinPuppetPath, type BrandInfo, type BuiltinCharacter } from "../../
 import { defaultTrackWaveform } from "../../lib/waveform/buildTracks";
 import type { OutlineShape, SpeakerConfig } from "../../store/types";
 import { GEMINI_MODELS, GEMINI_VOICES, DEFAULT_GEMINI_MODEL, DEFAULT_GEMINI_VOICE, geminiModeOf, engineOf } from "../../lib/narration/geminiVoices";
+import { VoiceCharacterPicker } from "./VoiceCharacterPicker";
 
 /** DramaBox was retired on 10 Oct 2026 (it needed a rented Google Cloud GPU).
  *  Its per-character knobs stay in the code — the Narration tab can still
@@ -476,6 +477,7 @@ export function CastPanel({ only, speakerId }: { only?: string[]; speakerId?: st
               return (
             <Section title="Voice" tip="How they sound.">
               <VoiceTest sp={sp} />
+              <VoiceCharacterPicker sp={sp} onChange={(voiceCharacter) => updateSpeaker(sp.id, { voiceCharacter })} />
               {own && !usesProjectVoice(sp) && (
                 <p className="text-sm text-neutral-400" data-tip={`This voice belongs to ${sp.label} and travels with them. Change anything below and it changes in this project only; ${sp.label}'s own voice stays as it is.`}>
                   🔒 {sp.label}&apos;s own voice: {said(own)}. Changing it here changes it in this project only.
@@ -837,6 +839,9 @@ function VoiceTest({ sp: raw }: { sp: SpeakerConfig }) {
   const lang = useProjectStore((s) => s.language);
   const sameMs = useProjectStore((s) => s.pauseSameMs);
   const piperPython = useSettingsStore((s) => s.defaults.piperPythonPath);
+  // heard as the render will make it: this speaker's voice character and the
+  // project's studio sound (electron/post)
+  const studioSound = useProjectStore((s) => s.post?.studioSound ?? false);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
@@ -855,7 +860,7 @@ function VoiceTest({ sp: raw }: { sp: SpeakerConfig }) {
         return;
       }
       const model = sp.geminiModel ?? DEFAULT_GEMINI_MODEL;
-      const buf = await window.byok.tts.testVoice({ engine, text: say, language: lang, model, voice: sp.geminiVoice ?? DEFAULT_GEMINI_VOICE, mode: geminiModeOf(model), persona: sp.description, pythonPath: piperPython, onnxPath: sp.voiceId, pitch: sp.pitch ?? 0, speed: sp.speed ?? 1, breathMs: sp.breathMs ?? sameMs });
+      const buf = await window.byok.tts.testVoice({ engine, text: say, language: lang, model, voice: sp.geminiVoice ?? DEFAULT_GEMINI_VOICE, mode: geminiModeOf(model), persona: sp.description, pythonPath: piperPython, onnxPath: sp.voiceId, pitch: sp.pitch ?? 0, speed: sp.speed ?? 1, breathMs: sp.breathMs ?? sameMs, character: raw.voiceCharacter, studioSound });
       const a = new Audio(URL.createObjectURL(new Blob([buf], { type: "audio/wav" })));
       audio.current = a; await a.play();
     } catch (e) { setNote(plainError(e, "Press Test again.")); }

@@ -17,6 +17,7 @@
 // ---------------------------------------------------------------------------
 
 import type { RenderJob } from "./renderVideo";
+import { cleanPostJob } from "../../src/lib/post/postSettings.ts";
 
 /** Every file on disk the job asks the render to read, with what it is for. */
 export function renderJobPaths(job: RenderJob): { what: string; path: unknown }[] {
@@ -30,6 +31,7 @@ export function renderJobPaths(job: RenderJob): { what: string; path: unknown }[
   add("outro", job.outroPath);
   add("logo", job.logo?.filePath);
   add("banner", job.bannerVideo?.filePath);
+  add("colour LUT", job.post?.grade?.lutPath);
   for (const s of job.sfx ?? []) add("sound effect", s?.filePath);
   for (const b of job.backgrounds ?? []) add("background", b?.filePath);
   for (const sp of job.speakers ?? []) {
@@ -71,6 +73,8 @@ export function cleanRenderNumbers(job: RenderJob): RenderJob {
     idleMotion: opt(job.idleMotion),
     introOverMs: opt(job.introOverMs),
     backgroundColorLook: typeof job.backgroundColorLook === "string" ? job.backgroundColorLook : undefined,
+    // post-production numbers go into ffmpeg filter text too
+    post: job.post === undefined ? undefined : cleanPostJob(job.post),
     sfx: job.sfx?.map((s) => ({ ...s, atMs: num(s.atMs, 0), volume: num(s.volume, 1) })),
     backgrounds: job.backgrounds?.map((b) => ({ ...b, startMs: num(b.startMs, 0), endMs: num(b.endMs, 0), sourceSec: opt(b.sourceSec) })),
     backgroundBand: job.backgroundBand ? { top: num(job.backgroundBand.top, 0), bottom: num(job.backgroundBand.bottom, 1) } : job.backgroundBand,
