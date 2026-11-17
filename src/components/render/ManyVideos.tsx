@@ -19,9 +19,9 @@ import { ErrorLine } from "../ui/ErrorLine";
 
 type ManyStep = "cast" | "sheet" | "check" | "make";
 const STEPS: { id: ManyStep; title: string; sub: string }[] = [
-  { id: "cast", title: "Cast & look", sub: "From your puppet video" },
+  { id: "cast", title: "Characters & look", sub: "From your puppet video" },
   { id: "sheet", title: "Sheet", sub: "One row per video" },
-  { id: "check", title: "Check", sub: "Every script against the cast" },
+  { id: "check", title: "Check", sub: "Every script against the characters" },
   { id: "make", title: "Make", sub: "One video at a time" },
 ];
 const WIDTH: Record<ManyStep, number> = { cast: 400, sheet: 460, check: 420, make: 420 };
@@ -38,7 +38,7 @@ export function ManyVideosStudio({ onEditProject }: { onEditProject: () => void 
   const failed = Object.values(progress).filter((p) => p.status === "failed").length;
 
   const status: Record<ManyStep, string> = {
-    cast: speakers.length ? `${speakers.map((s) => s.label).join(", ")} · ${render.format}` : "No cast yet — set it up in Puppet video",
+    cast: speakers.length ? `${speakers.map((s) => s.label).join(", ")} · ${render.format}` : "No characters yet — set them up in Puppet video",
     sheet: rows.length ? `${rows.length} row${rows.length > 1 ? "s" : ""} from ${/docs\.google\.com/.test(source) ? "a Google Sheet" : source.split(/[\\/]/).pop() || "the sheet"}` : "No sheet read yet",
     check: rows.length ? `${ready} of ${rows.length} ready` : "Read a sheet first",
     make: running ? `Making… ${done} of ${ready} done` : finished ? finished.split(" — ")[0] : ready ? `Ready to make ${ready}` : "Nothing ready yet",
@@ -84,7 +84,7 @@ export function ManyVideosStudio({ onEditProject }: { onEditProject: () => void 
         {rows.length === 0 ? (
           <div className="forge-many-empty" data-tip="Read a sheet in step 2 and its videos appear here.">
             <b>One row of a spreadsheet = one video.</b>
-            <span>Your cast and look stay the same; each row brings its own script. Read a sheet in step 2.</span>
+            <span>Your characters and look stay the same; each row brings its own script. Read a sheet in step 2.</span>
           </div>
         ) : (
           <div className="forge-many-board">
@@ -119,7 +119,7 @@ function CastStep({ onEditProject }: { onEditProject: () => void }) {
   const render = useProjectStore((s) => s.render);
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-neutral-300" data-tip="Every video in the sheet uses the cast and look you set up in the puppet video.">Every video uses the cast and the look of your puppet video. Each row of the sheet only brings its script (and, if you like, its own shape, music and backgrounds).</p>
+      <p className="text-sm text-neutral-300" data-tip="Every video in the sheet uses the characters and look you set up in the puppet video.">Every video uses the characters and the look of your puppet video. Each row of the sheet only brings its script (and, if you like, its own shape, music and backgrounds).</p>
       {speakers.length ? (
         <ul className="flex flex-wrap gap-2 m-0 p-0 list-none">
           {speakers.map((s) => (
@@ -130,7 +130,7 @@ function CastStep({ onEditProject }: { onEditProject: () => void }) {
         <p className="text-sm text-amber-200" data-tip="There is nobody to speak the lines yet.">No speakers yet.</p>
       )}
       <p className="text-xs text-neutral-400" data-tip="The shape and size every video will have, unless its row says otherwise.">Shape: {render.format} · {render.width}×{render.height}</p>
-      <button className="btn" onClick={onEditProject} data-tip="Opens the puppet video, where you change the cast and the look. Come back here after.">Change the cast or the look</button>
+      <button className="btn" onClick={onEditProject} data-tip="Opens the puppet video, where you change the characters and the look. Come back here after.">Change the characters or the look</button>
     </div>
   );
 }
@@ -182,7 +182,7 @@ function CheckStep() {
   const bad = checks.map((c, i) => ({ c, i })).filter((x) => !x.c.ok);
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm text-neutral-300" data-tip="Every row's script was matched against your cast: each line must start with a speaker's name.">{checks.length - bad.length} of {rows.length} rows are ready. Each script was matched against your cast.</p>
+      <p className="text-sm text-neutral-300" data-tip="Every row's script was matched against your characters: each line must start with a speaker's name.">{checks.length - bad.length} of {rows.length} rows are ready. Each script was matched against your characters.</p>
       {bad.length > 0 && (
         <>
           <div className="label-etched" data-tip="Rows that will be skipped until they are fixed in the sheet.">Not ready</div>

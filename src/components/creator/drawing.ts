@@ -81,6 +81,8 @@ export interface Clip {
   /** A chair under them. */
   chair?: boolean;
   framing?: Framing;
+  /** Talking clips only: how much the hands move, 0 (still) to 1 (lively). Default 1. */
+  energy?: number;
 }
 
 /** The preview strip, in Ak's order: idle, talk, hair, sit, stand, walk, wave, dance, then acted moves. */
@@ -111,7 +113,13 @@ const TALK = ["explain", "point", "shrug", "think", "hips"];
 export function clipFrame(clip: Clip, t: number, seed = 2): { state: CharacterState; mirror: boolean } {
   const len = clipLength(clip), ms = t % len, view = clip.view ?? 0;
   if (!clip.move) {
-    const state = autoPerformance(ms / 1000, { seed, talking: !!clip.talking, pose: clip.talking ? TALK[Math.floor(ms / 2600) % TALK.length] : "rest", poseK: 1, view });
+    // Gestures work like the video (buildSpeakerPoseTracks): the amount is how OFTEN a line gets
+    // a gesture: every line at 100%, every other at 50%, one in four at 25%, none at 0.
+    // Each 2.6 s here stands for one line; counted on the real clock so a calm figure stays calm.
+    const k = Math.max(0, Math.min(1, clip.energy ?? 1));
+    const line = Math.floor(t / 2600), every = k > 0.02 ? Math.max(1, Math.round(1 / k)) : Infinity;
+    const gesturing = !!clip.talking && line % every === 0;
+    const state = autoPerformance(ms / 1000, { seed, talking: !!clip.talking, pose: gesturing ? TALK[Math.floor(line / every) % TALK.length] : "rest", poseK: 0.55 + 0.45 * k, view });
     return { state, mirror: false };
   }
   const end = Math.min(SHELF[clip.move].lengthMs, 7000) + 300;
@@ -120,7 +128,7 @@ export function clipFrame(clip: Clip, t: number, seed = 2): { state: CharacterSt
   const perf: any = performAt({ poseSpans: [], moveSpans: spans as any, shelf: SHELF }, ms, { view, energy: 0.6, seed: 2 });
   const ap = autoPerformance(ms / 1000, { seed, talking: false });
   const props = [...(perf.props ?? []), ...(clip.chair ? [{ id: "chair", hand: "F", open: 0 }] : [])];
-  const state: any = characterState({ timeMs: ms, viseme: 0, mix: 1, head: ap.head ?? undefined, active: false, view, move: { joints: perf.joints, hands: perf.hands ?? { F: "relaxed", B: "relaxed" }, props, face: perf.faceCue } as any, breath: perf.breath });
+  const state: any = characterState({ timeMs: ms, viseme: 0, mix: 1, head: ap.head ?? undefined, active: false, view, move: { joints: perf.joints, hands: perf.hands ?? { F: "relaxed", B: "relaxed" }, handBlend: perf.handBlend, props, face: perf.faceCue } as any, breath: perf.breath });
   state.lid = ap.lid;
   if (clip.follow) {
     state.follow = followAt((x) => {

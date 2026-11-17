@@ -69,6 +69,9 @@ export type RenderSpeaker = {
    *  tuned, and a mismatch shows up as a missing layer instead of as art that
    *  is subtly the wrong one. */
   puppetFiles: Record<string, string>;
+  /** A Kenney 3D character. Wins over everything else. */
+  kenney?: import("../src/lib/kenney/actor").KenneyCard | null;
+  kenneyFraming?: "body" | "bust" | "face";
   /** A drawn character (characters/core). Wins over the puppet and the sheet.
    *  Pure JSON: nothing to copy into the public dir. */
   character?: CharacterCard | null;

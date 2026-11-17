@@ -38,6 +38,56 @@ interface Provider {
   access: Access;
 }
 
+/** More Gemini keys: used in turn when one runs out of its free allowance. */
+function ExtraGeminiKeys({ saved, onSaved }: { saved: string[]; onSaved: () => void }) {
+  const [text, setText] = useState("");
+  const [count, setCount] = useState<number | null>(null);
+  const [msg, setMsg] = useState("");
+  useEffect(() => { void window.byok.keys.geminiCount().then(setCount).catch(() => setCount(null)); }, [saved]);
+  const n = text.split(/[\s,;]+/).filter((s) => s.trim().length >= 20).length;
+  const save = async () => {
+    try { await window.byok.keys.set("gemini-extra", text.trim()); setText(""); setMsg(`Saved ${n} extra key${n === 1 ? "" : "s"}.`); onSaved(); }
+    catch (e) { setMsg(String((e as Error)?.message ?? e)); }
+  };
+  const clear = async () => { try { await window.byok.keys.remove("gemini-extra"); setMsg("Extra keys removed."); onSaved(); } catch (e) { setMsg(String((e as Error)?.message ?? e)); } };
+  return (
+    <div className="mb-3 space-y-1">
+      <div className="label-etched" data-tip="When one key's free allowance runs out, the next one is used.">More Gemini keys, used in turn {count !== null && <span className="text-emerald-400">· {count} key{count === 1 ? "" : "s"} in use</span>}</div>
+      <div className="flex gap-2 items-start">
+        <textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder={saved.includes("gemini-extra") ? "Replace the extra keys… (one per line)" : "Paste extra keys, one per line"}
+          aria-label="Extra Gemini keys" data-tip="One key per line. Saving replaces the extra keys saved before; the main key above stays."
+          className="flex-1 bg-metal-900 border border-accent/25 px-3 py-2 text-base text-neutral-100 outline-hidden focus:border-accent" style={{ WebkitTextSecurity: "disc" } as React.CSSProperties} />
+        <button onClick={() => void save()} disabled={!n} data-tip="Keeps these keys on this computer." className="btn cut-sm btn-primary px-4 py-2 text-sm font-display font-semibold uppercase tracking-[0.1em] disabled:opacity-40">Save {n || ""}</button>
+        {saved.includes("gemini-extra") && <button onClick={() => void clear()} data-tip="Forgets the extra keys. The main key stays." className="btn cut-sm px-4 py-2 text-sm font-display uppercase tracking-[0.1em] hover:text-red-400">Clear extras</button>}
+      </div>
+      {msg && <p className="text-sm text-neutral-300" data-tip="What happened to the extra keys.">{msg}</p>}
+    </div>
+  );
+}
+
+/** The address of "Your own server". Saved beside the keys; never read back. */
+function ServerAddress({ saved, onSaved }: { saved: boolean; onSaved: () => void }) {
+  const [url, setUrl] = useState("");
+  const [msg, setMsg] = useState("");
+  const ok = /^https?:\/\/[^\s/]+/i.test(url.trim());
+  const save = async () => {
+    try { await window.byok.keys.set("custom-url", url.trim()); setUrl(""); setMsg("Address saved. Now paste its key (or none) and press Test."); onSaved(); }
+    catch (e) { setMsg(String((e as Error)?.message ?? e)); }
+  };
+  return (
+    <div className="mb-3 space-y-1">
+      <div className="flex gap-2">
+        <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder={saved ? "Replace address…" : "http://localhost:1234/v1"}
+          aria-label="Server address" data-tip="The server's address, like http://localhost:1234/v1 for LM Studio or http://localhost:11434/v1 for Ollama. /v1 is added if missing."
+          className="flex-1 bg-metal-900 border border-accent/25 px-3 py-2 text-base text-neutral-100 outline-hidden focus:border-accent" />
+        <button onClick={() => void save()} disabled={!ok} data-tip="Keeps this address on this computer." className="btn cut-sm btn-primary px-4 py-2 text-sm font-display font-semibold uppercase tracking-[0.1em] disabled:opacity-40">Save address</button>
+      </div>
+      {saved && !msg && <p className="text-sm text-emerald-400" data-tip="An address for your own server is saved.">address saved ✓</p>}
+      {msg && <p className="text-sm text-neutral-300" data-tip="What happened to the address.">{msg}</p>}
+    </div>
+  );
+}
+
 const PROVIDERS: Provider[] = [
   {
     id: "elevenlabs",
@@ -63,21 +113,21 @@ const PROVIDERS: Provider[] = [
   {
     id: "openrouter",
     label: "OpenRouter",
-    what: "Fish Audio, the voice with the funny foreign accent. Free model; the key is free too.",
+    what: "Fish Audio, the voice with the funny foreign accent, and a choice of AIs for directing, explainers and character cards. Free models; the key is free too.",
     url: "https://openrouter.ai/keys",
     access: "instant",
   },
   {
     id: "nvidia",
     label: "NVIDIA",
-    what: "Writes and polishes your script with GLM-5.2. Free to use.",
+    what: "Writes and polishes your script, and can direct (✨ Suggest in the Direct step). Free to use.",
     url: "https://build.nvidia.com/",
     access: "instant",
   },
   {
     id: "groq",
     label: "Groq",
-    what: "A fast, free-tier brain for writing explainer scene lists and character cards. The easiest one to start with.",
+    what: "A fast, free-tier brain for directing, explainer scene lists and character cards. The easiest one to start with.",
     url: "https://console.groq.com/keys",
     access: "instant",
   },
@@ -100,6 +150,16 @@ const PROVIDERS: Provider[] = [
     label: "Mistral",
     what: "A brain for explainers and character cards. Has a free tier.",
     url: "https://console.mistral.ai/api-keys",
+    access: "instant",
+  },
+  {
+    id: "custom",
+    label: "Your own server",
+    what:
+      "Any AI server that speaks the OpenAI language: OmniRoute, FreeLLMAPI, LM Studio, Ollama, llama.cpp, or a computer of " +
+      "your own on the network. Put its address below, then its key (type none if it has no key). Used for directing, " +
+      "explainers and character cards.",
+    url: "https://lmstudio.ai/",
     access: "instant",
   },
   {
@@ -427,8 +487,10 @@ export default function BackendPanel() {
               className="text-sm text-accent-bright underline hover:text-accent inline-block mb-3"
               data-tip={`Opens the ${p.label} website where you can get your own key. A key is like a password that lets this app use the service.`}
             >
-              Get a key →
+              {p.id === "custom" ? "Get LM Studio (one way to run your own) →" : "Get a key →"}
             </a>
+            {p.id === "custom" && <ServerAddress saved={saved.includes("custom-url")} onSaved={refresh} />}
+            {p.id === "gemini" && <ExtraGeminiKeys saved={saved} onSaved={refresh} />}
 
                 <div className="flex gap-2">
                   <input

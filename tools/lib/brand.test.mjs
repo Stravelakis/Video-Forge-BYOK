@@ -8,6 +8,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { ROOT, activeBrandId, listBrands, loadBrand, setActiveBrand } from "./brand.mjs";
+import __fsForPacks from "node:fs";
+
+// These tests read the private brand packs (brands/ = DnD-World/Video-Forge-brands).
+// In a public copy without them they are skipped, not failed.
+const __packsHere = __fsForPacks.existsSync(new URL("../../brands/skilitsa/brand.json", import.meta.url));
+const packTest = (name, fn) => test(name, { skip: !__packsHere && "needs the private brand packs" }, fn);
 
 function tmpRoot() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "brand-"));
@@ -62,7 +68,7 @@ test("lists packs by folder", () => {
 });
 
 // The real pack in this repository: every character it names has a puppet.
-test("the Skilitsa pack is complete", () => {
+packTest("the Skilitsa pack is complete", () => {
   const b = loadBrand("skilitsa", ROOT);
   assert.ok(b.cast.length > 0);
   for (const c of b.cast) {

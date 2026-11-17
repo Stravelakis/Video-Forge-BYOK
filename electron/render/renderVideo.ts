@@ -16,6 +16,7 @@
 // ---------------------------------------------------------------------------
 
 import { activeCard } from "../../characters/core/index.mjs";
+import { pictureTag } from "../../src/lib/motion/popTracks";
 import path from "node:path";
 import fsp from "node:fs/promises";
 import os from "node:os";
@@ -32,6 +33,7 @@ import type { Puppet } from "../../src/store/puppetTypes";
 import { puppetAssetPaths, validatePuppet } from "../../src/lib/puppets/puppetAssets";
 import { ensureFont } from "../net/fonts";
 import { joinCards } from "./joinCards";
+import { cleanRenderNumbers } from "./jobSafety";
 import { spawnTracked } from "../process/childTree";
 import { ffmpegBin } from "../process/ffmpegPath";
 import { buildCues } from "../../src/lib/subtitles/wordTiming";
@@ -147,6 +149,10 @@ export interface RenderContext {
   /** Aborting stops the render: the processes it started are ended and the
    *  half-made file is removed. */
   signal?: AbortSignal;
+  /** May this file be read? main passes the path guard, so a puppet cannot
+   *  name art outside the folders the app reads from. Absent: no check (the
+   *  batch runs job files the user wrote themselves). */
+  canRead?: (p: string) => boolean;
 }
 
 const AUDIO_PUBLIC_NAME = "narration.wav";
@@ -166,7 +172,7 @@ function lerp(stage: { from: number; to: number }, t: number): number {
 }
 
 export async function renderVideo(
-  job: RenderJob,
+  rawJob: RenderJob,
   ctx: RenderContext
 ): Promise<{
   outputPath: string;
@@ -177,6 +183,9 @@ export async function renderVideo(
   warnings: string[];
 }> {
   const { projectRoot, outputDir, onProgress } = ctx;
+  // Every number that reaches the page or an ffmpeg filter, made a real number
+  // (a project file can hold a string there: jobSafety.ts).
+  const job = cleanRenderNumbers(rawJob);
 
   const entryPoint = path.join(projectRoot, "remotion", "index.ts");
   try {
@@ -292,6 +301,10 @@ export async function renderVideo(
         if (!res.ok) throw new Error(res.error);
         const files: Record<string, string> = {};
         for (const [file, abs] of Object.entries(puppetAssetPaths(res.puppet, puppetPath))) {
+          if (ctx.canRead && !ctx.canRead(abs)) {
+            warnings.push(`[video-forge] ${label}: layer ${file} is outside the folders this app reads from; left out.`);
+            continue;
+          }
           let name = layerNameByPath.get(abs);
           if (!name) {
             name = `puppet-${layerNameByPath.size}${path.extname(abs) || ".png"}`;
@@ -317,6 +330,22 @@ export async function renderVideo(
       puppetCache.set(puppetPath, prepared);
       return prepared;
     };
+
+    // Script stickers ([pop emoji dog-face]): only the ones this video uses
+    for (const seg of job.narrationSegments ?? []) {
+      for (const tag of seg.tags ?? []) {
+        const rel = pictureTag(tag);
+        if (!rel) continue;
+        const to = path.join(publicDir, "shelf", rel);
+        await fsp.mkdir(path.dirname(to), { recursive: true });
+        await fsp.copyFile(path.join(process.env.VIDEOFORGE_SHELVES || path.join(os.homedir(), "Tools", "assets", "_shelves"), rel), to).catch(() => warnings.push(`[video-forge] Sticker not found: ${tag}`));
+      }
+    }
+
+    // 3D characters: their models, faces and motions ride along in the render folder
+    if (job.speakers.some((sp) => sp.kenney)) {
+      await fsp.cp(path.join(projectRoot, "characters", "samples", "kenney", "builder"), path.join(publicDir, "kenney"), { recursive: true });
+    }
 
     const speakers: RenderSpeaker[] = [];
     const portraitByPath = new Map<string, string>();
@@ -373,6 +402,8 @@ export async function renderVideo(
         // the one rule for which form shows (characters/core/profile.mjs)
         character: activeCard(sp) ?? null,
         portrait,
+        kenney: sp.kenney ?? null,
+        kenneyFraming: sp.kenneyFraming,
       });
     }
 
@@ -560,7 +591,7 @@ export async function renderVideo(
       backgroundCrossfadeMs: job.backgroundCrossfadeMs ?? 0,
       subtitles: job.subtitles,
       subtitleFont,
-      visemeFadeMs: job.visemeFadeMs ?? 0,
+      visemeFadeMs: job.visemeFadeMs ?? 70, // picture mouths fade (Ak, 11 Nov 2026)
       idleMotion: job.idleMotion ?? 0,
       narrationSegments: job.narrationSegments ?? [],
       narrationPauses: job.narrationPauses ?? [],
@@ -737,6 +768,8 @@ export async function renderVideo(
     // A Stop leaves no half-made video behind.
     if (ctx.signal?.aborted && partialOutput) await fsp.rm(partialOutput, { force: true }).catch(() => {});
     // Best-effort: a leftover temp dir must never fail an otherwise good render.
-    await fsp.rm(publicDir, { recursive: true, force: true }).catch(() => {});
+    // VIDEOFORGE_KEEP_RENDER=1 keeps the work folder for debugging a render (its path is logged)
+    if (process.env.VIDEOFORGE_KEEP_RENDER === "1") console.log(`[video-forge] render work folder kept: ${publicDir}`);
+    else await fsp.rm(publicDir, { recursive: true, force: true }).catch(() => {});
   }
 }

@@ -62,6 +62,7 @@ export function characterState(sig) {
   return {
     joints: mv?.joints ?? null,
     hands: mv?.hands ?? null,
+    handBlend: mv?.handBlend ?? null,
     props: mv?.props ?? [],
     smile: mf?.smile ?? 0,
     t,
@@ -73,7 +74,7 @@ export function characterState(sig) {
     mouth: { from: sig.prevViseme ?? sig.viseme ?? 0, to: sig.viseme ?? 0, mix: sig.mix ?? 1 },
     // a move's eyes give way to blinks (closed beats wide), never the other way round
     lid: mf?.lids && sig.lidTo !== "closed" && sig.lidFrom !== "closed" ? { from: mf.lids, to: mf.lids, mix: 1 } : { from: sig.lidFrom ?? "open", to: sig.lidTo ?? sig.lidFrom ?? "open", mix: sig.lidMix ?? 1 },
-    brows: mf?.brows ? { left: mf.brows, right: mf.brows } : { left: sig.browLeft ?? "serious", right: sig.browRight ?? sig.browLeft ?? "serious" },
+    brows: mf?.brows ? { left: mf.brows, right: mf.brows } : { left: sig.browLeft ?? "serious", right: sig.browRight ?? sig.browLeft ?? "serious", from: sig.browFrom, mix: sig.browMix ?? 1 },
     gaze: 0.4,
     walk: sig.walk ?? null,
     sitting: !!sig.sitting,

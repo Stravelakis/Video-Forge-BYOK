@@ -289,7 +289,7 @@ export function PresetsPanel() {
           is for keeping named copies and moving them between machines.
         </p>
         <div className="flex gap-2">
-          <HudButton onClick={saveProject} data-tip="Saves everything (cast, script, voices, look) into one file on your computer.">Save project…</HudButton>
+          <HudButton onClick={saveProject} data-tip="Saves everything (characters, script, voices, look) into one file on your computer.">Save project…</HudButton>
           <HudButton onClick={openProject} data-tip="Opens a project file you saved before, with everything just as you left it.">Open project…</HudButton>
         </div>
       </section>

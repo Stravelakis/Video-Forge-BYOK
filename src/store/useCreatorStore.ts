@@ -1,3 +1,4 @@
+import type { SpeakerConfig } from "./types";
 // ---------------------------------------------------------------------------
 // The character creator's working state (phase 2, 7 Nov 2026).
 //
@@ -10,7 +11,7 @@
 // ---------------------------------------------------------------------------
 
 import { create } from "zustand";
-import { normalizeCharacter, type CharacterFile, type PartId } from "../../characters/core/index.mjs";
+import { PARTS, normalizeCharacter, type CharacterCard, type CharacterFile, type PartId } from "../../characters/core/index.mjs";
 import { changed } from "../lib/creator/edit";
 
 export interface BrandCast {
@@ -46,6 +47,8 @@ interface CreatorState {
 
   load: () => Promise<void>;
   open: (brand: string, id: string) => void;
+  /** Open a video's drawn speaker in the builder, without any character file. */
+  openForSpeaker: (sp: SpeakerConfig) => Promise<void>;
   /** Change the open character (fn gets the current version). */
   edit: (fn: (c: CharacterFile) => CharacterFile) => void;
   undoOne: () => void;
@@ -91,6 +94,23 @@ export const useCreatorStore = create<CreatorState>((set, get) => ({
     } catch (e) {
       set({ brands: [], loadError: e instanceof Error ? e.message : String(e) });
     }
+  },
+
+  openForSpeaker: async (sp) => {
+    if (!get().brands) await get().load();
+    const card = sp.character; if (!card) return;
+    const { wear = [], name, look, framing, ...base } = card as CharacterCard & { wear?: unknown[] };
+    const raw = {
+      kind: "video-forge-character", v: 1, id: sp.id, roster: null, name: sp.label || name || "Character", group: "video", role: sp.description ?? "", look: look ?? "sticker", framing: framing ?? "full",
+      signature: sp.borderColor, signatureName: "main colour", voice: null, locks: Object.fromEntries(PARTS.map((p) => [p.id, false])), base: { ...base, name: sp.label },
+      accessories: [], faces: [{ id: "usual", label: "Usual", set: {} }], chosen: { face: "usual", outfits: ["outfit"] }, outfits: [{ id: "outfit", label: "Outfit", wear }],
+    };
+    const { character } = normalizeCharacter(raw);
+    const list = get().brands ?? [];
+    const old = list.find((b) => b.brand === "__video");
+    const video: BrandCast = { brand: "__video", title: "This video", settings: {}, saved: { ...old?.saved, [sp.id]: character }, readProblems: {}, where: {}, order: [...new Set([...(old?.order ?? []), sp.id])] };
+    set({ brands: [video, ...list.filter((b) => b.brand !== "__video")] });
+    get().open("__video", sp.id);
   },
 
   open: (brand, id) => {
@@ -154,6 +174,7 @@ export const useCreatorStore = create<CreatorState>((set, get) => ({
     const k = keyOf(s.brand, s.id);
     const draft = s.drafts[k];
     if (!draft || s.saving) return;
+    if (s.brand === "__video") { set({ lastSave: { at: Date.now(), ok: true, text: "This character lives in this video; changes are already in." } }); return; }
     set({ saving: true });
     try {
       const r = await window.byok.characters.saveFile(s.brand, draft);

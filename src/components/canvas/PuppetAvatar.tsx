@@ -271,7 +271,8 @@ export function PuppetAvatar({
     prevViseme !== undefined && prevViseme !== viseme
       ? mouthFor(prevViseme)
       : undefined;
-  // OFF BY DEFAULT — see visemeFadeMs in store/defaults.ts. Fading between two
+  // 70 ms BY DEFAULT since 11 Nov 2026 (Ak's choice after a side-by-side) — see
+  // visemeFadeMs in store/defaults.ts. The known cost: fading between two
   // mouth drawings does not produce an in-between mouth, it produces both at
   // half strength, and a half-and-half of an open mouth and a closed one has
   // no solid outline and no solid fill. That is what Ak saw as the mouth

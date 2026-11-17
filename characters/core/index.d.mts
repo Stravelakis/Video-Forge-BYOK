@@ -93,7 +93,7 @@ export interface CharacterState {
 export interface Signals {
   timeMs: number; viseme: number; prevViseme?: number; mix?: number;
   lidFrom?: string; lidTo?: string; lidMix?: number;
-  browLeft?: string; browRight?: string; head?: HeadPose; poseSpans?: PoseSpan[]; pose?: string;
+  browLeft?: string; browRight?: string; browFrom?: string; browMix?: number; head?: HeadPose; poseSpans?: PoseSpan[]; pose?: string;
   view?: number; active?: boolean; sitting?: boolean; move?: MoveState | null; breath?: number;
 }
 
@@ -201,6 +201,8 @@ export interface MoveState {
   joints: Joints; hands: { F: string; B: string }; face: { brows?: string; lids?: string; smile?: number } | null;
   props: HeldProp[]; travel: { from: PathEnd; to: PathEnd; p: number } | null; facing: "left" | "right" | null;
   target?: string | null; move?: string; sit?: number;
+  /** A hand changing shape: the shape it is leaving and how far along (1 = done). */
+  handBlend?: { F?: { from: string; mix: number }; B?: { from: string; mix: number } };
 }
 export interface MoveStyle { label: string; tempo: number; size: number; snap: number; lean: number; headTilt: number; headDrop: number; armsIn: number; gait: Record<string, number> }
 export const MOVE_VERSION: number;
@@ -229,6 +231,7 @@ export interface Performance {
   joints: Joints; hands: { F: string; B: string } | null; props: HeldProp[]; smile: number;
   faceCue: { brows?: string; lids?: string; smile?: number } | null; breath: number;
   facing: "left" | "right" | null; travel: { from: PathEnd; to: PathEnd; p: number } | null; move: string | null;
+  handBlend: { F?: { from: string; mix: number }; B?: { from: string; mix: number } };
 }
 export function performAt(src: { poseSpans?: PoseSpan[]; moveSpans?: MoveSpan[]; shelf: Record<string, Move> }, timeMs: number, o?: { view?: number; talk?: number; energy?: number; seed?: number; sitting?: boolean }): Performance;
 export function poseArms(pose?: string, poseK?: number, t?: number, talk?: number): { armF: number[]; armB: number[] };

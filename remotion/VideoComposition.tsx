@@ -12,16 +12,19 @@
 // layout-critical has to be an inline style.
 // ---------------------------------------------------------------------------
 
+import { setFor } from "../characters/sets/custom.mjs";
 import { AiBadge } from "./AiBadge";
 import { viewFor } from "../src/lib/motion/facing";
 import { useMemo } from "react";
-import { AbsoluteFill, Audio, Img, Loop, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, continueRender, delayRender, Img, Loop, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { WaveformScene } from "../src/components/canvas/WaveformScene";
 import { SubtitleScene } from "../src/components/canvas/SubtitleScene";
 import { SpeakerAvatar } from "../src/components/canvas/SpeakerAvatar";
 import { PuppetAvatar } from "../src/components/canvas/PuppetAvatar";
 import { PortraitAvatar } from "./portrait/PortraitAvatar";
 import { CharacterAvatar } from "../src/components/canvas/CharacterAvatar";
+import { KenneyStage } from "./KenneyStage";
+import { buildStaging, cameraCss, walkBob, withWalkMoves } from "../src/lib/direct/directions";
 import { buildSpeakerMoveTracks, moveAt, placeTracks, seatedTracks, stagePlacement, travelBob } from "../src/lib/motion/moveTracks";
 import type { MoveSpan } from "../characters/core/index.mjs";
 import { seatSpeakers } from "../src/lib/motion/seats";
@@ -37,6 +40,7 @@ import { buildCues, cueAt } from "../src/lib/subtitles/wordTiming";
 import { buildTracks } from "../src/lib/waveform/buildTracks";
 import { buildSpeakerVisemeTracks } from "../src/lib/visemes/speakerTracks";
 import { visemeBlendAt } from "../src/lib/visemes/timeline";
+import { drawnFaceAt } from "../src/lib/motion/drawnFace";
 import { VISEME, SMILE_VISEME } from "../src/lib/visemes/visemeMap";
 import { useWaitForImages } from "./useWaitForImages";
 import { useSpectrumFile } from "./useSpectrumFile";
@@ -155,7 +159,10 @@ export function VideoComposition({
   // Moves from the motion library: [walks in], [sits down], [gives the box to Maria]…
   const cast = useMemo(() => speakers.map((sp) => ({ id: sp.id, label: sp.label, x: sp.x, size: sp.size })), [speakers]);
   const pops = useMemo(() => buildPopTracks(narrationSegments), [narrationSegments]);
-  const moveTracks = useMemo(() => (scene ? seatedTracks : (t: Record<string, MoveSpan[]>) => t)(buildSpeakerMoveTracks(narrationSegments, cast)), [narrationSegments, cast, scene]);
+  const placed = useMemo(() => speakers.map((s) => ({ id: s.id, label: s.label, x: s.x, y: s.y, size: s.size })), [speakers]);
+  const staging = useMemo(() => buildStaging(narrationSegments, placed), [narrationSegments, placed]);
+  const moveTracks0 = useMemo(() => { const t = buildSpeakerMoveTracks(narrationSegments, cast); return scene ? seatedTracks(t, (setFor(scene) as { sit?: boolean } | null)?.sit ? cast.map((c) => c.id) : undefined) : t; }, [narrationSegments, cast, scene]);
+  const moveTracks = useMemo(() => withWalkMoves(moveTracks0, staging), [moveTracks0, staging]);
 
   // Every image any avatar might draw: a flattened sheet, or every layer of a
   // layered puppet. Resolved to public-dir URLs here, once, and handed to the
@@ -199,7 +206,9 @@ export function VideoComposition({
   // Where every speaker stands this frame: walking in or out, or off stage.
   const stages = speakers.map((sp, i) => {
     const move = moveAt(moveTracks[sp.id], timeMs, sp.gestures ?? 0.5);
-    return { move, stage: stagePlacement(moveTracks[sp.id], move, cast[i], cast, timeMs) };
+    const st = stagePlacement(moveTracks[sp.id], move, cast[i], cast, timeMs);
+    const g = staging.go(sp.id, timeMs);
+    return { move, walking: g.walking, stage: { ...st, dx: st.dx + g.dx } };
   });
 
   // Same source as the waveform's active-speaker gate, so the head that moves
@@ -311,6 +320,8 @@ export function VideoComposition({
         </Sequence>
       ))}
 
+      {/* THE CAMERA (Direct step): everything on stage zooms and pans together; captions stay put */}
+      <AbsoluteFill style={{ transform: cameraCss(staging.camera(timeMs), width, height), transformOrigin: "0 0" }}>
       {behindGlass}
 
       {/* GLASS GOES HERE, and the position in this file is the feature.
@@ -377,7 +388,7 @@ export function VideoComposition({
               left: `${(sp.x + stage.dx) * 100}%`,
               top: `${sp.y * 100}%`,
               // a portrait sways inside its own frame; the frame itself stays put
-              transform: "translate(-50%, -50%)" + (sp.portrait ? "" : motionTransform(motion, size) + travelBob(move, timeMs, size, !!sp.character)),
+              transform: "translate(-50%, -50%)" + (sp.portrait ? "" : motionTransform(motion, size) + travelBob(move, timeMs, size, !!sp.character) + (sp.character || sp.kenney ? "" : walkBob(stages[i].walking, timeMs, size))),
             }}
           >
             {/* The very same components the preview draws. Duplicating the disk
@@ -394,6 +405,8 @@ export function VideoComposition({
                 active={activeSpeakerId === sp.id}
                 size={size}
               />
+            ) : sp.kenney ? (
+              <KenneyStage sp={sp} size={size} timeMs={timeMs} track={track} moods={moodTracks[sp.id]} segments={narrationSegments} fadeSec={visemeFadeMs / 1000} idleMotion={idleMotion} yaw={staging.yaw(sp.id, timeMs)} walks={staging.walks[sp.id]} />
             ) : sp.character ? (
               // A drawn character takes the very same signals as the puppet
               // below; it draws instead of swapping pictures.
@@ -401,19 +414,11 @@ export function VideoComposition({
                 card={sp.character}
                 size={size}
                 timeMs={timeMs}
-                viseme={mouth.to}
-                prevViseme={mouth.from}
-                mix={mouth.mix}
-                {...(() => {
-                  const b = blinkBlendAt(sp.id, timeMs, idleMotion);
-                  const at = (state: string) => (state === "open" && face?.lid ? face.lid : state);
-                  return { lidFrom: at(b.from), lidTo: at(b.to), lidMix: b.mix };
-                })()}
-                browLeft={browAt(browTracks[sp.id], timeMs)}
-                browRight={browAt(browTracks[sp.id], timeMs)}
+                // mouth, lids and brows all blended (drawnFace.ts, shared with the preview)
+                {...drawnFaceAt({ id: sp.id, timeMs, track, visemeFadeMs, idleMotion, brows: browTracks[sp.id], moods: moodTracks[sp.id] })}
                 head={headPoseAt(sp.id, headTracks[sp.id], timeMs, idleMotion)}
                 poseSpans={poseTracks[sp.id]}
-                {...facingView(sp.facing, sp, speakers.filter((o) => o.id !== sp.id), { dialogue: lookById(sp.character.look).profile ? 2 : 1 })}
+                {...facingView(staging.facing(sp.id, timeMs) ?? sp.facing, sp, speakers.filter((o) => o.id !== sp.id), { dialogue: lookById(sp.character.look).profile ? 2 : 1 })}
                 active={activeSpeakerId === sp.id}
                 move={move}
                 moveSpans={moveTracks[sp.id]}
@@ -456,7 +461,7 @@ export function VideoComposition({
                 browRight={browAt(browTracks[sp.id], timeMs)}
                 head={headPoseAt(sp.id, headTracks[sp.id], timeMs, idleMotion)}
                       pose={poseAt(poseTracks[sp.id], timeMs)}
-                {...viewFor(sp, speakers, sp.puppet)}
+                {...viewFor({ ...sp, facing: staging.facing(sp.id, timeMs) ?? sp.facing }, speakers, sp.puppet)}
                 size={size}
                 bgOpacity={sp.bgOpacity}
                 borderOpacity={sp.borderOpacity}
@@ -488,7 +493,8 @@ export function VideoComposition({
 
       {/* the set's furniture in front of the speakers, hiding them from the waist down */}
       <SetLayer scene={scene} part="front" width={width} height={height} timeMs={timeMs} />
-      <PopLayer pops={pops} speakers={speakers} width={width} height={height} timeMs={timeMs} />
+      <PopLayer pops={pops} speakers={speakers} width={width} height={height} timeMs={timeMs} pictureUrl={(rel) => staticFile("shelf/" + rel)} hold={() => { const h = delayRender("sticker"); return () => continueRender(h); }} />
+      </AbsoluteFill>
 
       {/* Last, so subtitles sit above the waveform and the avatars. */}
       {/* THE CAPTION'S PANE, and it lives here rather than inside SubtitleScene

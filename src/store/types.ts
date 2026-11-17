@@ -49,7 +49,7 @@ export interface RenderSettings {
 // is worth returning to — but nothing uses it yet.
 export const WAVEFORM_STYLES = [
   "bars", "wave", "mirror", "dots", "mesh",
-  "ribbon", "particles", "sparks", "bloomBars", "boil",
+  "ribbon", "particles", "sparks", "bloomBars", "boil", "centreBar",
 ] as const;
 
 export type WaveformStyle = (typeof WAVEFORM_STYLES)[number];
@@ -313,6 +313,10 @@ export interface SpeakerConfig {
    *  render with no files. Which form shows is `form` (formOf in
    *  characters/core/profile.mjs is the one rule; old saves: the card wins). */
   character?: CharacterCard;
+  /** A Kenney 3D character. When set, it is what shows. */
+  kenney?: import("../lib/kenney/actor").KenneyCard;
+  /** How close the 3D camera is. */
+  kenneyFraming?: "body" | "bust" | "face";
   /** ONE CHARACTER, TWO FORMS (#13, 27 Oct 2026): which one is on screen.
    *  Both are kept, so switching back loses nothing. Unset = old rule. */
   form?: "puppet" | "drawn";
@@ -528,11 +532,13 @@ export interface SfxClip {
 }
 
 export interface ProjectState {
+  /** The Direct step's stage directions, per line (src/lib/direct/directions.ts). */
+  directions?: import("../lib/direct/directions").Directions;
   render: RenderSettings;
   /** A set the speakers sit in (characters/sets/sets.mjs: news desk,
    *  conference room, stage, podcast, game show), or null for none. With a
    *  set, speakers are seated by it; their own places are kept for later. */
-  scene: { id: string; title?: string; names?: string[] } | null;
+  scene: { id: string; title?: string; names?: string[]; spec?: unknown } | null;
   /** Background clips, in order. Empty means a plain dark background. */
   backgrounds: BackgroundScene[];
   /** Scrim over the background clips, 0–1. Backgrounds sit under the waveform,
@@ -570,6 +576,9 @@ export interface ProjectState {
   /** Crossfade between viseme cells, in ms. A hard cut between photoreal mouth
    *  shapes reads as a glitch; a short fade reads as movement. 0 = hard cut. */
   visemeFadeMs: number;
+  /** Set once an older project's picture-mouth cut (0) was switched to the 70 ms fade
+   *  (Ak, 11 Nov 2026). After that, a 0 is the person's own choice and stays. */
+  fadeMigrated?: boolean;
   /** How much the heads breathe and drift when nothing else is happening.
    *  0 = perfectly still, which is what made them read as photographs. */
   idleMotion: number;

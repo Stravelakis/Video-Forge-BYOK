@@ -1,4 +1,3 @@
-![Video Forge](docs/images/app-2026-10-09.png)
 
 # Video Forge
 
@@ -74,8 +73,7 @@ npm run dev
 ## Guides
 - [Make a video, in plain words](docs/eli5/make-a-video.md)
 - [Writing scripts](docs/WRITING-SCRIPTS.md) · [Making puppets](docs/PUPPET-MAKING.md) · [Install](docs/INSTALL.md)
-- [Brief for an AI that writes scripts](docs/AI-BRIEF.md)
-- [Handoff (current state)](docs/HANDOFF.md) · [Changelog](CHANGELOG.md)
+- [Handoff (current state)](HANDOFF.md) · [Changelog](CHANGELOG.md)
 
 ## 🗺️ Roadmap
 - Template gallery: lesson, news desk, podcast, promo
@@ -95,6 +93,14 @@ This project was designed and engineered in collaboration with AI systems:
 - Hermes Agent — automation
 - Google Flow — media workflow support
 - Human direction & product vision: Stravelakis.
+
+## 💚 Thank you, Kenney
+The 3D characters, pets and furniture in the Kenney cast tests (Mini Characters,
+Cube Pets, Animated Characters, Furniture Kit) are by
+**Kenney** — [kenney.nl](https://kenney.nl) — released as CC0. Thank you for giving
+so much to everyone who makes things. If these help you too, consider
+[supporting Kenney](https://kenney.nl/donate).
+
 ## 📄 License
 Video Forge is **source available** under the [Forge Attribution License (FAL) v1.2](LICENSE).
 
@@ -106,3 +112,5 @@ Video Forge is **source available** under the [Forge Attribution License (FAL) v
 
 FAL is not an OSI-approved open-source licence.
 Copies taken before 26 Oct 2026 keep the MIT licence they came with.
+
+Props also come from [Quaternius](https://quaternius.com). Thank you.

@@ -17,6 +17,7 @@ import type { ProjectPreset, SpeakerSlot } from "./templatesTypes";
 import { defaultProject } from "./defaults";
 import { defaultTrackWaveform } from "../lib/waveform/buildTracks";
 import { withCharacterColor } from "./characterColor";
+import { autosaveSnapshot, blankProject } from "../lib/project/projectFile";
 
 
 const SPEAKER_COLORS = ["#e8a24a", "#4ac2e8"]; // speaker1 / speaker2 from tailwind theme
@@ -57,6 +58,13 @@ function applySlots(
   }
   // Written before slots existed: the whole speaker, faces and voices included.
   return snap.speakers ?? current;
+}
+
+/** Older projects cut picture mouths (0). Ak, 11 Nov 2026: they fade now, once.
+ *  Coded characters morph whatever this says (lib/motion/drawnFace.ts). */
+export function migrateFade<T extends { visemeFadeMs?: number; fadeMigrated?: boolean }>(p: T): T {
+  if (p.fadeMigrated) return p;
+  return { ...p, visemeFadeMs: !p.visemeFadeMs ? defaultProject.visemeFadeMs : p.visemeFadeMs, fadeMigrated: true };
 }
 
 function migrateSpeaker(sp: SpeakerConfig, i: number): SpeakerConfig {
@@ -122,6 +130,8 @@ interface Actions {
   setFps: (fps: Fps) => void;
   setScene: (scene: ProjectState["scene"]) => void;
   setScript: (text: string) => void;
+  /** One line's directions; null removes them. */
+  setLineDirections: (key: string, d: import("../lib/direct/directions").LineDirections | null) => void;
   setLanguage: (lang: string) => void;
   setNarration: (n: NarrationResult | null) => void;
   setAttachedAudio: (a: ProjectState["attachedAudio"]) => void;
@@ -192,6 +202,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
   setScene: (scene) => set({ scene }),
 
   setScript: (text) => set({ script: text }),
+  setLineDirections: (key, d) => set((s) => { const next = { ...(s.directions ?? {}) }; if (d && d.items.length) next[key] = d; else delete next[key]; return { directions: next }; }),
 
   setLanguage: (lang) => set({ language: lang }),
 
@@ -337,8 +348,9 @@ export const useProjectStore = create<ProjectState & Actions>()(
 
   loadProject: (p) => {
     set(() => ({
-      ...defaultProject,
-      ...p,
+      // blankProject: nothing of the previous project survives the merge
+      ...blankProject(defaultProject),
+      ...migrateFade(p),
       // Nested objects get merged over the defaults rather than replacing them,
       // so a project saved before a field existed still opens with that field
       // at its default instead of undefined. Same shallow-merge trap that made
@@ -352,7 +364,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
   },
 
   reset: () => {
-    set(defaultProject);
+    set(blankProject(defaultProject));
     wholeProjectHook.fn?.();
   },
     }),
@@ -365,45 +377,13 @@ export const useProjectStore = create<ProjectState & Actions>()(
       // give. The WAV it came from is still on disk, so App.tsx re-analyses it
       // on startup — a second of work rather than a quota error that silently
       // stops every future autosave.
-      partialize: (s) => ({
-        render: s.render,
-        musicWaveform: s.musicWaveform,
-        musicColor: s.musicColor,
-        cards: s.cards,
-        logo: s.logo,
-        subtitles: s.subtitles,
-        // Worth persisting: the clips themselves are already cached under
-        // userData by provider and id, so what is saved here is a few hundred
-        // bytes of timing that points at files still on disk. Losing it means
-        // re-planning and re-downloading a background set that never changed.
-        backgrounds: s.backgrounds,
-        backgroundDim: s.backgroundDim,
-        backgroundCrossfadeMs: s.backgroundCrossfadeMs,
-        scene: s.scene,
-        pauseSameMs: s.pauseSameMs,
-        pauseTurnMs: s.pauseTurnMs,
-        visemeFadeMs: s.visemeFadeMs,
-        idleMotion: s.idleMotion,
-        fps: s.fps,
-        speakers: s.speakers,
-        script: s.script,
-        language: s.language,
-        narration: s.narration
-          ? { filePath: s.narration.filePath, segments: s.narration.segments, analysis: null }
-          : null,
-        attachedAudio: s.attachedAudio
-          ? { filePath: s.attachedAudio.filePath, analysis: null }
-          : null,
-        // Same deal as the narration: the path survives, the megabytes don't.
-        // App.tsx re-analyses on startup.
-        music: s.music ? { filePath: s.music.filePath, analysis: null } : null,
-        musicVolume: s.musicVolume,
-        musicDuck: s.musicDuck,
-        sfx: s.sfx,
-      }),
+      //
+      // The same fields as the project file (lib/project/projectFile.ts), from
+      // the same list: blur and colour look used to be missing here only.
+      partialize: (s) => autosaveSnapshot(s),
 
       merge: (persisted, current) => {
-        const p = (persisted ?? {}) as Partial<ProjectState>;
+        const p = migrateFade((persisted ?? {}) as Partial<ProjectState>);
         return {
           ...current,
           ...p,
