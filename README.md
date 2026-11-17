@@ -96,4 +96,13 @@ This project was designed and engineered in collaboration with AI systems:
 - Google Flow — media workflow support
 - Human direction & product vision: Stravelakis.
 ## 📄 License
-No licence: all rights reserved (since 26 Oct 2026). Copies taken before that date keep the MIT licence they came with.
+Video Forge is **source available** under the [Forge Attribution License (FAL) v1.2](LICENSE).
+
+- ✅ Free for personal, school and paid work, including running it as an online service.
+- 🏷️ The one condition: every video you publish credits
+  **"Made with Video Forge - https://stravelakis.com/forge"**. The small label the app adds is a good start; add the address in the description if the label doesn't show it.
+- 🔓 Need different terms? [Ask for a more permissive licence](https://stravelakis.com/forge).
+- ⚖️ The [full licence](LICENSE) also covers forks, online services, banned uses and arbitration.
+
+FAL is not an OSI-approved open-source licence.
+Copies taken before 26 Oct 2026 keep the MIT licence they came with.

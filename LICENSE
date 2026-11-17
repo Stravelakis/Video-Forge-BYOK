@@ -1,0 +1,381 @@
+# Forge Attribution License (FAL) v1.2
+
+Copyright © 2026 Stravelakis
+
+Effective 15 November 2026.
+
+## 1. Purpose
+
+The purpose of this License is to permit broad personal, educational, commercial, and professional use of the Software without requiring payment of a monetary licence fee. Optional paid Access Tiers do not change this purpose.
+
+In exchange for the rights granted under this License, Licensees agree to provide public Attribution when distributing Outputs created using the Software.
+
+The parties acknowledge and agree that Attribution constitutes the primary consideration received by the Licensor in exchange for granting rights under this License.
+
+The Attribution Requirements are therefore an essential condition of this License and not merely a request, courtesy, or voluntary acknowledgment.
+
+Licensees who need terms more permissive than this License may contact the Licensor through https://stravelakis.com/forge to request a separate licence under Section 8.
+
+## 2. Definitions
+
+**"Licensor"** means the individual or entity distributing the Software under this License.
+
+**"Software"** means the Video Forge source code, object code, libraries, modules, templates, and documentation that the Licensor publishes under this License, and updates to them published under this License. The Software does not include Extra Content.
+
+**"Extra Content"** means characters, voices, motions, media, templates, packs, and other materials that the Licensor delivers only after registration or Key validation, together with any Key, server, or online service operated by the Licensor.
+
+**"Derivative Software"** means any modification, adaptation, fork, extension, port, derivative work, or redistributed version of the Software.
+
+**"Licensee"** means any individual or entity exercising rights under this License. Where an individual accepts this License on behalf of a company, organisation, or other entity, "Licensee" includes that entity.
+
+**"Output"** means any video, animation, motion graphic, audiovisual work, rendered media file, or similar content generated wholly or partially through use of the Software.
+
+**"Public Distribution"** means any publication, upload, streaming, hosting, broadcasting, sale, licensing, exhibition, embedding, transmission, sharing, or making available of an Output to one or more third parties.
+
+**"Attribution"** means a clear notice that Video Forge was used in creating the Output, together with a reference to https://stravelakis.com/forge.
+
+**"Approved Attribution Method"** means any Attribution method published by the Licensor on https://stravelakis.com/forge or in the Software documentation.
+
+**"Provenance Signal"** means any label, watermark, metadata entry, or other marker that the Software adds to an Output to show that it was made with Video Forge or with artificial intelligence.
+
+**"Online Service"** means making the Software or Derivative Software available to third parties so that they can create Outputs without receiving a copy of the Software, whether through a website, application, application programming interface, or any other remote means, with or without charge.
+
+**"Notice File"** means a plain text file named `NOTICE` distributed with the Software or Derivative Software.
+
+**"Serious Misuse"** means any use prohibited by Section 13.
+
+**"Key"** means an access credential issued by the Licensor to a registered person.
+
+**"Access Tier"** means one of the levels of access described in Section 12.
+
+**"Access Controls"** means the Key checks, usage limits, feature limits, and other technical measures by which the Software applies an Access Tier.
+
+**"Tier Terms"** means the description of each Access Tier published by the Licensor on https://stravelakis.com/forge or in the Software documentation.
+
+## 3. License Grant
+
+Subject to the terms of this License, the Licensor grants the Licensee a worldwide, non-exclusive, royalty-free licence, perpetual unless terminated under Section 18, to:
+
+- use the Software;
+- reproduce the Software;
+- modify the Software;
+- adapt the Software;
+- create Derivative Software;
+- distribute the Software;
+- distribute Derivative Software;
+- sublicense the Software and Derivative Software, but only under this License and without adding to, removing from, or changing its terms;
+- operate the Software or Derivative Software as an Online Service, including for a fee, under Section 11;
+- create Outputs;
+- publish Outputs;
+- monetize Outputs;
+- commercially exploit Outputs.
+
+All rights granted under this License are subject to continued compliance with the Attribution Requirements, Sections 11, 12 and 13, and the other terms of this License.
+
+## 4. Attribution Requirement
+
+Unless Section 8 applies, every Output that is Publicly Distributed must include Attribution.
+
+The Attribution must:
+
+- clearly identify Video Forge;
+- include the URL https://stravelakis.com/forge;
+- be reasonably visible to the intended audience;
+- accompany the Output in a manner reasonably associated with the viewing, distribution, publication, or consumption of that Output.
+
+Examples include:
+
+- "Made with Video Forge - https://stravelakis.com/forge"
+- "Created using Video Forge - https://stravelakis.com/forge"
+- "Produced with Video Forge - https://stravelakis.com/forge"
+
+Equivalent wording is permitted.
+
+## 5. Approved Attribution Methods
+
+Attribution may be provided through any Approved Attribution Method published by the Licensor.
+
+Examples may include:
+
+- a video description;
+- a prominent comment;
+- a visual watermark;
+- a lower-third graphic;
+- an opening credit;
+- a closing credit;
+- a branded end card;
+- a branded attribution clip;
+- a webpage attribution block associated with the Output;
+- any other method designated by the Licensor as an Approved Attribution Method.
+
+The Licensor may add additional Approved Attribution Methods from time to time.
+
+No change shall invalidate Attribution already published in compliance with a previously approved method.
+
+## 6. Attribution Must Accompany the Output
+
+Attribution must accompany the Output itself.
+
+Attribution that is unlikely to be encountered by a reasonable viewer of the Output shall not satisfy this requirement.
+
+Attribution solely within a legal notice, hidden page, repository documentation, website footer, or similar location shall not by itself satisfy this License.
+
+The purpose of this requirement is to ensure that a reasonable viewer is able to discover that Video Forge was used.
+
+## 7. Anti-Circumvention
+
+A Licensee shall not:
+
+- intentionally conceal Attribution;
+- render Attribution illegible or inaccessible;
+- hide Attribution solely within metadata;
+- obstruct Attribution through technical means;
+- remove supplied Attribution assets without replacing them with another compliant Attribution method;
+- intentionally remove, disable, or obscure a Provenance Signal;
+- distribute any tool, Derivative Software, or service designed to remove Attribution or Provenance Signals;
+- otherwise defeat the purpose of the Attribution Requirements.
+
+Ordinary editing, cropping, compression, or format conversion of an Output that is not intended to remove a Provenance Signal is not a breach of this Section, provided the Output still carries Attribution under Section 4.
+
+## 8. Waivers, Separate Terms and More Permissive Licences
+
+The Licensor may waive or reduce the Attribution Requirements in writing, including through the Tier Terms of an Access Tier.
+
+An Output Publicly Distributed while such a waiver applied remains compliant after the waiver ends, as to that same publication.
+
+Any Licensee who needs terms more permissive than this License, including different Attribution, may contact the Licensor through https://stravelakis.com/forge to request a separate licence. The Licensor may grant or refuse such a request at its discretion.
+
+Nothing in this License limits the Licensor's right to offer the Software or Extra Content under other terms. Where the Licensor and a Licensee have signed a separate written agreement covering the Software, that agreement governs to the extent it conflicts with this License.
+
+## 9. Agencies, Freelancers, Contractors and Client Work
+
+A Licensee may use the Software in connection with services performed for clients, customers, employers, production companies, agencies, contractors, or other third parties.
+
+Where Outputs are provided to third parties for publication, the Licensee shall notify such recipients of the Attribution Requirements and shall include an appropriate contractual obligation requiring preservation of Attribution whenever reasonably practicable.
+
+A Licensee shall not be considered in breach solely because an independent third party subsequently removes Attribution without the Licensee's knowledge, authorization, or participation, provided that:
+
+- the Licensee fulfilled its obligations under this Section;
+- the Licensee did not encourage or request removal of Attribution; and
+- upon becoming aware of the removal, the Licensee takes reasonable steps to request restoration of the Attribution.
+
+## 10. Derivative Software and Notices
+
+Any Derivative Software distributed to third parties must:
+
+- remain subject to this License or a successor licence approved by the Licensor;
+- include a copy of this License;
+- include a Notice File containing the notice "Video Forge is licensed under the Forge Attribution License (FAL). Copyright © 2026 Stravelakis." and a statement that the Software was changed and how;
+- preserve the Attribution Requirements;
+- preserve the anti-circumvention provisions;
+- preserve Section 12 and any Access Controls;
+- preserve the cure provisions;
+- preserve this Section relating to Derivative Software.
+
+A Licensee may add its own notices to the Notice File, provided it clearly states which notices apply to the Software.
+
+No distributed Derivative Software may remove, weaken, bypass, disable, or substantially interfere with the Attribution Requirements or the Access Controls, unless the Licensor has agreed in writing.
+
+## 11. Online Services
+
+A Licensee may operate the Software or Derivative Software as an Online Service, including as a paid service, provided that:
+
+- the Online Service prominently displays "Built with Video Forge - https://stravelakis.com/forge" in its user interface and on its website;
+- every Output that the Online Service delivers to its users carries Attribution in a form that meets Sections 4 to 6, and the Online Service does not offer its users a way to remove it;
+- the Online Service binds its users, by enforceable terms, to keep that Attribution when they Publicly Distribute those Outputs, and to restrictions at least as protective as Section 13;
+- where Keys have been introduced under Section 12, the operator holds its own Key, at the Friend in Good Standing tier or higher, and the Access Tier of that Key applies to the Online Service.
+
+Users of an Online Service who Publicly Distribute Outputs from it must keep the Attribution those Outputs carry.
+
+An operator who wants to offer an Online Service without these conditions may request a separate licence under Section 8.
+
+## 12. Access Tiers, Keys and Extra Content
+
+**Registration, Keys and Access Tiers are optional and may be introduced in the future.** The Licensor may, but is not obliged to, introduce registration, Keys and Access Tiers in a future release of the Software, by publishing Tier Terms. Until it does so, no registration is required, the Software has no Access Tiers, every Licensee may use all functionality of the Software without registering or holding a Key, and the provisions of this License about registration, Keys, Access Tiers, Access Controls and Extra Content have no effect. Introducing Keys and Access Tiers does not reduce the functionality of releases of the Software already made without them.
+
+Once introduced, the Software may operate at the following Access Tiers, as further described in the Tier Terms:
+
+- **Open:** limited functionality or limited uses, without registration.
+- **Friend in Good Standing:** full access, for a person who holds a valid Key and has no breach of this License that remains uncured after the cure period in Section 16.
+- **Patron:** full access and any further benefits stated in the Tier Terms, for a person whose paid or supporting status is active.
+
+A Licensee shall not:
+
+- remove, disable, bypass, or falsify Access Controls;
+- share a Key with another person, or use a Key that was not issued to that Licensee;
+- distribute Software or Derivative Software in which Access Controls have been removed, disabled, or bypassed.
+
+Modifying other parts of the Software remains permitted under Section 3.
+
+If a breach remains uncured after the cure period in Section 16, the Licensor may suspend or revoke the Licensee's Key and reduce that Licensee to the Open tier. Doing so does not by itself terminate this License.
+
+Extra Content is not licensed under this License. It is provided under its own terms, which remain subject to the rights of its creators under Section 15.
+
+The Licensor may change the Tier Terms for future versions and for future periods. Changes to the Tier Terms do not reduce the access of any Friend in Good Standing to versions of the Software already released to them.
+
+If the Licensor has introduced Keys and later permanently stops operating the Key service, the Licensor shall, no later than ninety (90) days after it stops, publish an update or other means that lets every Friend in Good Standing use the full functionality of the Software without the Key service. Where the Licensor holds the necessary rights, the Licensor shall also make the Extra Content already made available to Friends in Good Standing available for download. Apart from this, the Licensor is not obliged to continue operating any Key or online service.
+
+## 13. Prohibited Uses
+
+Unless expressly authorized by law, the Software may not be used primarily to create, promote, facilitate, or distribute:
+
+- child sexual abuse material, or any sexual content involving a minor or a character or voice presented as a minor;
+- human trafficking;
+- non-consensual sexual content, or sexual content using the face, body, or voice of any real person without that person's consent;
+- terrorist recruitment or terrorist propaganda;
+- direct incitement of unlawful violence against real persons;
+- fraud, scams, or criminal deception;
+- content that imitates the voice or likeness of an identifiable real person without that person's prior consent (or, for a minor, the consent of a parent or legal guardian, and for a deceased person, the consent of the holder of the relevant rights) or another legal right to do so;
+- impersonation of any person or organisation in order to deceive, defraud, or harass.
+
+Nothing in this License shall prohibit lawful political speech, journalism, commentary, artistic expression, academic discussion, religious expression, satire, parody, criticism, advocacy, or public debate.
+
+## 14. Ownership and Names
+
+**Outputs.** As between the Licensor and the Licensee, the Licensee owns the Outputs it creates, to the extent permitted by applicable law. The only condition this License places on Outputs is the Attribution Requirement and Section 13.
+
+**Derivative Software.** As between the Licensor and the Licensee, the Licensee owns its own changes in Derivative Software it creates, subject to the Licensor's ownership of the Software.
+
+**Names and marks.** This License grants no trademark rights. A Licensee may not use "Video Forge", "Forge", "Stravelakis", or any logo of the Licensor, except:
+
+- as required for Attribution under this License; and
+- to make truthful, factual references, such as "based on Video Forge",
+
+provided that the Licensee does not use those names as the name of its own product, service, or company, and does not state or imply that the Licensor sponsors, endorses, or officially released the Licensee, its products, or its Derivative Software.
+
+## 15. Third-Party Components
+
+The Software may include libraries, frameworks, fonts, media, code, or other materials owned by third parties.
+
+Such materials remain subject to their respective licences.
+
+Nothing in this License modifies or supersedes any rights or obligations applicable to third-party components.
+
+The Licensor shall make reasonable efforts to identify third-party components and provide copies of or references to their applicable licence terms.
+
+## 16. Notice and Opportunity to Cure
+
+The primary purpose of enforcement under this License is to secure compliance with the Attribution Requirements.
+
+Except in cases of Serious Misuse, before pursuing legal remedies for an alleged violation, the Licensor shall provide written notice describing the alleged breach.
+
+The Licensee shall have thirty (30) calendar days from receipt of such notice to cure the breach.
+
+A cure may include:
+
+- adding missing Attribution;
+- restoring removed Attribution;
+- replacing non-compliant Attribution with compliant Attribution;
+- correcting another violation identified in the notice.
+
+No damages may be sought under Section 19 where the Licensee fully cures the violation within the cure period. A cure does not affect the allocation of arbitration costs under Section 20.
+
+Serious Misuse cannot be cured and is not subject to this Section.
+
+## 17. Good Faith Enforcement
+
+The parties acknowledge that the purpose of this License is to obtain Attribution in exchange for use of the Software.
+
+Enforcement of this License is intended to secure compliance and compensation for uncured breaches and not to interfere with a Licensee's lawful livelihood, business, clients, publications, audience, or revenue streams.
+
+The Licensor shall act reasonably and in good faith when providing notice of alleged violations.
+
+## 18. Termination
+
+If a material breach is not cured within the thirty (30) day cure period, the Licensor may terminate this License.
+
+This License and all rights granted to the Licensee terminate automatically, without notice or cure period, if the Licensee:
+
+- commits Serious Misuse; or
+- starts litigation or other proceedings (including a counterclaim) against the Licensor alleging that the Software or any Output infringes the Licensee's intellectual property or other rights, as of the date those proceedings start.
+
+Upon termination, further use of the Software, including the creation of new Outputs, shall be unauthorized, and the Licensee shall delete its copies of the Software and Derivative Software.
+
+Outputs Publicly Distributed in compliance with this License before termination may remain published, except Outputs involving Serious Misuse. Outputs that are not compliant must be brought into compliance or withdrawn.
+
+The rights and obligations arising before termination shall survive to the extent permitted by applicable law.
+
+## 19. Compensation for Uncured Attribution Violations
+
+No compensation may be sought for an Attribution violation that is cured within the cure period described in Section 16.
+
+Where:
+
+- Attribution was required under this License;
+- the Licensee received proper notice;
+- the violation was not cured within the cure period; and
+- the Output remains publicly distributed without required Attribution,
+
+the Licensor may seek compensation.
+
+Compensation for any single violation shall not exceed €1,000.
+
+For purposes of this Section, each separate publication of an Output at a distinct URL or location controlled by the Licensee constitutes a separate potential violation. Views, downloads, and copies made by independent third parties are not separate violations.
+
+Nothing in this Section limits a court's or arbitral tribunal's ability to refuse, reduce, or otherwise adjust any award in accordance with applicable law.
+
+## 20. Mandatory Arbitration
+
+Any dispute arising out of or relating to this License, including its existence, validity, breach, or termination, shall be finally resolved by binding arbitration, and not in court, except as stated in this Section.
+
+The arbitration shall be conducted under the UNCITRAL Arbitration Rules in force when the arbitration starts. There shall be one arbitrator. If the parties do not agree on the arbitrator within thirty (30) days after the arbitration starts, the appointing authority shall be designated by the Secretary-General of the Permanent Court of Arbitration. The seat of arbitration shall be Athens, Greece. The language of the arbitration shall be English or Greek. The proceedings may be held by video conference.
+
+**Costs.** If the arbitral tribunal finds that the Licensee committed any breach of this License, whether minor or major, and whether or not it was later cured, the Licensee shall bear all fees and costs of the arbitration, including the fees of the arbitral institution and of the arbitrator. In all other cases, the party that loses the arbitration shall bear those fees and costs. Where each party succeeds in part, the tribunal shall divide those fees and costs in proportion to each party's success.
+
+Either party may seek urgent interim relief, such as an order to restore Attribution or to stop Serious Misuse, from a competent court pending the arbitration.
+
+Where mandatory law gives a consumer the right to bring or defend proceedings in the courts of the consumer's country of habitual residence, or makes this Section or any part of it non-binding on a consumer, this Section applies to that consumer only to the extent that law allows.
+
+## 21. Indemnity
+
+The Licensee shall indemnify and hold harmless the Licensor against any claim by a third party arising out of the Licensee's use or distribution of the Software, Derivative Software, or Outputs in breach of this License.
+
+## 22. Feedback
+
+The Licensee is not obliged to give the Licensor suggestions, comments, or other feedback about the Software. Any feedback the Licensee gives may be used by the Licensor freely, worldwide, and without payment or obligation. Feedback is provided "as is".
+
+## 23. Contributions
+
+The Licensor does not accept contributions of code or other material to the Software except under a separate written contributor agreement.
+
+## 24. Versions
+
+The Licensor may publish revised versions of this License, each identified by a version number.
+
+Each release of the Software is licensed under the version of this License that accompanies it. A revised version does not reduce the rights a Licensee already holds under the version it received. A Licensee may choose to use a release of the Software under a later version that the Licensor designates as applicable to it.
+
+Copies of the Software that the Licensor released under the MIT License before 26 October 2026 remain under the MIT License. This License applies to releases from 26 October 2026 onwards.
+
+## 25. Acceptance
+
+By using, copying, modifying, distributing, or operating the Software or Derivative Software, the Licensee accepts this License.
+
+An individual who accepts this License on behalf of a company, organisation, or other entity confirms that they are authorised to bind that entity.
+
+## 26. No Endorsement
+
+Attribution required by this License does not imply endorsement, sponsorship, approval, support, partnership, or affiliation between the Licensor and any Licensee, Output, organization, product, service, viewpoint, or activity.
+
+## 27. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE."
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSOR DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.
+
+## 28. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR SHALL NOT BE LIABLE UNDER ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, TORT, NEGLIGENCE, PRODUCT LIABILITY, OR OTHERWISE, FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS, REVENUE, DATA, OR GOODWILL, ARISING OUT OF THIS LICENSE, THE SOFTWARE, EXTRA CONTENT, ANY KEY OR ONLINE SERVICE OF THE LICENSOR, OR ANY OUTPUT CREATED WITH THE SOFTWARE, EVEN IF THE LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+WHERE APPLICABLE LAW DOES NOT ALLOW THE ABOVE EXCLUSION, THE LICENSOR'S TOTAL LIABILITY FOR ALL CLAIMS TOGETHER SHALL NOT EXCEED THE GREATER OF (A) EUR 20 AND (B) THE AMOUNTS THE LICENSEE PAID TO THE LICENSOR FOR THE SOFTWARE OR ANY ACCESS TIER IN THE TWELVE (12) MONTHS BEFORE THE EVENT GIVING RISE TO THE CLAIM.
+
+NOTHING IN THIS LICENSE EXCLUDES OR LIMITS ANY LIABILITY THAT CANNOT BE EXCLUDED OR LIMITED UNDER APPLICABLE LAW.
+
+## 29. Survival
+
+Sections 13 (as to Outputs the Licensee keeps), 14, 16 to 22, 26 to 30 and this Section survive termination of this License.
+
+## 30. Governing Law and Severability
+
+This License shall be governed by and construed in accordance with the laws of Greece, without depriving a consumer of the protection of mandatory rules of the consumer's country of habitual residence. The United Nations Convention on Contracts for the International Sale of Goods does not apply to this License.
+
+If any provision of this License is held invalid or unenforceable, it shall be enforced to the maximum extent permitted, and the remaining provisions shall remain in full force.
