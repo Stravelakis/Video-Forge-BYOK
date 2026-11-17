@@ -29,6 +29,9 @@ interface Props {
   lidMix?: number;
   browLeft?: string;
   browRight?: string;
+  /** The brows they are gliding from, and how far along (1 = arrived). */
+  browFrom?: string;
+  browMix?: number;
   head?: HeadPose;
   poseSpans?: PoseSpan[];
   /** 0 front · 1 three-quarter · 2 side profile. */
@@ -56,7 +59,7 @@ interface Props {
 const SHAPE_RADIUS: Record<OutlineShape, string> = { circle: "50%", rounded: "18%", square: "0%", none: "0%" };
 
 export function CharacterAvatar({
-  card, size, timeMs, viseme, prevViseme, mix = 1, lidFrom, lidTo, lidMix, browLeft, browRight, head,
+  card, size, timeMs, viseme, prevViseme, mix = 1, lidFrom, lidTo, lidMix, browLeft, browRight, browFrom, browMix, head,
   poseSpans, view = 0, mirror: mirror0 = false, active = false, move = null, moveSpans, stage,
   bgOpacity, borderOpacity, bgColor = "#1a1a1a", borderColor = "#d98a3d", outlineShape = "none",
   frameWidth, sizeFraction,
@@ -82,8 +85,8 @@ export function CharacterAvatar({
     // preview and in every render worker
     const perf = performAt({ poseSpans, moveSpans, shelf: SHELF }, timeMs, { view, talk: active ? 1 : 0, energy: card.energy ?? 0.5, seed: card.seed ?? 0 });
     const state = characterState({
-      timeMs, viseme, prevViseme, mix, lidFrom, lidTo, lidMix, browLeft, browRight, head, poseSpans, view, active,
-      move: { joints: perf.joints, hands: perf.hands ?? { F: "relaxed", B: "relaxed" }, props: perf.props, face: perf.faceCue, facing: perf.facing, travel: perf.travel },
+      timeMs, viseme, prevViseme, mix, lidFrom, lidTo, lidMix, browLeft, browRight, browFrom, browMix, head, poseSpans, view, active,
+      move: { joints: perf.joints, hands: perf.hands ?? { F: "relaxed", B: "relaxed" }, handBlend: perf.handBlend, props: perf.props, face: perf.faceCue, facing: perf.facing, travel: perf.travel },
       breath: perf.breath,
     });
     // walking across the picture faces the way they walk

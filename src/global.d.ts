@@ -43,6 +43,7 @@ declare global {
     DecoNoir?: DecoNoirApi;
     byok: {
       keys: {
+        geminiCount: () => Promise<number>;
         list: () => Promise<string[]>;
         set: (provider: string, value: string) => Promise<boolean>;
         remove: (provider: string) => Promise<boolean>;
@@ -64,6 +65,14 @@ declare global {
         ) => Promise<AudioAnalysis | null>;
       };
       media: {
+        searchPhotos: (query: string, orientation?: "portrait" | "landscape") => Promise<{ hits: { id: string; provider: "pixabay" | "pexels"; url: string; thumbUrl: string; width: number; height: number; author: string; pageUrl: string; tags: string }[]; problems: string[] }>;
+        photoClip: (url: string, width: number, height: number) => Promise<string>;
+        fileClip: (file: string, width: number, height: number) => Promise<string>;
+        savePicture: (dataUrl: string, name: string) => Promise<string>;
+        slidesFile: (file: string) => Promise<Uint8Array>;
+        slidesGoogle: (url: string) => Promise<Uint8Array>;
+        slidesCanOffice: () => Promise<boolean>;
+        makePicture: (prompt: string, width: number, height: number) => Promise<{ picture: string; clip: string; by: string }>;
         searchVideos: (
           query: string,
           providers?: ("pixabay" | "pexels")[],
@@ -93,6 +102,7 @@ declare global {
           source?: string;
         }[]>;
         /** Reads the script, plans a query per scene and picks a clip for each. */
+        stillClip: (rel: string, width: number, height: number) => Promise<string>;
         autoBackgrounds: (opts: {
           segments: { text: string; startMs: number; endMs: number; speakerLabel: string }[];
           languageName: string;
@@ -197,6 +207,7 @@ declare global {
         ) => () => void;
       };
       tts: {
+        testVoice: (line: { engine: string; text: string; language: string; model?: string; voice?: string; mode?: string; persona?: string; pythonPath?: string; onnxPath?: string; pitch?: number; speed?: number; breathMs?: number }) => Promise<ArrayBuffer>;
         listPiperVoices: (voicesDir: string) => Promise<{ id: string; name: string; onnxPath: string }[]>;
         synthesizePiper: (
           pythonPath: string,
@@ -311,6 +322,10 @@ declare global {
           tone?: string;
           characters?: string[];
         }) => Promise<string>;
+        suggestDirections: (system: string, user: string, provider?: string, model?: string) => Promise<{ text: string; by: string }>;
+        directBrains: () => Promise<{ id: string; label: string }[]>;
+        makeSet: (system: string, user: string) => Promise<{ text: string; by: string }>;
+        directModels: (provider: string) => Promise<string[]>;
       };
     };
   }

@@ -75,5 +75,19 @@ characters/samples/natural-movement.html
 characters/samples/redflag-cast.html
 characters/samples/redflag.html
 
+# Mixamo-derived motion data: Adobe does not allow redistributing it (see docs/IMPORT-MOTIONS.md)
+characters/samples/kenney/builder/models/animated/*.glb
+characters/samples/kenney/builder/motions.json
 # the character creator keeps the old version of a character here before each save
 brands/*/characters/.backup/
+
+# Kept on this PC, never in the public repo (moved out 16 Nov 2026):
+# brand packs = private repo DnD-World/Video-Forge-brands, cloned here
+# workshop    = private repo DnD-World/Video-Forge-workshop (plans, research, labs, dev tools)
+# music       = local library; licence for public sharing not proven
+# Claude's working notes stay local
+brands/
+workshop/
+music/
+CLAUDE.md
+.claude/

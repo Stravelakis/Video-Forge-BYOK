@@ -1,3 +1,4 @@
+import { setFor } from "../characters/sets/custom.mjs";
 import { ExplainerStudio } from "./components/explainer/ExplainerStudio";
 import { ManyVideosStudio } from "./components/render/ManyVideos";
 import { CharacterStudio } from "./components/creator/CharacterStudio";
@@ -11,6 +12,11 @@ import { PuppetAvatar } from "./components/canvas/PuppetAvatar";
 import { CharacterAvatar } from "./components/canvas/CharacterAvatar";
 import { PortraitView } from "./components/canvas/PortraitView";
 import { usePortraits } from "./lib/portraits/usePortraits";
+import { KenneyLive } from "./components/canvas/KenneyLive";
+import { FlowStudio } from "./components/flow/FlowStudio";
+import { DirectPanel } from "./components/panels/DirectPanel";
+import { buildStaging, cameraCss, walkBob, withDirections, withWalkMoves } from "./lib/direct/directions";
+import { buildSpeakerMoodTracks } from "./lib/motion/facePerformance";
 import { activeCard, facingView, lookById } from "../characters/core/index.mjs";
 import { WaveformScene } from "./components/canvas/WaveformScene";
 import { BackgroundScene } from "./components/canvas/BackgroundScene";
@@ -21,6 +27,7 @@ import { PreviewPlayerContext, usePreviewPlayer } from "./lib/motion/usePreviewP
 import { buildCues } from "./lib/subtitles/wordTiming";
 import { buildSpeakerVisemeTracks } from "./lib/visemes/speakerTracks";
 import { visemeBlendAt } from "./lib/visemes/timeline";
+import { drawnFaceAt } from "./lib/motion/drawnFace";
 import { useFileUrls } from "./lib/assets/useFileUrls";
 import { useSubtitleFont } from "./lib/assets/useSubtitleFont";
 import { usePuppets } from "./lib/puppets/usePuppets";
@@ -77,12 +84,13 @@ const fmtTime = (ms: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 };
 
-type Step = "cast" | "script" | "look" | "make";
+type Step = "cast" | "script" | "direct" | "look" | "make";
 /** How wide the steps column is for each step: Script needs room to write. */
-const STEP_WIDTH: Record<Step, number> = { cast: 420, script: 600, look: 440, make: 440 };
+const STEP_WIDTH: Record<Step, number> = { cast: 420, script: 600, direct: 640, look: 440, make: 440 };
 const STEPS: { id: Step; title: string; sub: string }[] = [
-  { id: "cast", title: "Cast", sub: "Who speaks" },
+  { id: "cast", title: "Characters", sub: "Who speaks" },
   { id: "script", title: "Script", sub: "What they say" },
+  { id: "direct", title: "Direct", sub: "Who moves, where, when" },
   { id: "look", title: "Look", sub: "How it looks and sounds" },
   { id: "make", title: "Make", sub: "Preview, render, publish" },
 ];
@@ -97,9 +105,9 @@ export default function App() {
   // explainers (animated, drawn by code — src/components/explainer). Remembered.
   // MANY VIDEOS (26 Oct 2026) is a third kind, with its own screen.
   // CHARACTERS (7 Nov 2026): the character creator, its own screen too.
-  type Mode = "puppet" | "explainer" | "many" | "characters";
+  type Mode = "flow" | "puppet" | "explainer" | "many" | "characters";
   const [mode, setModeState] = useState<Mode>(() => {
-    try { const m = localStorage.getItem("vf.mode"); return m === "explainer" || m === "many" || m === "characters" ? m : "puppet"; } catch { return "puppet"; }
+    try { const m = localStorage.getItem("vf.mode"); return m === "explainer" || m === "many" || m === "characters" || m === "puppet" ? (localStorage.getItem("vf.flowSeen") ? m : "flow") : "flow"; } catch { return "puppet"; }
   });
   const setMode = (m: Mode) => { setModeState(m); setSettingsOpen(false); try { localStorage.setItem("vf.mode", m); } catch { /* fine */ } };
   // A batch reports its progress whichever screen is open.
@@ -130,6 +138,7 @@ export default function App() {
       if (!segs.length) return st.attachedAudio ? "Your own recording" : "Narration not made yet";
       return `${segs.length} lines · ${fmtTime(segs[segs.length - 1].endMs)}`;
     }
+    if (id === "direct") { const n = Object.values(st.directions ?? {}).reduce((k, d) => k + d.items.length, 0); return n ? `${n} direction${n === 1 ? "" : "s"}` : "No directions yet"; }
     if (id === "look") return `${st.backgrounds.length ? `${st.backgrounds.length} background clip${st.backgrounds.length > 1 ? "s" : ""}` : "Plain background"}${st.music ? " · music" : ""}`;
     return `${st.render.format} · ${st.render.width}×${st.render.height}`;
   };
@@ -248,7 +257,7 @@ export default function App() {
     () =>
       backgrounds.map((b) => ({
         startMs: b.startMs,
-        endMs: b.endMs,
+        endMs: b.endMs > b.startMs ? b.endMs : Math.max(b.startMs + 1000, narration?.segments?.at(-1)?.endMs ?? 60000),
         sourceSec: b.hit?.durationSec ?? 0,
         filePath: b.filePath,
       })),
@@ -256,22 +265,29 @@ export default function App() {
   );
   const { puppets } = usePuppets(speakers.map((sp) => sp.puppetPath));
   const { files: portraits } = usePortraits(speakers.map((sp) => sp.portraitPath));
+  // the Direct step's directions, added to the lines' tags (the voices are untouched)
+  const directions = useProjectStore((s) => s.directions);
+  const segs = useMemo(() => withDirections(narration?.segments ?? [], directions), [narration, directions]);
+  const moodTracks = useMemo(() => buildSpeakerMoodTracks(segs), [segs]);
   const browTracks = useMemo(
-    () => buildSpeakerBrowTracks(narration?.segments ?? []),
-    [narration]
+    () => buildSpeakerBrowTracks(segs),
+    [segs]
   );
   // Arm poses from [waves], [points]… and greetings (12 Oct 2026).
   const poseTracks = useMemo(
-    () => buildSpeakerPoseTracks(narration?.segments ?? [], Object.fromEntries(speakers.map((sp) => [sp.id, sp.gestures ?? 0.5]))),
-    [narration, speakers]
+    () => buildSpeakerPoseTracks(segs, Object.fromEntries(speakers.map((sp) => [sp.id, sp.gestures ?? 0.5]))),
+    [segs, speakers]
   );
   // Moves from the motion library ([walks in], [sits down]…), as the render does them.
   const cast = useMemo(() => speakers.map((sp) => ({ id: sp.id, label: sp.label, x: sp.x, size: sp.size })), [speakers]);
-  const pops = useMemo(() => buildPopTracks(narration?.segments ?? []), [narration]);
-  const moveTracks = useMemo(() => (scene ? seatedTracks : (t: Record<string, MoveSpan[]>) => t)(buildSpeakerMoveTracks(narration?.segments ?? [], cast)), [narration, cast, scene]);
+  const pops = useMemo(() => buildPopTracks(segs), [segs]);
+  const placed = useMemo(() => speakers.map((s) => ({ id: s.id, label: s.label, x: s.x, y: s.y, size: s.size })), [speakers]);
+  const staging = useMemo(() => buildStaging(segs, placed), [segs, placed]);
+  const moveTracks0 = useMemo(() => { const t = buildSpeakerMoveTracks(segs, cast); return scene ? seatedTracks(t, (setFor(scene) as { sit?: boolean } | null)?.sit ? cast.map((c) => c.id) : undefined) : t; }, [segs, cast, scene]);
+  const moveTracks = useMemo(() => withWalkMoves(moveTracks0, staging), [moveTracks0, staging]);
   const headTracks = useMemo(
-    () => buildSpeakerHeadTracks(narration?.segments ?? []),
-    [narration]
+    () => buildSpeakerHeadTracks(segs),
+    [segs]
   );
   const speakerColors = useMemo(
     () => Object.fromEntries(speakers.map((sp) => [sp.id, sp.borderColor])),
@@ -504,10 +520,11 @@ export default function App() {
         </div>
         <div className="ml-auto"><HistoryBar /></div>
         <div className="flex gap-2 items-center" role="group" aria-label="Kind of video">
-          <HudButton data-tip="Puppet videos: talking characters, in four steps." active={mode === "puppet" && !settingsOpen} onClick={() => setMode("puppet")}>Puppet video</HudButton>
+          <HudButton data-tip="Set up a video one decision at a time: style, characters, background, format, review." active={mode === "flow" && !settingsOpen} onClick={() => { setMode("flow"); setSettingsOpen(false); }}>Create</HudButton>
+          <HudButton data-tip="Production: script, voices, final settings and render." active={mode === "puppet" && !settingsOpen} onClick={() => setMode("puppet")}>Production</HudButton>
           <HudButton data-tip="Explainers: animated pictures, words and charts drawn by code, timed to a narration — with or without puppets on top." active={mode === "explainer" && !settingsOpen} onClick={() => setMode("explainer")}>Explainer</HudButton>
           <HudButton data-tip="Many videos at once: one row of a spreadsheet per video, all made in a row with the look you set up." active={mode === "many" && !settingsOpen} onClick={() => setMode("many")}>Many videos</HudButton>
-          <HudButton data-tip="The character creator: each person of your cast, part by part, with locks, a randomiser, outfits and moving previews." active={mode === "characters" && !settingsOpen} onClick={() => setMode("characters")}>Characters</HudButton>
+          <HudButton data-tip="The character creator: each of your characters, part by part, with locks, a randomiser, outfits and moving previews." active={mode === "characters" && !settingsOpen} onClick={() => setMode("characters")}>Characters</HudButton>
         </div>
         <button
           className={`forge-gear ml-3 ${settingsOpen ? "on" : ""}`}
@@ -520,7 +537,7 @@ export default function App() {
         </button>
       </header>
 
-      {mode === "characters" && !settingsOpen ? <CharacterStudio /> : mode === "explainer" && !settingsOpen ? <ExplainerStudio /> : mode === "many" && !settingsOpen ? <ManyVideosStudio onEditProject={() => { setMode("puppet"); goStep("cast"); }} /> : view === "settings" ? (
+      {mode === "flow" && !settingsOpen ? <FlowStudio onProduce={(m) => { if (m) setMode(m); else { setMode("puppet"); setStep("script"); } }} /> : mode === "characters" && !settingsOpen ? <CharacterStudio /> : mode === "explainer" && !settingsOpen ? <ExplainerStudio /> : mode === "many" && !settingsOpen ? <ManyVideosStudio onEditProject={() => { setMode("puppet"); goStep("cast"); }} /> : view === "settings" ? (
         <main className="panel-hud relative flex-1 mx-3 mb-3 p-6 min-h-0 overflow-hidden">
           <HudCorners />
           <div className="w-full h-full flex flex-col">
@@ -548,6 +565,8 @@ export default function App() {
           <PreviewPlayerContext.Provider value={player}>
           {step === "cast" ? (
             <CastPanel />
+          ) : step === "direct" ? (
+            <DirectPanel />
           ) : step === "script" ? (
             <NarrationPanel />
           ) : step === "look" ? (
@@ -578,6 +597,7 @@ export default function App() {
               style={{ width: canvasSize.w, height: canvasSize.h }}
             >
               {/* Under everything, as in the render. */}
+              <div className="absolute inset-0" style={{ transform: cameraCss(staging.camera(previewTimeMs), canvasSize.w, canvasSize.h), transformOrigin: "0 0" }}>
               <BackgroundScene
                 clips={backgroundClips}
                 urls={backgroundUrls}
@@ -639,7 +659,9 @@ export default function App() {
                 // a move: where they stand now (walking in, off stage…), as the render places them
                 const ci = cast.findIndex((c) => c.id === sp.id);
                 const move = draggingId === sp.id ? null : moveAt(moveTracks[sp.id], previewTimeMs, sp.gestures ?? 0.5);
-                const stage = draggingId === sp.id ? { dx: 0, hidden: false, facing: null } : stagePlacement(moveTracks[sp.id], move, cast[ci], cast, previewTimeMs);
+                const go = draggingId === sp.id ? { dx: 0, walking: 0 as const } : staging.go(sp.id, previewTimeMs);
+                const st0 = draggingId === sp.id ? { dx: 0, hidden: false, facing: null } : stagePlacement(moveTracks[sp.id], move, cast[ci], cast, previewTimeMs);
+                const stage = { ...st0, dx: st0.dx + go.dx };
                 return (
                 <div
                   key={sp.id}
@@ -671,7 +693,7 @@ export default function App() {
                               idleMotion
                             ),
                             sp.size * canvasSize.w
-                          ) + travelBob(move, previewTimeMs, sp.size * canvasSize.w, !!activeCard(sp))),
+                          ) + travelBob(move, previewTimeMs, sp.size * canvasSize.w, !!activeCard(sp)) + (activeCard(sp) || sp.kenney ? "" : walkBob(go.walking, previewTimeMs, sp.size * canvasSize.w))),
                     cursor: draggingId === sp.id ? "grabbing" : "grab",
                     touchAction: "none",
                   }}
@@ -689,21 +711,19 @@ export default function App() {
                       active={activeSpeakerId === sp.id}
                       size={sp.size * canvasSize.w}
                     />
+                  ) : sp.kenney ? (
+                    <KenneyLive sp={sp} size={sp.size * canvasSize.w} timeMs={previewTimeMs} track={track} moods={moodTracks[sp.id]} segments={segs} fadeSec={visemeFadeMs / 1000} idleMotion={idleMotion} yaw={staging.yaw(sp.id, previewTimeMs)} walks={staging.walks[sp.id]} />
                   ) : activeCard(sp) ? (
                     // a drawn character: same signals as the puppet, drawn by code
                     <CharacterAvatar
                       card={activeCard(sp)!}
                       size={sp.size * canvasSize.w}
                       timeMs={previewTimeMs}
-                      viseme={blend.to}
-                      prevViseme={blend.from}
-                      mix={blend.mix}
-                      lidFrom={blinkAt(sp.id, previewTimeMs, idleMotion)}
-                      browLeft={browAt(browTracks[sp.id], previewTimeMs)}
-                      browRight={browAt(browTracks[sp.id], previewTimeMs)}
+                      // mouth, lids and brows all blended, exactly as the render does (drawnFace.ts)
+                      {...drawnFaceAt({ id: sp.id, timeMs: previewTimeMs, track, visemeFadeMs, idleMotion, brows: browTracks[sp.id], moods: moodTracks[sp.id] })}
                       head={headPoseAt(sp.id, headTracks[sp.id], previewTimeMs, idleMotion)}
                       poseSpans={poseTracks[sp.id]}
-                      {...facingView(sp.facing, sp, speakers.filter((o) => o.id !== sp.id), { dialogue: lookById(activeCard(sp)!.look).profile ? 2 : 1 })}
+                      {...facingView(staging.facing(sp.id, previewTimeMs) ?? sp.facing, sp, speakers.filter((o) => o.id !== sp.id), { dialogue: lookById(activeCard(sp)!.look).profile ? 2 : 1 })}
                       active={activeSpeakerId === sp.id}
                       move={move}
                       moveSpans={moveTracks[sp.id]}
@@ -729,7 +749,7 @@ export default function App() {
                       browRight={browAt(browTracks[sp.id], previewTimeMs)}
                       head={headPoseAt(sp.id, headTracks[sp.id], previewTimeMs, idleMotion)}
                       pose={poseAt(poseTracks[sp.id], previewTimeMs)}
-                      {...viewFor(sp, speakers, loaded.puppet)}
+                      {...viewFor({ ...sp, facing: staging.facing(sp.id, previewTimeMs) ?? sp.facing }, speakers, loaded.puppet)}
                       // size is a fraction of frame width; the render resolves
                       // it against the output width the exact same way.
                       size={sp.size * canvasSize.w}
@@ -762,7 +782,8 @@ export default function App() {
               {/* the set's furniture in front of the speakers */}
               <SetLayer scene={scene} part="front" width={canvasSize.w} height={canvasSize.h} timeMs={previewTimeMs} />
               {/* [pop …] and emoji tags: animated icons beside the speaker */}
-              <PopLayer pops={pops} speakers={speakers} width={canvasSize.w} height={canvasSize.h} timeMs={previewTimeMs} />
+              <PopLayer pops={pops} speakers={speakers} width={canvasSize.w} height={canvasSize.h} timeMs={previewTimeMs} pictureUrl={(rel) => "forge-kenney://shelf/" + rel} />
+              </div>
 
               {/* Above the avatars, matching the render's layer order. */}
               <SubtitleScene

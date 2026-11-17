@@ -355,6 +355,28 @@ export function buildSpeakerBrowTracks(
 
 /** The brow set at a moment. Later spans win where two overlap — a short line
  *  ending "…;" should ask the question, not trail off. */
+/** Drawn mouths are shapes, not pictures, so they MORPH from one to the next
+ *  (no washed-out half-and-half like a picture dissolve). Ak, 11 Nov 2026:
+ *  blending everywhere. Pictures keep the project's own fade (usually a cut). */
+export const DRAWN_MOUTH_MORPH_MS = 70;
+/** How long a drawn brow takes to glide to its new shape. */
+export const BROW_GLIDE_MS = 160;
+
+/** The brows at a moment, gliding from the previous set over `fadeMs` (eased). */
+export function browBlendAt(spans: BrowSpan[] | undefined, timeMs: number, fadeMs = BROW_GLIDE_MS): { from: string; to: string; mix: number } {
+  const to = browAt(spans, timeMs);
+  if (!spans?.length || fadeMs <= 0) return { from: to, to, mix: 1 };
+  let edge = -Infinity;
+  for (const s of spans) {
+    for (const b of [s.startMs, s.endMs]) {
+      if (b <= timeMs && b > edge && timeMs - b < fadeMs && browAt(spans, b - 1) !== browAt(spans, b)) edge = b;
+    }
+  }
+  if (edge === -Infinity) return { from: to, to, mix: 1 };
+  const k = (timeMs - edge) / fadeMs;
+  return { from: browAt(spans, edge - 1), to, mix: k * k * (3 - 2 * k) };
+}
+
 export function browAt(spans: BrowSpan[] | undefined, timeMs: number): string {
   if (!spans) return BROW_REST;
   let set = BROW_REST;

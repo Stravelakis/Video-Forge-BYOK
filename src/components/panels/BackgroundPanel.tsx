@@ -21,13 +21,15 @@ import { HudButton } from "../ui/HudButton";
 import { Slider } from "../ui/Slider";
 import { COLOR_LOOKS } from "../../lib/background/colorLook";
 import { useProjectStore } from "../../store/useProjectStore";
+import { ShelfPicker, type ShelfItem } from "./ShelfPicker";
 
 type Hit = Awaited<ReturnType<typeof window.byok.media.searchVideos>>["hits"][number];
 type Scene = Awaited<ReturnType<typeof window.byok.media.autoBackgrounds>>["scenes"][number];
 
 const LANGUAGE_NAMES: Record<string, string> = { el: "Greek", en: "English" };
 
-export function BackgroundPanel() {
+/** shelves: show the free-picture shelves here too (Production). The Create flow keeps them under Paintings & materials. */
+export function BackgroundPanel({ shelves = true }: { shelves?: boolean } = {}) {
   const narration = useProjectStore((s) => s.narration);
   const render = useProjectStore((s) => s.render);
   const language = useProjectStore((s) => s.language);
@@ -51,6 +53,11 @@ export function BackgroundPanel() {
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
+  // search filters (Ak, 10 Nov 2026): which library, and how long the clip is
+  const [prov, setProv] = useState<"both" | "pixabay" | "pexels">("both");
+  const [len, setLen] = useState<"any" | "short" | "medium" | "long">("any");
+  const LEN: Record<string, [number, number]> = { any: [0, 1e9], short: [0, 10], medium: [10, 30], long: [30, 1e9] };
+  const shown = hits.filter((h) => h.durationSec >= LEN[len][0] && h.durationSec < LEN[len][1]);
   const [notes, setNotes] = useState<string[]>([]);
   /** Which scene a manual pick will replace; null means "append as a new one". */
   const [targetScene, setTargetScene] = useState<number | null>(null);
@@ -125,16 +132,37 @@ export function BackgroundPanel() {
     }
   }
 
+  async function uploadClip() {
+    const f = await window.byok.dialog.openFile([{ name: "Video clip", extensions: ["mp4", "mov", "webm"] }]);
+    if (!f) return;
+    const endMs = Math.max(0, narration?.segments.at(-1)?.endMs ?? 0);
+    setBackgrounds([{ startMs: 0, endMs, query: f.split(/[\/]/).pop() ?? "Your clip", reason: "Your own clip.", filePath: f, hit: null } as Scene]);
+  }
+
   async function runSearch() {
     if (!query.trim()) return;
     setBusy("Searching…");
     setError(null);
     try {
-      const res = await window.byok.media.searchVideos(query.trim(), undefined, portrait ? "portrait" : "landscape");
+      const res = await window.byok.media.searchVideos(query.trim(), prov === "both" ? undefined : [prov], portrait ? "portrait" : "landscape");
       setHits(res.hits);
       setNotes(res.notes);
     } catch (e) {
       setError(plainError(e, "Check your internet, then search again."));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function useShelf(item: ShelfItem) {
+    setBusy("Preparing the picture…");
+    try {
+      const filePath = await window.byok.media.stillClip(item.file, render.width, render.height);
+      const hit = { id: item.id, url: "", durationSec: 12, width: render.width, height: render.height, thumbnail: "", provider: "shelf", pageUrl: "", credit: item.by } as unknown as Hit;
+      const endMs = narration?.segments.at(-1)?.endMs ?? 0;
+      setBackgrounds([...backgrounds, { startMs: 0, endMs, query: item.label, reason: `${item.by}, ${item.licence}.`, hit, filePath } as Scene]);
+    } catch (e) {
+      setError(plainError(e, "Pick a different picture."));
     } finally {
       setBusy(null);
     }
@@ -169,9 +197,13 @@ export function BackgroundPanel() {
 
   return (
     <div className="space-y-4">
+      {shelves && <ShelfPicker onBackground={(i) => void useShelf(i)} busy={!!busy} />}
       <div className="flex flex-wrap items-center gap-2">
         <HudButton onClick={chooseAutomatically} disabled={!!busy} data-tip="Reads your narration and picks a stock video for each scene for you. You can swap any pick afterwards.">
           Choose automatically
+        </HudButton>
+        <HudButton onClick={uploadClip} disabled={!!busy} data-tip="Use a video from your computer as the background of the whole video.">
+          ⬆ Your own clip
         </HudButton>
         <HudButton onClick={useExplainer} disabled={!!busy} data-tip="Use an explainer you made (Explainer, top right) as the whole background. The puppets move into the spots it left empty for them.">
           Use an explainer
@@ -256,7 +288,7 @@ export function BackgroundPanel() {
         />
         <p className="text-sm text-neutral-500">
           Everything else draws over the background, so some dimming is what keeps the
-          sound bars and the subtitles readable. A blend longer than half the shortest
+          sound waves and the subtitles readable. A blend longer than half the shortest
           scene is trimmed to fit.
         </p>
       </div>
@@ -359,6 +391,15 @@ export function BackgroundPanel() {
                 </HudButton>
               </div>
 
+              <div className="flex flex-wrap items-center gap-2 mb-3" role="group" aria-label="Filters">
+                <span className="label-etched" data-tip="Which free library to search.">Library</span>
+                {(["both", "pixabay", "pexels"] as const).map((v) => <HudButton key={v} active={prov === v} onClick={() => setProv(v)} data-tip={v === "both" ? "Search both libraries." : `Only ${v === "pixabay" ? "Pixabay" : "Pexels"}.`}>{v === "both" ? "Both" : v === "pixabay" ? "Pixabay" : "Pexels"}</HudButton>)}
+                <span className="label-etched ml-3" data-tip="How long the clip is.">Length</span>
+                {(["any", "short", "medium", "long"] as const).map((v) => <HudButton key={v} active={len === v} onClick={() => setLen(v)} data-tip={v === "any" ? "Any length." : v === "short" ? "Under 10 seconds." : v === "medium" ? "10 to 30 seconds." : "Over 30 seconds."}>{v === "any" ? "Any" : v === "short" ? "Short" : v === "medium" ? "Medium" : "Long"}</HudButton>)}
+                <span className="text-sm text-neutral-500 ml-3" data-tip="Clips are always the shape of your video.">Shape: {portrait ? "tall" : "wide"}, always</span>
+                {hits.length > 0 && <span className="text-sm text-neutral-500" data-tip="How many clips match the filters.">· {shown.length} of {hits.length}</span>}
+              </div>
+
               {notes.map((n, i) => (
                 <p key={i} className="text-sm text-amber-400 mb-1" data-tip="A heads-up from the search. It did not stop the search.">{n}</p>
               ))}
@@ -370,10 +411,11 @@ export function BackgroundPanel() {
               )}
 
               <div className="flex-1 overflow-y-auto grid content-start grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 pr-1">
-                {hits.map((h) => (
+                {shown.map((h) => (
                   <button
                     key={h.id}
                     onClick={() => useHit(h)}
+                    data-preview={JSON.stringify({ kind: "image", src: h.thumbUrl })}
                     className="text-left group"
                     title={`${h.provider} · ${h.author} · ${h.width}×${h.height}`}
                   >

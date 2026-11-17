@@ -314,6 +314,31 @@ function WaveformSceneDrawn({
         // than accumulated, so they survive being rendered out of order. The
         // ring they are born on follows the speaker's own frame shape, like the
         // boil does.
+        // THE CENTRE BAR (Ak, 10 Nov 2026): one bar along an edge, growing from the
+        // middle out to both sides. A quarter of the edge when silent, the whole
+        // edge when shouting, in the speaker's colour. Top/bottom run across,
+        // left/right run up and down; "flush" puts it on the very edge.
+        if (cfg.style === "centreBar") {
+          const lvl = silent ? 0 : Math.max(0, Math.min(1, ((src?.level ?? 0) - 0.06) / 0.7 * cfg.scale));
+          const eased = 1 - (1 - lvl) * (1 - lvl);
+          const vertical = cfg.position === "left" || cfg.position === "right";
+          const along = vertical ? height : width;
+          const len = along * (0.25 + 0.75 * eased);
+          const th = Math.max(3, frameMin * 0.022 * cfg.thickness);
+          const gap = cfg.edgeFlush ? 0 : frameMin * 0.035;
+          const lane = cfg.lane * th * 1.6;
+          const x = vertical ? (cfg.position === "left" ? gap + lane : width - gap - th - lane) : (width - len) / 2;
+          const y = vertical ? (height - len) / 2 : cfg.position === "top" ? gap + lane : height - gap - th - lane;
+          const w = vertical ? th : len, h = vertical ? len : th;
+          const r = cfg.edgeFlush ? 0 : th / 2;
+          return (
+            <g key={ti} opacity={opacity}>
+              <rect x={x - th * 0.6} y={y - th * 0.6} width={w + th * 1.2} height={h + th * 1.2} rx={r + th * 0.6} fill={track.color} opacity={0.18 + 0.25 * eased} style={{ filter: `blur(${th * 0.8}px)` }} />
+              <rect x={x} y={y} width={w} height={h} rx={r} fill={track.color} />
+            </g>
+          );
+        }
+
         if (cfg.style === "particles" || cfg.style === "sparks" || cfg.style === "bloomBars") {
           const cx = halo ? halo.cx : width * cfg.ringX;
           const cy = halo ? halo.cy : height * cfg.ringY;

@@ -132,6 +132,8 @@ export const useManyStore = create<ManyState>((set, get) => ({
       portraitPath: s.portraitPath,
       sheetPath: s.sheetPath,
       character: activeCard(s) ?? undefined,
+      kenney: s.kenney,
+      kenneyFraming: s.kenneyFraming,
       engine: (s.ttsEngine === "dramabox" ? "gemini" : s.ttsEngine ?? "gemini") as "gemini",
       geminiMode: s.geminiMode,
       geminiModel: s.geminiModel,

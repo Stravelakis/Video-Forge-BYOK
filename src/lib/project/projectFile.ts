@@ -28,13 +28,39 @@ export const PROJECT_VERSION = 2;
 export const PLAIN_FIELDS = [
   "render", "fps", "speakers", "script", "language",
   "musicWaveform", "musicColor", "subtitles",
-  "pauseSameMs", "pauseTurnMs", "visemeFadeMs", "idleMotion",
+  "pauseSameMs", "pauseTurnMs", "visemeFadeMs", "fadeMigrated", "idleMotion",
   "cards", "logo",
   "backgrounds", "backgroundDim", "backgroundBlur", "backgroundColorLook", "backgroundCrossfadeMs",
   "musicVolume", "musicDuck", "sfx", "scene",
+  // The Direct step's stage directions (17 Nov 2026: Save project used to drop
+  // them; a file without them opens with none).
+  "directions",
 ] as const;
 
 type Plain = (typeof PLAIN_FIELDS)[number];
+
+/** Everything the project owns besides the plain fields: the audio entries. */
+const AUDIO_FIELDS = ["narration", "music", "attachedAudio"] as const;
+
+/** What the autosave keeps: exactly what the project file keeps (one list, so
+ *  the two cannot drift apart again — blur and colour look were in the file but
+ *  missing from the autosave until 17 Nov 2026). */
+export function autosaveSnapshot(s: ProjectState): ProjectDoc["project"] {
+  return projectToDoc(s, 0).project;
+}
+
+/** A project with nothing of the previous one left in it.
+ *
+ *  The store MERGES on every set, so "New" and "Open" used to keep any field
+ *  the defaults have no value for (the Direct step's directions, the colour
+ *  look). Every field a project owns is named here, explicitly undefined when
+ *  the defaults have no value, then the defaults go on top. */
+export function blankProject<T extends object>(defaults: T): T {
+  const out: Record<string, unknown> = {};
+  for (const k of PLAIN_FIELDS) out[k] = undefined;
+  for (const k of AUDIO_FIELDS) out[k] = null;
+  return { ...out, ...defaults } as T;
+}
 
 export interface ProjectDoc {
   kind: typeof PROJECT_KIND;
@@ -77,6 +103,10 @@ export function docToProject(raw: unknown): OpenResult {
   // Only the fields this app knows. Anything else in the file is ignored, so a
   // hand-edited or foreign file cannot write arbitrary state.
   for (const k of PLAIN_FIELDS) if (src[k] !== undefined) project[k] = src[k];
+  // Directions are read field by field: the Direct step and the render both
+  // walk them, so a wrong shape would break the screen rather than be ignored.
+  // A file without any (older files) leaves the new project's empty default.
+  if (src.directions !== undefined) project.directions = cleanDirections(src.directions);
   const pathOnly = (v: unknown) => {
     const f = (v as { filePath?: unknown } | null)?.filePath;
     return typeof f === "string" && f ? { filePath: f, analysis: null } : null;
@@ -86,4 +116,21 @@ export function docToProject(raw: unknown): OpenResult {
   project.music = pathOnly(src.music);
   project.attachedAudio = pathOnly(src.attachedAudio);
   return { ok: true, version, project: project as Partial<ProjectState> };
+}
+
+/** A file's stage directions in the shape the app uses; anything else is dropped.
+ *  A file without any (older files) gives none. */
+export function cleanDirections(v: unknown): NonNullable<ProjectState["directions"]> {
+  const out: NonNullable<ProjectState["directions"]> = {};
+  if (!v || typeof v !== "object" || Array.isArray(v)) return out;
+  for (const [key, line] of Object.entries(v as Record<string, unknown>)) {
+    const l = line as { text?: unknown; items?: unknown } | null;
+    if (!l || typeof l !== "object" || typeof l.text !== "string" || !Array.isArray(l.items)) continue;
+    const items = l.items
+      .filter((x): x is { tag: string; at: number; ai?: unknown } =>
+        !!x && typeof x === "object" && typeof (x as { tag?: unknown }).tag === "string" && Number.isFinite((x as { at?: unknown }).at))
+      .map((x) => ({ tag: x.tag, at: Math.min(1, Math.max(0, x.at)), ...(x.ai === true ? { ai: true } : {}) }));
+    if (items.length) out[key] = { text: l.text, items };
+  }
+  return out;
 }

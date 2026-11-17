@@ -16,10 +16,11 @@ import { PuppetAvatar } from "../canvas/PuppetAvatar";
 /** A made-up line of mouth shapes, looped while the pointer is over the face. */
 const TALK = [1, 3, 0, 2, 4, 1, 7, 3, 0, 6, 2, 1, 8, 0, 3, 1];
 
-export function LiveFace({ path, label, color, size = 56 }: { path: string; label: string; color?: string; size?: number }) {
+export function LiveFace({ path, label, color, size = 56, talking = false }: { path: string; label: string; color?: string; size?: number; talking?: boolean }) {
   const { puppets, errors } = usePuppets([path]);
   const loaded = puppets[path];
-  const [hover, setHover] = useState(false);
+  const [hover0, setHover] = useState(false);
+  const hover = hover0 || talking;
   const [tick, setTick] = useState(0);
   const [blink, setBlink] = useState(false);
 

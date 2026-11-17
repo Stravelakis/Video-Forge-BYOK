@@ -7,14 +7,15 @@
 // Relative imports only (no "@/"): Remotion's own webpack renders this too.
 // ---------------------------------------------------------------------------
 
-import { SETS } from "../../../characters/sets/sets.mjs";
+import { setFor } from "../../../characters/sets/custom.mjs";
 import { activeCard, frameFor, lookById, normalizeCard } from "../../../characters/core/index.mjs";
 
-export interface SceneSetting { id: string; title?: string; names?: string[] }
+/** spec: a set made from a description (characters/sets/custom.mjs); otherwise id names a built-in set. */
+export interface SceneSetting { id: string; title?: string; names?: string[]; spec?: unknown }
 export interface Seat { x: number; y: number; h: number; face: "camera" | "left" | "right" }
 
 export function seatsFor(scene: SceneSetting | null | undefined, n: number, W: number, H: number): Seat[] | null {
-  const set = scene && (SETS as Record<string, { seats: (n: number, W: number, H: number) => Seat[]; max: number }>)[scene.id];
+  const set = setFor(scene) as { seats: (n: number, W: number, H: number) => Seat[]; max: number } | null;
   if (!set || n === 0) return null;
   return set.seats(Math.min(n, set.max), W, H);
 }
@@ -51,6 +52,7 @@ export function seatSpeakers<T extends { x: number; y: number; size: number; fac
 ): T[] {
   const seats = seatsFor(scene, speakers.length, W, H);
   if (!seats) return speakers;
+  const sit = !!(setFor(scene) as { sit?: boolean } | null)?.sit;
   return speakers.slice(0, seats.length).map((sp, i) => {
     const seat = seats[i];
     const card = activeCard(sp as never) as { look: string; framing: string } | null;
@@ -59,9 +61,17 @@ export function seatSpeakers<T extends { x: number; y: number; size: number; fac
       const full = normalizeCard({ ...card, framing: "full" }).card;
       const fr = frameFor(full, full.look, "full", { x: 0, y: 0, w: b, h: b });
       const hy = (lookById(full.look).p as { hy: number }).hy;
-      // hips a little above the seat line: a cartoon torso is shorter than a person's
-      const cy = seat.y - seat.h * 0.1 + b / 2 - fr.y - hy * fr.S;
+      // hips a little above the seat line: a cartoon torso is shorter than a person's.
+      // On a room's real chair (sit): the seated hips (0.27 above the floor, rig.mjs) land on the seat.
+      const cy = sit ? seat.y + b / 2 - fr.y + 0.27 * fr.S : seat.y - seat.h * 0.1 + b / 2 - fr.y - hy * fr.S;
       return { ...sp, character: full, x: seat.x / W, y: cy / H, size: b / W, facing: seatFacing(seat) };
+    }
+    // a 3D character is drawn whole body: its box is sized so the hips (about the middle of the box)
+    // land on the seat line, and the furniture in front hides the legs
+    if ((sp as { kenney?: unknown }).kenney) {
+      const size = seat.h * 0.78;
+      const kenney = (sp as { kenney?: { motion?: string } }).kenney;
+      return { ...sp, x: seat.x / W, y: (seat.y - size * 0.3) / H, size: size / W, facing: seatFacing(seat), ...(sit ? { kenney: { ...kenney, motion: "sit" } } : {}) };
     }
     const box = puppetBox(seat, W);
     return { ...sp, x: box.x, y: box.yPx / H, size: box.size / W, facing: seatFacing(seat) };

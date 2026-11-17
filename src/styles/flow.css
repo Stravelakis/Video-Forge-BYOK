@@ -1,0 +1,237 @@
+/* The five-step set-up (src/components/flow). Same tokens as forge.css; all the room the window has. */
+.flow { flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0 12px 12px; gap: 10px; }
+.flow-steps { display: flex; gap: 8px; }
+.flow-step { flex: 1; display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 16px; background: var(--metal); border: 1px solid var(--line); color: var(--ink-2); cursor: pointer; font: 600 15px var(--body); min-width: 0; position: relative; transition: border-color .15s, background .15s, transform .15s; }
+.flow-step:hover { border-color: var(--line-hot); transform: translateY(-1px); }
+.flow-step i { font-style: normal; width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-hot); color: var(--accent); }
+.flow-step b { color: var(--ink); font-weight: 700; }
+.flow-step small { font-size: 13px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flow-step em { font-style: normal; margin-left: auto; min-width: 24px; height: 24px; border-radius: 12px; background: var(--crit); color: #1a0505; font-weight: 800; font-size: 13px; display: grid; place-items: center; padding: 0 6px; }
+.flow-step.done i { background: var(--accent); color: #05140e; border-color: var(--accent); }
+.flow-step.on { border-color: var(--accent); background: linear-gradient(120deg, rgba(85, 98, 184, .45), rgba(118, 255, 194, .16)); box-shadow: 0 0 26px rgba(118, 255, 194, .18); }
+.flow-step.on i { background: var(--accent); color: #05140e; }
+
+.flow-body { flex: 1; min-height: 0; overflow-y: auto; border-radius: 18px; border: 1px solid var(--line); background: rgba(3, 12, 16, .72); }
+.flow-foot { display: flex; justify-content: space-between; align-items: center; }
+.flow-next, .flow-go { border: 0; cursor: pointer; font: 800 16px var(--body); color: #05140e; background: linear-gradient(100deg, #8fb2ff, var(--accent)); padding: 12px 34px; border-radius: 99px; box-shadow: 0 0 30px rgba(118, 255, 194, .3); transition: transform .15s, box-shadow .15s; }
+.flow-next:hover, .flow-go:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 44px rgba(118, 255, 194, .5); }
+.flow-go { font-size: 20px; padding: 18px 60px; margin-top: 16px; }
+
+.flow-page { padding: 22px 26px 40px; }
+.flow-h { font: 800 30px var(--display); color: var(--ink); margin: 0; letter-spacing: -.01em; }
+.flow-lede { color: var(--ink-2); font-size: 16px; margin: 4px 0 12px; }
+.flow-note { color: var(--ink-3); font-size: 14px; margin: 10px 0; }
+.flow-ok { color: var(--good); font-size: 14px; }
+.flow-need { color: var(--crit); font-size: 15px; font-weight: 600; margin: 4px 0; }
+.flow-group { margin-top: 22px; }
+.flow-group h3 { font: 700 19px var(--display); color: var(--ink); margin: 0 0 10px; }
+.flow-group h3 small { font: 400 14px var(--body); color: var(--ink-3); margin-left: 8px; }
+.flow-sub { font: 700 15px var(--display); color: var(--ink-2); margin: 16px 0 8px; }
+.flow-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; align-items: center; }
+.flow-tpl { display: inline-flex; gap: 2px; }
+
+/* step 1 */
+.flow-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
+.flow-popon { display: block; }
+.flow-style, .flow-method, .flow-format { width: 100%; height: 100%; text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 10px 12px 14px; border-radius: 16px; background: var(--metal); border: 1px solid var(--line); color: var(--ink-2); cursor: pointer; font: 400 14px/1.4 var(--body); transition: transform .16s, border-color .16s, box-shadow .16s; }
+.flow-style:hover, .flow-method:hover, .flow-format:hover { transform: translateY(-3px); border-color: var(--line-hot); box-shadow: 0 10px 34px rgba(0, 0, 0, .5); }
+.flow-style.on, .flow-method.on, .flow-format.on { border-color: var(--accent); box-shadow: 0 0 28px rgba(118, 255, 194, .28); }
+.flow-style b, .flow-method b, .flow-format b { color: var(--ink); font: 700 17px var(--display); }
+.flow-demo { height: 200px; border-radius: 11px; overflow: hidden; position: relative; display: grid; place-items: center; }
+.flow-demo canvas { width: 100%; height: 100%; display: block; }
+.flow-demo-3d { background: radial-gradient(circle at 50% 40%, #4b4364, #1c1826); }
+.flow-demo-3d img { height: 100%; object-fit: contain; }
+.flow-demo-puppet { background: radial-gradient(circle at 50% 40%, #33476b, #101827); display: grid; place-items: center; font-size: 64px; }
+.flow-pros, .flow-cons { list-style: none; margin: 0; padding: 0; }
+.flow-pros li, .flow-cons li { padding-left: 20px; position: relative; }
+.flow-pros li::before { content: "+"; position: absolute; left: 3px; font-weight: 800; color: var(--good); }
+.flow-cons li::before { content: "–"; position: absolute; left: 3px; font-weight: 800; color: var(--warn); }
+
+/* the hover pop-out */
+.flow-pop { position: fixed; z-index: 400; pointer-events: none; border-radius: 22px; overflow: hidden; background: #0a1117; border: 1px solid var(--line-hot); box-shadow: 0 30px 90px rgba(0, 0, 0, .75), 0 0 60px rgba(118, 255, 194, .18); animation: flow-pop .16s ease-out; }
+@keyframes flow-pop { from { opacity: 0; transform: scale(.93); } to { opacity: 1; transform: none; } }
+.flow-pop-stage { position: relative; background: radial-gradient(circle at 50% 35%, #33394d, #0b1016); display: grid; place-items: center; }
+.flow-pop-stage canvas { width: 100%; height: 100%; display: block; }
+.flow-pop-cap { padding: 9px 16px 11px; display: flex; gap: 12px; align-items: baseline; color: var(--ink-2); font-size: 14px; }
+.flow-pop-cap b { color: var(--ink); font: 700 18px var(--display); white-space: nowrap; }
+
+/* step 2 */
+.flow-cast { display: grid; grid-template-columns: minmax(0, 1fr) 340px; height: 100%; position: relative; }
+.flow-cast-main { overflow-y: auto; padding: 20px 24px 40px; min-width: 0; }
+.flow-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.flow-search { margin-left: auto; width: 260px; }
+.flow-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; }
+.flow-tile { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px; background: var(--metal); border: 1px solid var(--line); border-radius: 14px; color: var(--ink); cursor: pointer; font: 600 14px var(--body); transition: transform .15s, border-color .15s; }
+.flow-tile:hover { transform: translateY(-3px) scale(1.03); border-color: var(--accent); }
+.flow-tile-pic { width: 110px; height: 110px; display: grid; place-items: center; overflow: hidden; }
+.flow-tile-pic img, .flow-tile-pic canvas { width: 100%; height: 100%; object-fit: contain; display: block; }
+.flow-tile-name { text-align: center; line-height: 1.2; }
+.flow-builder { height: min(880px, 86vh); border-radius: 16px; overflow: hidden; border: 1px solid var(--line); display: flex; }
+.flow-builder > * { flex: 1; min-width: 0; }
+.flow-cust { max-width: 900px; }
+
+.flow-side { border-left: 1px solid var(--line); padding: 18px 14px; overflow-y: auto; background: rgba(0, 0, 0, .3); }
+.flow-side h3 { font: 700 19px var(--display); color: var(--ink); margin: 0 0 8px; }
+.flow-side h3 small { color: var(--ink-3); font: 400 14px var(--body); }
+.flow-legend { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--ink-3); margin-bottom: 10px; }
+.flow-legend .grey { filter: grayscale(1); opacity: .75; }
+.flow-legend .red { color: var(--crit); }
+.flow-member { display: grid; grid-template-columns: 1fr auto; gap: 6px; padding: 10px; border-radius: 14px; border: 1px solid var(--line); background: var(--metal); margin-bottom: 8px; }
+.flow-member.on { border-color: var(--c, var(--accent)); box-shadow: 0 0 18px color-mix(in srgb, var(--c, #76ffc2) 35%, transparent); }
+.flow-member-name { display: flex; gap: 8px; align-items: center; background: none; border: 0; color: var(--ink); font: 700 16px var(--display); cursor: pointer; text-align: left; padding: 0; }
+.flow-member-name i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); flex: none; }
+.flow-x { background: none; border: 0; color: var(--ink-3); font-size: 18px; cursor: pointer; }
+.flow-x:hover { color: var(--crit); }
+.flow-emojis { grid-column: 1 / -1; display: flex; gap: 5px; }
+.flow-emo { width: 42px; height: 42px; font-size: 21px; display: grid; place-items: center; border-radius: 11px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); cursor: pointer; transition: transform .12s; }
+.flow-emo:hover { transform: scale(1.14); }
+.flow-emo.ok { border-color: var(--good); background: rgba(118, 255, 194, .13); }
+.flow-emo.grey { filter: grayscale(1); opacity: .62; }
+.flow-emo.grey:hover { opacity: 1; }
+.flow-emo.red { border-color: var(--crit); background: rgba(255, 90, 74, .3); box-shadow: 0 0 12px rgba(255, 90, 74, .5); filter: grayscale(1) sepia(1) hue-rotate(-40deg) saturate(5); }
+
+.flow-param { position: absolute; inset: 0 340px 0 0; background: #050c11; border-right: 1px solid var(--line-hot); display: flex; flex-direction: column; z-index: 20; }
+.flow-param-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px 8px; }
+.flow-param h3 { font: 800 26px var(--display); color: var(--ink); margin: 0; }
+.flow-param h3 small { font: 400 16px var(--body); color: var(--ink-3); margin-left: 8px; }
+.flow-param-body { flex: 1; overflow-y: auto; padding: 8px 24px; }
+.flow-param-foot { display: flex; gap: 10px; justify-content: flex-end; align-items: center; padding: 12px 24px; border-top: 1px solid var(--line); }
+.flow-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-width: 760px; }
+.flow-field textarea, .flow-field input[type=text] { width: 100%; }
+
+/* steps 3 and 4 */
+.flow-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 14px; }
+.flow-emoji { font-size: 32px; }
+.flow-work { margin-top: 16px; max-width: 1200px; }
+.flow-ai { max-width: 800px; }
+.flow-prompt { padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; color: var(--ink); }
+.flow-formats { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.flow-format-pic { width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; display: block; }
+.flow-format span { color: var(--ink-2); }
+.flow-spots { position: relative; background: linear-gradient(160deg, #182f3b, #0b1a24); overflow: hidden; }
+.flow-spots i { position: absolute; transform: translate(-50%, -50%); background: var(--accent); opacity: .8; }
+.flow-spots.big { display: grid; place-items: center; font-size: 56px; }
+
+/* step 5 */
+.flow-review { max-width: 880px; }
+.flow-row { display: grid; grid-template-columns: 16px 130px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: 16px; }
+.flow-row b { color: var(--ink); font: 700 16px var(--display); }
+.flow-dot { width: 12px; height: 12px; border-radius: 50%; }
+.flow-dot.ok { background: var(--good); }
+.flow-dot.red { background: var(--crit); }
+
+/* the Direct step */
+.forge-dline { border: 1px solid var(--line); border-left: 4px solid var(--c, var(--accent)); border-radius: 14px; padding: 10px 12px; background: var(--metal); }
+.forge-dline-head { display: flex; gap: 10px; align-items: center; margin-bottom: 4px; }
+.forge-dline-head b { color: var(--ink); }
+.forge-dline-text { margin: 4px 0 8px; line-height: 1.9; }
+.forge-dword { background: none; border: 0; padding: 1px 3px; border-radius: 6px; color: var(--ink); font: 15px var(--body); cursor: pointer; }
+.forge-dword:hover { background: rgba(118, 255, 194, .14); }
+.forge-dword.on { background: var(--accent); color: #05140e; font-weight: 700; }
+.forge-dchip { display: inline-flex; gap: 6px; align-items: center; padding: 4px 6px 4px 10px; border-radius: 99px; border: 1px solid var(--line-hot); color: var(--ink); font-size: 14px; background: rgba(118, 255, 194, .08); }
+.forge-dchip small { color: var(--ink-3); font-size: 13px; }
+.forge-dchip button { background: none; border: 0; color: var(--ink-3); cursor: pointer; font-size: 16px; }
+.forge-dchip button:hover { color: var(--crit); }
+.forge-direct-big { position: fixed; z-index: 60; left: 12px; top: 100px; bottom: 80px; width: 640px; max-width: 48vw; display: flex; flex-direction: column; padding: 16px 18px; border-radius: 18px; border: 1px solid var(--line-hot); background: #050c11; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+
+/* AI directing */
+.forge-dchip.ai { border-style: dashed; border-color: rgba(190, 150, 255, .7); background: rgba(160, 110, 255, .1); animation: forge-ai-in .5s cubic-bezier(.2, .9, .3, 1.3) both; }
+@keyframes forge-ai-in { from { opacity: 0; transform: translateY(6px) scale(.85); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.forge-ai-btn { background-image: linear-gradient(110deg, transparent 30%, rgba(190, 150, 255, .25) 50%, transparent 70%); background-size: 250% 100%; animation: forge-ai-sheen 4s ease-in-out infinite; }
+@keyframes forge-ai-sheen { 0%, 60% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+.forge-ai-bar { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding: 12px; border-radius: 14px; border: 1px solid rgba(190, 150, 255, .45); background: linear-gradient(135deg, rgba(160, 110, 255, .12), rgba(118, 255, 194, .05)); }
+.forge-ai-bar.busy { background-size: 300% 300%; animation: forge-ai-think 2.4s ease-in-out infinite; }
+@keyframes forge-ai-think { 0%, 100% { background-position: 0% 50%; box-shadow: 0 0 0 rgba(160, 110, 255, 0); } 50% { background-position: 100% 50%; box-shadow: 0 0 24px rgba(160, 110, 255, .35); } }
+@media (prefers-reduced-motion: reduce) { .forge-dchip.ai, .forge-ai-btn, .forge-ai-bar.busy { animation: none; } }
+
+/* Characters step: live pictures (10 Nov) */
+.forge-waves .wave.screen .pic { position: relative; display: block; overflow: hidden; border-radius: 6px; background: linear-gradient(160deg, #13232c, #070d11); }
+.forge-waves .wave.screen .who { position: absolute; transform: translate(-50%, -50%); border: 2px solid; display: grid; place-items: center; font-style: normal; font-weight: 700; color: #fff; font-size: 11px; background: rgba(255, 255, 255, .06); }
+.flow-stage { position: relative; overflow: hidden; border-radius: 12px; border: 1px solid var(--line-hot); background: radial-gradient(120% 90% at 50% 20%, #1b3340, #070d11 70%); box-shadow: inset 0 0 60px rgba(0, 0, 0, .5); user-select: none; }
+.flow-stage-who { display: grid; place-items: center; }
+.flow-stage-who.on { outline: 2px dashed rgba(118, 255, 194, .6); outline-offset: 4px; border-radius: 8px; }
+.flow-stage-frame { position: absolute; inset: 0; border: 3px solid; pointer-events: none; }
+.flow-stage-name { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); font-size: 13px; padding: 1px 8px; border-radius: 99px; background: rgba(0, 0, 0, .6); color: var(--c); white-space: nowrap; pointer-events: none; }
+.flow-stage-cap { position: absolute; left: 0; right: 0; bottom: 8%; text-align: center; font: 700 22px var(--display); color: #fff; text-shadow: 0 2px 8px #000; pointer-events: none; z-index: 5; }
+.flow-stage-cap span { transition: color .25s; }
+.flow-swatches { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.flow-swatch { width: 44px; height: 44px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, .15); cursor: pointer; transition: transform .18s cubic-bezier(.2, .9, .3, 1.4), box-shadow .18s; }
+.flow-swatch:hover { transform: scale(1.15); box-shadow: 0 0 18px var(--sw); }
+.flow-swatch.on { border-color: #fff; box-shadow: 0 0 0 3px var(--sw); }
+.flow-gest { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: end; }
+.flow-gest button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px; border-radius: 14px; border: 1px solid var(--line); background: #08121a; color: var(--ink); cursor: pointer; }
+.flow-gest button.on { border-color: var(--line-hot); box-shadow: 0 0 24px rgba(118, 255, 194, .18); }
+.flow-place { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start; }
+.flow-place table { border-collapse: collapse; font-size: 14px; }
+.flow-place td, .flow-place th { padding: 4px 6px; text-align: left; }
+.flow-place tr.on td { background: rgba(118, 255, 194, .07); }
+.flow-place input[type=number] { width: 70px; }
+.flow-shapes { display: flex; gap: 12px; flex-wrap: wrap; }
+.flow-param .forge-waves { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.forge-waves .wave.screen { padding: 8px; }
+.forge-waves .wave.screen .pic { box-shadow: 0 6px 20px rgba(0, 0, 0, .45); }
+
+/* Background step with a live preview (10 Nov) */
+.flow-bg { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 22px; align-items: start; }
+.flow-bg-side { position: sticky; top: 8px; display: flex; flex-direction: column; gap: 10px; }
+.flow-bg-stage { box-shadow: 0 18px 60px rgba(0, 0, 0, .6), 0 0 0 1px rgba(118, 255, 194, .12); }
+.flow-bg-stage img, .flow-bg-stage video { animation: flow-bg-in .35s ease both; }
+@keyframes flow-bg-in { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
+.flow-preview-label { font: 800 18px var(--display); color: var(--ink); }
+.flow-preview-label small { font: 400 14px var(--body); color: var(--ink-3); margin-left: 8px; }
+.flow-proscons { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 14px; background: #08121a; border: 1px solid var(--line); font-size: 15px; }
+.flow-proscons .pro { color: #9cf3cf; } .flow-proscons .con { color: #ffb0b0; }
+.flow-methods.compact { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.flow-methods.compact .flow-method { flex-direction: row; align-items: center; padding: 10px 12px; }
+.flow-methods.compact .flow-emoji { font-size: 26px; }
+@media (prefers-reduced-motion: reduce) { .flow-bg-stage img, .flow-bg-stage video { animation: none; } }
+.flow-formats.pics { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.flow-formats.pics .flow-format { align-items: center; text-align: center; }
+.flow-formats.pics .flow-format span { font-size: 14px; color: var(--ink-2); }
+.flow-formats.pics .flow-stage { border-radius: 10px; }
+.flow-stage .cr-still, .flow-gest .cr-still { width: 100%; height: 100%; display: block; object-fit: contain; }
+.forge-newset { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 14px; border: 1px solid rgba(190, 150, 255, .45); background: linear-gradient(135deg, rgba(160, 110, 255, .12), rgba(118, 255, 194, .05)); margin-bottom: 10px; }
+.forge-set-x { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(0, 0, 0, .65); color: #fff; cursor: pointer; }
+.forge-set-x:hover { background: #c0392b; }
+
+.flow-pictools { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: #08121a; }
+.flow-picgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; max-height: 420px; overflow-y: auto; }
+.flow-picgrid button { padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #000; cursor: pointer; aspect-ratio: 16 / 10; transition: transform .16s, border-color .16s; }
+.flow-picgrid button:hover { transform: translateY(-2px); border-color: var(--line-hot); }
+.flow-picgrid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.room-maker { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: #08121a; }
+.room-view { border-radius: 12px; overflow: hidden; border: 1px solid var(--line-hot); box-shadow: 0 14px 40px rgba(0, 0, 0, .5); }
+.room-view canvas { display: block; }
+.room-maker select, .flow-page select { background: #0b1820; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; }
+.room-maker select option { background: #0b1820; color: var(--ink); }
+.flow-wiz { display: flex; flex-direction: column; gap: 14px; }
+.flow-wiz section { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: #08121a; }
+.flow-wiz h4 { display: flex; align-items: center; gap: 10px; margin: 0; font: 700 17px var(--display); color: var(--ink); }
+.flow-wiz h4 small { font: 400 14px var(--body); color: var(--ink-3); }
+.flow-wiz-n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(118, 255, 194, .12); border: 1px solid var(--line-hot); color: var(--accent); font-size: 14px; }
+.flow-wiz-n.done { background: var(--accent); color: #04110c; }
+.flow-wiz-out { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; border: 1px dashed rgba(190, 150, 255, .5); background: rgba(160, 110, 255, .07); animation: forge-ai-in .45s ease both; }
+.flow-wiz-out p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink); }
+.flow-wiz-how { margin: 0; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.flow-wiz-ideas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+.flow-wiz-idea { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; padding: 10px; border-radius: 12px; border: 1px solid var(--line); cursor: pointer; font-size: 14px; color: var(--ink-2); }
+.flow-wiz-idea b { color: var(--ink); } .flow-wiz-idea span { grid-column: 2; }
+.flow-wiz-idea input { grid-row: span 2; margin-top: 3px; }
+.flow-wiz-idea.on { border-color: var(--line-hot); background: rgba(118, 255, 194, .06); }
+.flow-picgrid button.off { opacity: .35; filter: grayscale(.7); }
+.flow-picgrid button.on { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* a preview that stays in view beside its controls (Ak, 11 Nov 2026) */
+.flow-split { display: grid; grid-template-columns: minmax(0, 480px) minmax(300px, 1fr); gap: 20px; align-items: start; }
+.flow-split-stick { position: sticky; top: 8px; z-index: 2; }
+@media (max-width: 1100px) {
+  .flow-split { grid-template-columns: minmax(0, 1fr); }
+  .flow-split-stick { background: var(--bg, #0b0b0d); padding-bottom: 8px; }
+}
+
+/* Looks opens over the whole width: the customiser needs the room (Ak, 11 Nov 2026) */
+.flow-param.wide { right: 0; border-right: 0; }
+.flow-invideo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.flow-invideo-row { display: flex; gap: 20px; align-items: center; }
+.flow-invideo-row > p { max-width: 360px; }

@@ -7,6 +7,12 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { listCharacterFiles, saveCharacterFile } from "./characterFiles.mjs";
+import __fsForPacks from "node:fs";
+
+// These tests read the private brand packs (brands/ = DnD-World/Video-Forge-brands).
+// In a public copy without them they are skipped, not failed.
+const __packsHere = __fsForPacks.existsSync(new URL("../../brands/redflag/characters/jake.json", import.meta.url));
+const packTest = (name, fn) => test(name, { skip: !__packsHere && "needs the private brand packs" }, fn);
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const jake = () => JSON.parse(fs.readFileSync(path.join(REPO, "brands/redflag/characters/jake.json"), "utf8"));
@@ -22,7 +28,7 @@ function sandbox() {
   return { root, roots: { app, user } };
 }
 
-test("lists brands that have characters, with their settings", () => {
+packTest("lists brands that have characters, with their settings", () => {
   const { roots } = sandbox();
   const list = listCharacterFiles(roots);
   assert.equal(list.length, 1);
@@ -32,12 +38,12 @@ test("lists brands that have characters, with their settings", () => {
   assert.deepEqual(list[0].characters.map((c) => [c.id, c.where]), [["jake", "app"]]);
 });
 
-test("the real Red Flag folder lists all 40", () => {
+packTest("the real Red Flag folder lists all 40", () => {
   const list = listCharacterFiles({ app: path.join(REPO, "brands"), user: path.join(os.tmpdir(), "vf-none") });
   assert.equal(list.find((b) => b.brand === "redflag").characters.length, 40);
 });
 
-test("a save writes the checked file, keeps the old one in .backup, and an unchanged save does nothing", () => {
+packTest("a save writes the checked file, keeps the old one in .backup, and an unchanged save does nothing", () => {
   const { roots } = sandbox();
   const c = jake();
   c.base.hair = "short";
@@ -53,7 +59,7 @@ test("a save writes the checked file, keeps the old one in .backup, and an uncha
   assert.ok(!fs.readdirSync(path.join(roots.app, "redflag/characters")).some((f) => f.endsWith(".tmp")));
 });
 
-test("a character with problems is refused and nothing is written", () => {
+packTest("a character with problems is refused and nothing is written", () => {
   const { roots } = sandbox();
   const c = jake();
   c.outfits[0].wear = [{ id: "tshirt", colors: ["#ff0000"] }]; // the main colour is gone from this outfit
@@ -64,7 +70,7 @@ test("a character with problems is refused and nothing is written", () => {
   assert.equal(fs.readFileSync(path.join(roots.app, "redflag/characters/jake.json"), "utf8"), before);
 });
 
-test("brand and id are plain names: no way to write outside the characters folder", () => {
+packTest("brand and id are plain names: no way to write outside the characters folder", () => {
   const { roots } = sandbox();
   assert.equal(saveCharacterFile(roots, "../evil", jake()).ok, false);
   assert.equal(saveCharacterFile(roots, "nobrand", jake()).ok, false);
@@ -73,7 +79,7 @@ test("brand and id are plain names: no way to write outside the characters folde
   assert.equal(saveCharacterFile(roots, "redflag", c).ok, false);
 });
 
-test("a new character in the app folder updates the pages' index", () => {
+packTest("a new character in the app folder updates the pages' index", () => {
   const { roots } = sandbox();
   const c = jake();
   c.id = "jake_copy";
@@ -82,7 +88,7 @@ test("a new character in the app folder updates the pages' index", () => {
   assert.match(fs.readFileSync(path.join(roots.app, "redflag/characters/index.mjs"), "utf8"), /jake_copy\.json/);
 });
 
-test("when the app folder can't be written, the save goes to the data folder and wins the list", () => {
+packTest("when the app folder can't be written, the save goes to the data folder and wins the list", () => {
   const { roots } = sandbox();
   const asar = { app: path.join(roots.app, "..", "app.asar", "brands"), user: roots.user };
   // an app folder inside app.asar is never written to

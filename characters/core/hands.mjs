@@ -34,9 +34,13 @@ export function palmPx({ look, S, sk }) {
  * Draw one hand. arm: a skeleton arm { el, ha } (units); shape: a HAND_SHAPES
  * name; mirror: the figure is drawn mirrored (so "up the screen" is still up).
  */
-export function drawHand(G, arm, shape, { relaxed }) {
+export function drawHand(G, arm, shape, { relaxed, blend = null }) {
   const { pen, S, sk, look, card, ctx, ink } = G;
-  if (!shape || shape === "relaxed" || !FINGERS[shape]) return relaxed(arm);
+  // morphing from another shape (motion.mjs handBlend): fingers fold into the palm and unfold
+  const known = (s) => s && s !== "relaxed" && FINGERS[s] && s !== "grip";
+  const morph = blend && blend.mix < 1 && blend.from !== shape && (known(blend.from) || known(shape)) && shape !== "grip" && blend.from !== "grip";
+  if (!morph && (!shape || shape === "relaxed" || !FINGERS[shape])) return relaxed(arm);
+  if (morph && !known(shape) && blend.mix > 0.85) return relaxed(arm);
   const [hx, hy] = [arm.ha[0] * S, arm.ha[1] * S];
   const ang = Math.atan2(arm.ha[1] - arm.el[1], arm.ha[0] - arm.el[0]);
   // a shaped hand is drawn bigger than the round one: a thumb has to read on a phone
@@ -62,6 +66,19 @@ export function drawHand(G, arm, shape, { relaxed }) {
     if (vx * -Math.sin(ang) + vy * Math.cos(ang) < 0) flip = -1;
   }
   // fingers behind the palm first, so the palm's outline sits over their roots
+  if (morph) {
+    // pair the fingers up; a finger with no partner grows out of (or folds into) the palm
+    const A = known(blend.from) ? FINGERS[blend.from] : [], B = known(shape) ? FINGERS[shape] : [], k = blend.mix;
+    for (let i = 0; i < Math.max(A.length, B.length); i++) {
+      const a = A[i] ?? (B[i] ? [B[i][0], 0.5, B[i][2]] : null), b = B[i] ?? [a[0], 0.5, a[2]];
+      const len = a[1] + (b[1] - a[1]) * k;
+      if (len > 0.55) finger((a[0] + (b[0] - a[0]) * k) * flip, len, k < 0.5 ? a[2] : b[2]);
+    }
+    pen.circle(hx, hy, palm);
+    if (lineLook) { ctx.fillStyle = ink; ctx.fill(); }
+    else G.fill(skin, { role: look.gloves ? "eye" : "skin", noShade: true });
+    return palm;
+  }
   for (const [a, len, up] of FINGERS[shape]) finger(a * flip, len, up);
   if (shape === "grip") {
     // a C: the palm with a gap where the prop goes

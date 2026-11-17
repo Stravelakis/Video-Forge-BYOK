@@ -26,6 +26,7 @@ const STYLES = WAVEFORM_STYLES;
  *  and "boil" is a verb; nobody choosing a look should have to read either. */
 const STYLE_LABEL: Partial<Record<TrackWaveform["style"], string>> = {
   bloomBars: "bloom bars",
+  centreBar: "centre bar",
   boil: "boiling",
   mesh: "mesh",
 };
@@ -56,8 +57,10 @@ interface Props {
   /** The speaker's colour and frame shape: when given, styles are chosen from
    *  live picture tiles drawn on that frame, not from a list of names (Ak,
    *  12 Oct 2026: "the visuals are the way to understand which to choose"). */
-  face?: { color: string; shape: OutlineShape };
+  face?: Face;
 }
+/** The speaker the pictures are drawn for: colour, frame shape and, when known, where they stand. */
+interface Face { color: string; shape: OutlineShape; x?: number; y?: number; size?: number; label?: string; aspect?: number }
 
 /** One clock for all the tiles, so they move together and cost one loop. */
 function useTileClock() {
@@ -76,12 +79,38 @@ function useTileClock() {
 }
 
 const TILE = 96;
+const SCREEN = 150;
 
-function StyleTiles({ value, onChange, face }: { value: TrackWaveform; onChange: (p: Partial<TrackWaveform>) => void; face: { color: string; shape: OutlineShape } }) {
+/** A tiny picture of the whole video: the speaker at their place and the wave as it would be. */
+function ScreenTile({ value, patch, face, t, on, name, tip, onClick }: { value: TrackWaveform; patch: Partial<TrackWaveform>; face: Face; t: number; on: boolean; name: string; tip: string; onClick: () => void }) {
+  const aspect = face.aspect ?? 16 / 9;
+  const w = aspect >= 1 ? SCREEN : Math.round(SCREEN * 0.62), h = Math.round(w / aspect);
+  const x = face.x ?? .5, y = face.y ?? .5, size = face.size ?? .3;
+  const tracks = buildTracks([{ borderColor: face.color, outlineShape: face.shape, x, y, size, waveform: { ...value, ...patch, enabled: true } }], { ...value, enabled: false }, face.color);
+  const d = size * w;
+  const radius = face.shape === "square" ? "0%" : face.shape === "rounded" ? "18%" : "50%";
+  return (
+    <button className={`wave screen ${on ? "on" : ""}`} onClick={onClick} aria-label={name} data-tip={tip}>
+      <span className="pic" style={{ width: w, height: h }}>
+        <i className="who" style={{ left: `${x * 100}%`, top: `${y * 100}%`, width: d, height: d, borderRadius: radius, borderColor: face.color }}>{(face.label ?? "").slice(0, 1)}</i>
+        <WaveformScene tracks={tracks} width={w} height={h} timeMs={t} analysis={null} musicAnalysis={null} />
+      </span>
+      <span className="name">{name}</span>
+    </button>
+  );
+}
+
+function StyleTiles({ value, onChange, face }: { value: TrackWaveform; onChange: (p: Partial<TrackWaveform>) => void; face: Face }) {
   const t = useTileClock();
+  // along an edge, each style is shown on a little picture of the whole video
+  if (value.position !== "speaker") return (
+    <div className="forge-waves">
+      {STYLES.filter((s) => !isOrbit(s)).map((s) => <ScreenTile key={s} value={value} patch={{ style: s }} face={face} t={t} on={value.style === s} name={STYLE_LABEL[s] ?? s} tip={`Draws the voice as "${STYLE_LABEL[s] ?? s}". The picture shows how it will move.`} onClick={() => onChange({ style: s })} />)}
+    </div>
+  );
   return (
     <div className="forge-waves">
-      {STYLES.filter((s) => !isOrbit(s)).map((s) => {
+      {STYLES.filter((s) => !isOrbit(s) && s !== "centreBar").map((s) => {
         const tracks = buildTracks(
           [{ borderColor: face.color, outlineShape: face.shape, x: 0.5, y: 0.5, size: 0.42, waveform: { ...value, style: s, enabled: true, position: "speaker" } }],
           { ...value, enabled: false },
@@ -97,6 +126,30 @@ function StyleTiles({ value, onChange, face }: { value: TrackWaveform; onChange:
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function PositionTiles({ value, onChange, face, canAnchorToFace }: { value: TrackWaveform; onChange: (p: Partial<TrackWaveform>) => void; face: Face; canAnchorToFace: boolean }) {
+  const t = useTileClock();
+  return (
+    <div className="forge-waves">
+      {POSITIONS.filter((p) => p !== "speaker" || canAnchorToFace).filter((p) => value.style !== "centreBar" || ["top", "bottom", "left", "right"].includes(p)).map((p) => (
+        <ScreenTile key={p} value={value} patch={{ position: p }} face={face} t={t} on={value.position === p} name={POSITION_LABEL[p]} tip={`Places the waves ${POSITION_LABEL[p]}.`} onClick={() => onChange({ position: p })} />
+      ))}
+    </div>
+  );
+}
+
+function FlushTiles({ value, onChange, face }: { value: TrackWaveform; onChange: (p: Partial<TrackWaveform>) => void; face: Face }) {
+  const t = useTileClock();
+  return (
+    <div>
+      <div className="label-etched mb-2" data-tip="Whether the waves touch the very edge of the video.">Edge</div>
+      <div className="forge-waves">
+        <ScreenTile value={value} patch={{ edgeFlush: true }} face={face} t={t} on={value.edgeFlush} name="flush to edge" tip="The waves touch the very edge of the video." onClick={() => onChange({ edgeFlush: true })} />
+        <ScreenTile value={value} patch={{ edgeFlush: false }} face={face} t={t} on={!value.edgeFlush} name="small gap" tip="The waves leave a little gap before the edge." onClick={() => onChange({ edgeFlush: false })} />
+      </div>
     </div>
   );
 }
@@ -125,7 +178,8 @@ export function WaveformControls({ value, onChange, label, canAnchorToFace = tru
 
           {!isOrbit(value.style) && (
             <div>
-              <div data-tip="Where the moving sound bars sit on the picture." className="label-etched mb-2">Position</div>
+              <div data-tip="Where the moving sound waves sit on the picture." className="label-etched mb-2">Position</div>
+              {face ? <PositionTiles value={value} onChange={onChange} face={face} canAnchorToFace={canAnchorToFace} /> : (
               <div className="flex flex-wrap gap-2">
                 {POSITIONS.filter((p) => p !== "speaker" || canAnchorToFace).map((p) => (
                   <HudButton key={p} active={value.position === p} onClick={() => onChange({ position: p })} data-tip={`Places the moving picture ${POSITION_LABEL[p]}.`}>
@@ -133,6 +187,7 @@ export function WaveformControls({ value, onChange, label, canAnchorToFace = tru
                   </HudButton>
                 ))}
               </div>
+              )}
               {value.position === "speaker" && (
                 <p className="text-sm text-neutral-500 mt-2">
                   A halo on this speaker's own face — it moves with them. Ring
@@ -184,7 +239,8 @@ export function WaveformControls({ value, onChange, label, canAnchorToFace = tru
             />
           )}
 
-          {!isOrbit(value.style) && value.position !== "circular" && (
+          {face && !isOrbit(value.style) && value.position !== "circular" && value.position !== "speaker" && <FlushTiles value={value} onChange={onChange} face={face} />}
+          {!face && !isOrbit(value.style) && value.position !== "circular" && (
             <Toggle
               data-tip="On = the picture touches the very edge. Off = it leaves a little gap."
               label="Flush to edge" checked={value.edgeFlush}

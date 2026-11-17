@@ -327,7 +327,7 @@ export function drawCharacter(ctx, card, { look: look0 = card.look, S, x = 0, y 
     if (under.length && !fist.length) drawHand(G, arm, "open", { relaxed: relaxedHand });
     for (const p of [...under, ...fist]) drawProp(G, arm, p.id, { ...p, palm });
     if (fist.length) drawHand(G, arm, "fist", { relaxed: relaxedHand });
-    else if (!held.length) drawHand(G, arm, state.hands?.[which(arm)], { relaxed: relaxedHand });
+    else if (!held.length) drawHand(G, arm, state.hands?.[which(arm)], { relaxed: relaxedHand, blend: state.handBlend?.[which(arm)] });
     if (card.marks?.length && !look.gloves && look.limb !== "line") drawArmMarks(G, arm, card.marks, "hand", { ink: look.tone === "mono" ? ink : null });
     G.limbPass = false;
   };
@@ -708,10 +708,15 @@ function drawFace(G, state) {
     // "confused" lifts one brow only: the other stays at rest
     // (the far brow rests, so the lifted one is the near one and still shows in profile)
     if (names[0] === "confused" && names[1] === "confused") names[Math.max(0, F.eyes.findIndex((e) => e.far))] = "serious";
+    // gliding from the previous brows (blending, 11 Nov 2026): the same one-brow rule for those
+    const bmix = state.brows?.from && (state.brows.mix ?? 1) < 1 ? Math.max(0, state.brows.mix) : 1;
+    const fromNames = [state.brows?.from ?? names[0], state.brows?.from ?? names[1]];
+    if (fromNames[0] === "confused" && fromNames[1] === "confused") fromNames[Math.max(0, F.eyes.findIndex((e) => e.far))] = "serious";
+    const glide = (i) => { const a = browShape(fromNames[i]), z = browShape(names[i]); return bmix >= 1 ? z : { lift: a.lift + (z.lift - a.lift) * bmix, tilt: a.tilt + (z.tilt - a.tilt) * bmix, arch: a.arch + (z.arch - a.arch) * bmix }; };
     const bc = mono || look.incise || look.fill === "none" ? featureInk : look.id === "hose" || look.id === "hose2" ? featureInk : toneColor(look, shade(card.hairColor ?? "#262a33", -0.2), "hair");
     F.eyes.forEach((e, i) => {
       if (!e.visible) return;
-      const b = browShape(names[i]);
+      const b = glide(i);
       const inward = i === 0 ? 1 : -1; // the inner end is towards the nose
       const ex = e.x * S, by = (e.y - R * 0.32 - b.lift * R) * S, half = R * 0.14 * e.scaleX * S;
       const innerX = ex + inward * half, outerX = ex - inward * half;

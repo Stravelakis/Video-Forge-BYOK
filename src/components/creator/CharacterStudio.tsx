@@ -43,7 +43,7 @@ export function CharacterStudio() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  if (!s.brands) return <div className="cr-studio cr-empty" data-tip="Reading the character files.">Opening the cast…</div>;
+  if (!s.brands) return <div className="cr-studio cr-empty" data-tip="Reading the character files.">Opening the characters…</div>;
   if (!brandCast || !character) {
     return (
       <div className="cr-studio cr-empty" data-tip="The creator shows the character files in a brand's characters folder (brands/<brand>/characters).">
@@ -120,12 +120,12 @@ function Studio({ character: c, dirty }: { character: CharacterFile; dirty: bool
           {burst > 0 && <div className="cr-burst" key={burst} aria-hidden />}
 
           <div className="cr-id">
-            <div className="cr-kicker" data-tip={`Which group of the cast ${c.name} belongs to${c.roster ? `, and their number in the roster` : ""}.`}>
+            <div className="cr-kicker" data-tip={`Which group of characters ${c.name} belongs to${c.roster ? `, and their number in the roster` : ""}.`}>
               {settings.groups?.find((g) => g.id === c.group)?.title ?? c.group}{c.roster ? ` · #${c.roster}` : ""}
             </div>
             <h2 className={`cr-name ${c.name.length > 9 ? "long" : ""}`} data-tip={`${c.name}: the character open in the creator.`}>{c.name}</h2>
             <p className="cr-role" data-tip="Who they are, from the roster.">{c.role}</p>
-            <span className="cr-main" data-tip={`${c.name}'s main colour: their sound bars, their spoken word in the subtitles, their frame, and one piece of every outfit.`}>
+            <span className="cr-main" data-tip={`${c.name}'s main colour: their sound waves, their spoken word in the subtitles, their frame, and one piece of every outfit.`}>
               <i /> {(c.signatureName || c.signature).replace(/\s*\(.*$/, "")}
             </span>
           </div>
@@ -248,7 +248,7 @@ function Roster() {
   const groups = [...(b.settings.groups ?? []), { id: "__other", title: "Others" }];
   const match = (c: CharacterFile) => !q.trim() || `${c.name} ${c.role} ${c.id}`.toLowerCase().includes(q.trim().toLowerCase());
   return (
-    <nav className="cr-roster" aria-label="Cast">
+    <nav className="cr-roster" aria-label="Characters">
       {(s.brands?.length ?? 0) > 1 ? (
         <select className="cr-brand" value={s.brand} onChange={(e) => { const nb = s.brands!.find((x) => x.brand === e.target.value)!; s.open(nb.brand, nb.order[0]); }} data-tip="Which brand's characters to show.">
           {s.brands!.map((x) => <option key={x.brand} value={x.brand}>{x.title}</option>)}
@@ -286,11 +286,13 @@ function Roster() {
 
 /** Put this character, as shown, into the video being made (a copy). */
 function UseInVideo({ character: c, face, outfit }: { character: CharacterFile; face: string; outfit: string }) {
+  const inVideo = useCreatorStore((st) => st.brand === "__video");
   const add = useProjectStore((st) => st.addSpeakerFrom);
   const n = useProjectStore((st) => st.speakers.length);
   const [done, setDone] = useState(false);
   const t = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(t.current), []);
+  if (inVideo) return <span className="cr-use" data-tip="This character is already in your video. Every change here shows at once.">In your video ✓</span>;
   return (
     <button
       className="btn cr-use"

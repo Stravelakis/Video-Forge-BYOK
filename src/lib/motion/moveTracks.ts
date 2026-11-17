@@ -11,6 +11,7 @@
 
 import { SHELF, PROP_NAMES, readMoveTag, moveLengthMs, movesAt, type MoveSpan, type MoveState } from "../../../characters/core/index.mjs";
 import type { NarrationSegment } from "../../store/types";
+import { splitTag, tagStart } from "../direct/directions.ts";
 
 /** A move starts a breath before its line, like a gesture does. */
 const LEAD_MS = 150;
@@ -28,11 +29,13 @@ export function buildSpeakerMoveTracks(segments: NarrationSegment[], cast: CastM
   const push = (id: string, s: MoveSpan) => (tracks[id] ??= []).push(s);
   let seed = 1;
   for (const seg of segments) {
-    for (const tag of seg.tags ?? []) {
+    for (const raw of seg.tags ?? []) {
+      // "[waves @40%]": the Direct step can place a move inside its line
+      const { tag, at } = splitTag(raw);
       const hit = readMoveTag(tag, SHELF, { props: PROP_NAMES, cast });
       if (!hit) continue;
       const move = SHELF[hit.move];
-      const start = Math.max(0, seg.startMs - LEAD_MS);
+      const start = Math.max(0, tagStart(seg, at) - LEAD_MS);
       const own = moveLengthMs(move, { style: hit.style });
       const end = move.hold !== null || move.loop ? Math.max(start + own, seg.endMs) : start + own;
       push(seg.speakerId, { startMs: start, endMs: end, move: move.id, style: hit.style, prop: hit.prop, target: hit.target, seed: seed++ });
@@ -141,9 +144,12 @@ export function placeTracks<T extends { speakerIndex: number | null; anchor: { x
   });
 }
 
-/** Seated in a set: no walking in or out, sitting down or standing up — everyone is already at their seat. */
-export function seatedTracks(tracks: Record<string, MoveSpan[]>): Record<string, MoveSpan[]> {
+/** Seated in a set: no walking in or out, sitting down or standing up — everyone is already at their seat.
+ *  sitIds (a room's real chairs): those speakers sit from the first frame, without the drawn chair
+ *  a sit move brings ("none" is no prop), because the room has real ones. */
+export function seatedTracks(tracks: Record<string, MoveSpan[]>, sitIds?: string[]): Record<string, MoveSpan[]> {
   const out: Record<string, MoveSpan[]> = {};
   for (const [id, spans] of Object.entries(tracks)) out[id] = spans.filter((s) => !SHELF[s.move]?.path && !SHELF[s.move]?.stance);
+  for (const id of sitIds ?? []) out[id] = [{ startMs: 0, endMs: 36e5, move: "ual-sit-idle", prop: "none", seed: 1 }, ...(out[id] ?? [])];
   return out;
 }

@@ -10,12 +10,18 @@ import {
   addWear, removeWear, outfitsWithoutMain, setMainColor, setUsualFace, setLock, changed, randomValue, faceIdOf, outfitIdOf,
 } from "../../src/lib/creator/edit.ts";
 import { normalizeCharacter, allLocked, PARTS, FIELDS } from "../../characters/core/index.mjs";
+import __fsForPacks from "node:fs";
+
+// These tests read the private brand packs (brands/ = DnD-World/Video-Forge-brands).
+// In a public copy without them they are skipped, not failed.
+const __packsHere = __fsForPacks.existsSync(new URL("../../brands/redflag/characters/jake.json", import.meta.url));
+const packTest = (name, fn) => test(name, { skip: !__packsHere && "needs the private brand packs" }, fn);
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const load = (id) => normalizeCharacter(JSON.parse(fs.readFileSync(path.join(REPO, `brands/redflag/characters/${id}.json`), "utf8"))).character;
 const seeded = (seed = 1) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 
-test("a face-part change goes into the face being edited; the other faces keep theirs", () => {
+packTest("a face-part change goes into the face being edited; the other faces keep theirs", () => {
   const jake = load("jake");
   const [c, problem] = setField(jake, "B", "eyes", "sleepy");
   assert.equal(problem, null);
@@ -27,13 +33,13 @@ test("a face-part change goes into the face being edited; the other faces keep t
   assert.equal("eyes" in c2.faces.find((f) => f.id === "B").set, false);
 });
 
-test("a body change goes into the base, for every face", () => {
+packTest("a body change goes into the base, for every face", () => {
   const [c] = setField(load("jake"), "C", "height", 0.9);
   for (const f of c.faces) assert.equal(cardOf(c, f.id).height, 0.9);
   assert.equal(c.base.height, 0.9);
 });
 
-test("values are checked: out of range is clamped and said, unknown is refused", () => {
+packTest("values are checked: out of range is clamped and said, unknown is refused", () => {
   const [c, p] = setField(load("jake"), "A", "height", 5);
   assert.equal(c.base.height, 1.15);
   assert.match(p, /outside/);
@@ -41,7 +47,7 @@ test("values are checked: out of range is clamped and said, unknown is refused",
   assert.match(setField(load("jake"), "A", "signature", "#000000")[1], /isn't changed here/);
 });
 
-test("the randomiser changes only unlocked parts", () => {
+packTest("the randomiser changes only unlocked parts", () => {
   const jake = load("jake");
   const all = allLocked();
   assert.deepEqual(randomise(jake, "A", "o1", all, seeded(3)), jake, "everything locked: nothing changes");
@@ -60,7 +66,7 @@ test("the randomiser changes only unlocked parts", () => {
   assert.ok(differs > 10, "unlocked parts do change");
 });
 
-test("randomised outfits keep the main colour piece and the same clothes", () => {
+packTest("randomised outfits keep the main colour piece and the same clothes", () => {
   const jake = load("jake");
   const c = randomise(jake, "A", "o1", { ...allLocked(), outfits: false }, seeded(5));
   const a = jake.outfits.find((o) => o.id === "o1"), b = c.outfits.find((o) => o.id === "o1");
@@ -76,7 +82,7 @@ test("random numbers stay inside the field's range, away from the ends", () => {
   }
 });
 
-test("outfit sets: copy, new, rename, delete (never the last), chosen list", () => {
+packTest("outfit sets: copy, new, rename, delete (never the last), chosen list", () => {
   const rita = load("rita");
   const n = rita.outfits.length;
   const [c1, copyId] = copyOutfit(rita, rita.outfits[0].id);
@@ -100,7 +106,7 @@ test("outfit sets: copy, new, rename, delete (never the last), chosen list", () 
   assert.equal(normalizeCharacter(c4).problems.length, 0, "still a valid character");
 });
 
-test("the main colour: losing it is reported, putting it back fixes it, changing it moves it everywhere", () => {
+packTest("the main colour: losing it is reported, putting it back fixes it, changing it moves it everywhere", () => {
   const jake = load("jake");
   const o = jake.outfits[0];
   const idx = o.wear.findIndex((w) => w.colors.includes(jake.signature));
@@ -113,7 +119,7 @@ test("the main colour: losing it is reported, putting it back fixes it, changing
   assert.equal(normalizeCharacter(navyToRed).problems.length, 0);
 });
 
-test("adding a piece replaces what sat in its place; removing keeps at least one", () => {
+packTest("adding a piece replaces what sat in its place; removing keeps at least one", () => {
   const jake = load("jake");
   const o = jake.outfits[0];
   const [c, problems] = addWear(jake, o.id, "hoodie", ["#24365c"]);
@@ -126,7 +132,7 @@ test("adding a piece replaces what sat in its place; removing keeps at least one
   assert.equal(removeWear(one, o.id, 0), one);
 });
 
-test("usual face, locks, and the changed check", () => {
+packTest("usual face, locks, and the changed check", () => {
   const young = load("young_amber");
   assert.ok(young.chosen.faceNote);
   const c = setUsualFace(young, "B");

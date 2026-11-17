@@ -18,6 +18,7 @@
 // The Live models are told so; the TTS models understand them natively.
 // ---------------------------------------------------------------------------
 
+import { withGeminiKey } from "../geminiKeys";
 import WebSocket from "ws";
 import * as keyStore from "../keyStore";
 // WHY THE `ws` PACKAGE. Electron 31's Node has no built-in WebSocket (Node 22
@@ -54,11 +55,6 @@ export interface GeminiTake {
   attempts: number;
 }
 
-async function apiKey(): Promise<string> {
-  const key = await keyStore.getKey("gemini");
-  if (!key) throw new Error("No Gemini key saved (Settings → Gemini).");
-  return key;
-}
 
 export function pcmToWav(pcm: Buffer, rate = RATE): Buffer {
   const h = Buffer.alloc(44);
@@ -238,7 +234,12 @@ const MAX_LIVE_ATTEMPTS = 3;
 
 export async function synthesizeGemini(line: GeminiLine, keyOverride?: string): Promise<GeminiTake> {
   // keyOverride: for tools/tests running outside the app, where the vault is not available.
-  const key = keyOverride ?? (await apiKey());
+  // Otherwise every saved Gemini key in turn (electron/geminiKeys.ts).
+  if (keyOverride) return synthesizeWith(line, keyOverride);
+  return withGeminiKey((key) => synthesizeWith(line, key));
+}
+
+async function synthesizeWith(line: GeminiLine, key: string): Promise<GeminiTake> {
   if (line.mode === "tts") {
     const pcm = await ttsTake(line, key);
     return { audioBuffer: pcmToWav(pcm), transcript: "", match: 1, attempts: 1 };

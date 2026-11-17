@@ -30,6 +30,8 @@ import { poseBlendAt } from "./perform.mjs";
 import { movesAt } from "./moves.mjs";
 
 const WINDOW_MS = 900;
+/** How long a hand takes to change shape (fingers fold and unfold). */
+const HAND_MORPH_MS = 180;
 const DT = 1000 / 120;
 
 /**
@@ -90,8 +92,8 @@ export function performAt(src, timeMs, o = {}) {
   // the targets along the window (and a little ahead, for anticipation)
   const n = Math.ceil(WINDOW_MS / DT), ahead = Math.ceil(LOOK_AHEAD_MS / DT);
   const t0 = timeMs - n * DT;
-  const samples = [];
-  for (let i = 0; i <= n + ahead; i++) samples.push(targetsAt(src, Math.max(0, t0 + i * DT), opts).ch);
+  const samples = [], handsAt = [];
+  for (let i = 0; i <= n + ahead; i++) { const s = targetsAt(src, Math.max(0, t0 + i * DT), opts); samples.push(s.ch); handsAt.push(s.mv?.hands ?? null); }
   const now = targetsAt(src, timeMs, opts);
   const antic = 0.4 + opts.energy * 0.8;
 
@@ -133,9 +135,20 @@ export function performAt(src, timeMs, o = {}) {
   out.lean = [(out.lean?.[0] ?? 0) + Math.sin(t * 0.55 + hash(seed, 3) * 6.28 + 1.2) * 0.012 * still];
 
   const mv = now.mv;
+  // HANDS MORPH (Ak, 11 Nov 2026: "lines move from one position to the next"): when a hand
+  // changes shape, its fingers fold and unfold over HAND_MORPH_MS instead of popping.
+  const handBlend = {};
+  for (const h of ["F", "B"]) {
+    const cur = mv?.hands?.[h] ?? "relaxed";
+    for (let i = n - 1, back = 1; i >= 0 && back * DT <= HAND_MORPH_MS; i--, back++) {
+      const was = handsAt[i]?.[h] ?? "relaxed";
+      if (was !== cur) { const k = Math.min(1, ((back - 0.5) * DT) / HAND_MORPH_MS); handBlend[h] = { from: was, mix: k * k * (3 - 2 * k) }; break; }
+    }
+  }
   return {
     joints: { ...out, w: 1 },
     hands: mv?.hands ?? null,
+    handBlend,
     props: mv?.props ?? [],
     smile: mv?.face?.smile ?? 0,
     faceCue: mv?.face ?? null,

@@ -7,15 +7,28 @@
 // Relative imports only (no "@/"): Remotion's own webpack renders this too.
 // ---------------------------------------------------------------------------
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { drawPop } from "../../../characters/icons/icons.mjs";
 import type { SpeakerPop } from "../../lib/motion/popTracks";
 
 interface Placed { id: string; x: number; y: number; size: number }
 
-export function PopLayer({ pops, speakers, width, height, timeMs }: { pops: SpeakerPop[]; speakers: Placed[]; width: number; height: number; timeMs: number }) {
+export function PopLayer({ pops, speakers, width, height, timeMs, pictureUrl, hold }: { pops: SpeakerPop[]; speakers: Placed[]; width: number; height: number; timeMs: number; pictureUrl?: (rel: string) => string; hold?: () => () => void }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const live = pops.filter((p) => timeMs >= p.startMs && timeMs < p.endMs);
+  const pictures = useRef(new Map<string, HTMLImageElement>());
+  const [, setLoaded] = useState(0);
+  const wanted = [...new Set(pops.flatMap((p) => (p.picture ? [p.picture] : [])))].join("|");
+  const [release] = useState(() => (wanted ? hold?.() : undefined));
+  useEffect(() => {
+    if (!wanted || !pictureUrl) { release?.(); return; }
+    let left = wanted.split("|").length;
+    const done = () => { left--; setLoaded((n) => n + 1); if (left <= 0) release?.(); };
+    for (const rel of wanted.split("|")) {
+      if (pictures.current.has(rel)) { done(); continue; }
+      const img = new Image(); img.crossOrigin = "anonymous"; img.onload = done; img.onerror = done; img.src = pictureUrl(rel); pictures.current.set(rel, img);
+    }
+  }, [wanted]); // eslint-disable-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     const cv = ref.current;
     if (!cv) return;
@@ -34,7 +47,16 @@ export function PopLayer({ pops, speakers, width, height, timeMs }: { pops: Spea
       const size = Math.max(W * 0.06, box * 0.32);
       const x = sp.x * W + side * (box * 0.42 + p.slot * size * 1.15);
       const y = sp.y * H - box * 0.42;
-      drawPop(ctx, p, Math.min(W - size * 0.7, Math.max(size * 0.7, x)), Math.max(size * 0.7, y), size, timeMs);
+      const px = Math.min(W - size * 0.7, Math.max(size * 0.7, x)), py = Math.max(size * 0.7, y);
+      if (p.picture) {
+        const img = pictures.current.get(p.picture);
+        if (!img?.complete || !img.naturalWidth) continue;
+        // springs in, floats, fades out
+        const age = timeMs - p.startMs, left_ = p.endMs - timeMs, u = Math.min(1, age / 260);
+        const s = (1 + 2.2 * Math.pow(u - 1, 3) + 1.2 * Math.pow(u - 1, 2)) * size * 1.5, k = img.naturalWidth / img.naturalHeight;
+        ctx.globalAlpha = Math.min(1, left_ / 220); const w = k >= 1 ? s : s * k, h = k >= 1 ? s / k : s;
+        ctx.drawImage(img, px - w / 2, py - h / 2 + Math.sin(age / 260) * size * .05, w, h); ctx.globalAlpha = 1;
+      } else drawPop(ctx, p, px, py, size, timeMs);
     }
   });
   if (!pops.length) return null;

@@ -47,6 +47,8 @@ import { backgroundTiming } from "../../../src/lib/background/backgroundTiming";
 import { musicGainAt } from "../../../src/lib/audio/ducking";
 import { colorLookCss } from "../../../src/lib/background/colorLook";
 import type { RenderProps } from "../../../remotion/types";
+import { writePage } from "./hfPage";
+import { num } from "../jobSafety";
 
 const require_ = createRequire(import.meta.url);
 
@@ -62,7 +64,6 @@ export interface HyperframesInput {
   signal?: AbortSignal;
 }
 
-const ID = "video-forge";
 
 function run(cmd: string, args: string[], opts: { env?: NodeJS.ProcessEnv; onLine?: (l: string) => void; signal?: AbortSignal } = {}) {
   return new Promise<void>((resolve, reject) => {
@@ -94,7 +95,9 @@ function run(cmd: string, args: string[], opts: { env?: NodeJS.ProcessEnv; onLin
 }
 
 /** Output tags that say "ordinary video" (bt709), for every clip we build. */
-const SDR_TAGS = ["-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709"];
+// "-color_range tv": a picture made into a clip (JPEG, full range) otherwise comes out as
+// full-range yuvj420p, which the frame capture dropped: the background rendered black (10 Nov 2026).
+const SDR_TAGS = ["-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", "-color_range", "tv"];
 
 // ---- background track --------------------------------------------------------
 async function buildBackgroundTrack(input: HyperframesInput): Promise<{ file: string; startSec: number; durSec: number } | null> {
@@ -111,7 +114,7 @@ async function buildBackgroundTrack(input: HyperframesInput): Promise<{ file: st
     const d = (slot.durationInFrames / fps).toFixed(4);
     // object-fit: cover, at the composition's own size and frame rate
     chains.push(
-      `[${i}:v]fps=${fps},scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H},setsar=1,` +
+      `[${i}:v]fps=${fps},scale=${W}:${H}:force_original_aspect_ratio=increase:out_range=tv,crop=${W}:${H},setsar=1,` +
         `trim=duration=${d},setpts=PTS-STARTPTS,format=yuv420p[v${i}]`
     );
   });
@@ -193,7 +196,7 @@ async function buildMix(input: HyperframesInput, totalSec: number): Promise<stri
   for (const s of props.sfx ?? []) {
     inputs.push("-i", path.join(dir, s.fileName));
     const ms = Math.max(0, Math.round(s.atMs));
-    parts.push(`[${n}:a]aresample=${RATE},aformat=channel_layouts=stereo,volume=${s.volume},adelay=${ms}|${ms}[a${n}]`);
+    parts.push(`[${n}:a]aresample=${RATE},aformat=channel_layouts=stereo,volume=${num(s.volume, 1)},adelay=${ms}|${ms}[a${n}]`);
     labels.push(`[a${n}]`);
     n++;
   }
@@ -227,77 +230,8 @@ async function bundleEntry(input: HyperframesInput) {
   });
 }
 
-const attr = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-
-function writePage(input: HyperframesInput, parts: { bg: Awaited<ReturnType<typeof buildBackgroundTrack>>; banner: string | null; mix: string | null; totalSec: number }) {
-  const { props } = input;
-  const W = props.width, H = props.height, T = parts.totalSec.toFixed(4);
-  const band = props.backgroundBand;
-  const blurPx = (props.backgroundBlur ?? 0) * W;
-  const bgFilter = [blurPx > 0 ? `blur(${blurPx}px)` : "", colorLookCss(props.backgroundColorLook)].filter(Boolean).join(" ");
-  const bgWrap = band
-    ? `top:${band.top * 100}%;height:${(band.bottom - band.top) * 100}%;bottom:auto;overflow:hidden;` +
-      `-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 12%,black 88%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,black 12%,black 88%,transparent 100%);`
-    : "";
-  const layers: string[] = [];
-  if (parts.bg) {
-    // The React layer draws the dim over this exactly as BackgroundLayer did.
-    layers.push(
-      `<div class="vf-layer" style="${bgWrap}"><video id="vf-bg" class="clip" src="${parts.bg.file}" data-start="${parts.bg.startSec.toFixed(4)}" data-duration="${parts.bg.durSec.toFixed(4)}" data-track-index="0" muted playsinline ` +
-        `style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;${bgFilter ? `filter:${bgFilter};` : ""}${blurPx > 0 ? "transform:scale(1.1);" : ""}"></video></div>`
-    );
-  }
-  layers.push(`<div id="vf-react-clip" class="clip" data-start="0" data-duration="${T}" data-track-index="1"><div id="vf-react" style="position:absolute;inset:0"></div></div>`);
-  const intro = props.introOverlay;
-  if (intro) {
-    layers.push(
-      `<video id="vf-intro" class="clip" src="${attr(intro.fileName)}" data-start="0" data-duration="${(intro.durationMs / 1000).toFixed(4)}" data-track-index="2" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000"></video>`
-    );
-  }
-  const b = props.bannerVideo;
-  if (b && parts.banner) {
-    const keep = 1 - b.cropTop - b.cropBottom;
-    const sourceH = W * (9 / 16);
-    layers.push(
-      `<div class="vf-layer" style="top:auto;height:${sourceH * keep}px;overflow:hidden"><video id="vf-banner" class="clip" src="${parts.banner}" data-start="0" data-duration="${T}" data-track-index="3" muted playsinline ` +
-        `style="position:absolute;left:0;width:100%;height:${sourceH}px;top:${-sourceH * b.cropTop}px;object-fit:cover"></video></div>`
-    );
-  }
-  const logo = props.logo;
-  if (logo) {
-    const m = logo.margin * W;
-    // Same placement rules as the composition's own <Img>.
-    const pos =
-      logo.position === "watermark"
-        ? "left:50%;top:50%;transform:translate(-50%,-50%);"
-        : logo.position === "bottom-center"
-        ? `left:50%;bottom:${m}px;transform:translateX(-50%);`
-        : `${logo.position.startsWith("top") ? `top:${m}px;` : `bottom:${m}px;`}${logo.position.endsWith("left") ? `left:${m}px;` : `right:${m}px;`}`;
-    layers.push(`<img id="vf-logo" src="${attr(logo.fileName)}" alt="" style="position:absolute;width:${W * logo.size}px;opacity:${logo.opacity};${pos}">`);
-  }
-  if (parts.mix) layers.push(`<audio id="vf-mix" src="${parts.mix}" data-start="0" data-duration="${T}" data-track-index="4"></audio>`);
-
-  const data = { props: { ...props, nativeMedia: true }, config: { width: W, height: H, fps: props.fps, durationInFrames: Math.max(1, Math.round(props.durationSec * props.fps)) }, id: ID };
-  return `<!doctype html>
-<html><head><meta charset="utf-8">
-<style>
-  html,body{margin:0;background:#0b0b0d}
-  #stage{position:relative;width:${W}px;height:${H}px;overflow:hidden;background:#0b0b0d}
-  .vf-layer{position:absolute;left:0;right:0;top:0;bottom:0}
-  #vf-react-clip{position:absolute;inset:0}
-</style></head>
-<body>
-<div id="stage" data-composition-id="${ID}" data-start="0" data-width="${W}" data-height="${H}" data-duration="${T}" data-fps="${props.fps}">
-${layers.join("\n")}
-</div>
-<script>window.__VF__ = ${JSON.stringify(data).replace(/</g, "\\u003c")};</script>
-<script src="vf.js"></script>
-<script>
-  window.__timelines = window.__timelines || {};
-  window.__timelines["${ID}"] = window.__vfTimeline;
-</script>
-</body></html>`;
-}
+// The page itself is built in hfPage.ts (kept free of app imports so a test
+// can run it against a hostile project).
 
 // ---- the render --------------------------------------------------------------
 export async function renderHyperframes(input: HyperframesInput): Promise<void> {
@@ -312,7 +246,7 @@ export async function renderHyperframes(input: HyperframesInput): Promise<void> 
   const mix = await buildMix(input, totalSec);
   onProgress(0.16, "Building the page…");
   await bundleEntry(input);
-  await fsp.writeFile(path.join(input.dir, "index.html"), writePage(input, { bg, banner, mix, totalSec }));
+  await fsp.writeFile(path.join(input.dir, "index.html"), writePage(props, { bg, banner, mix, totalSec, lookCss: colorLookCss(props.backgroundColorLook) }));
 
   onProgress(0.2, "Rendering frames…");
   // A complete copy of the hidden browser (renderBrowser.ts says why).
