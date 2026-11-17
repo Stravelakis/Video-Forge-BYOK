@@ -33,6 +33,7 @@ import type { Puppet } from "../../src/store/puppetTypes";
 import { puppetAssetPaths, validatePuppet } from "../../src/lib/puppets/puppetAssets";
 import { ensureFont } from "../net/fonts";
 import { joinCards } from "./joinCards";
+import { cleanRenderNumbers } from "./jobSafety";
 import { spawnTracked } from "../process/childTree";
 import { ffmpegBin } from "../process/ffmpegPath";
 import { buildCues } from "../../src/lib/subtitles/wordTiming";
@@ -147,6 +148,10 @@ export interface RenderContext {
   /** Aborting stops the render: the processes it started are ended and the
    *  half-made file is removed. */
   signal?: AbortSignal;
+  /** May this file be read? main passes the path guard, so a puppet cannot
+   *  name art outside the folders the app reads from. Absent: no check (the
+   *  batch runs job files the user wrote themselves). */
+  canRead?: (p: string) => boolean;
 }
 
 const AUDIO_PUBLIC_NAME = "narration.wav";
@@ -166,7 +171,7 @@ function lerp(stage: { from: number; to: number }, t: number): number {
 }
 
 export async function renderVideo(
-  job: RenderJob,
+  rawJob: RenderJob,
   ctx: RenderContext
 ): Promise<{
   outputPath: string;
@@ -177,6 +182,9 @@ export async function renderVideo(
   warnings: string[];
 }> {
   const { projectRoot, outputDir, onProgress } = ctx;
+  // Every number that reaches the page or an ffmpeg filter, made a real number
+  // (a project file can hold a string there: jobSafety.ts).
+  const job = cleanRenderNumbers(rawJob);
 
   const entryPoint = path.join(projectRoot, "remotion", "index.ts");
   try {
@@ -292,6 +300,10 @@ export async function renderVideo(
         if (!res.ok) throw new Error(res.error);
         const files: Record<string, string> = {};
         for (const [file, abs] of Object.entries(puppetAssetPaths(res.puppet, puppetPath))) {
+          if (ctx.canRead && !ctx.canRead(abs)) {
+            warnings.push(`[video-forge] ${label}: layer ${file} is outside the folders this app reads from; left out.`);
+            continue;
+          }
           let name = layerNameByPath.get(abs);
           if (!name) {
             name = `puppet-${layerNameByPath.size}${path.extname(abs) || ".png"}`;

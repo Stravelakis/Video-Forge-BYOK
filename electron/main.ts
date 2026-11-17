@@ -35,6 +35,7 @@ import { planBackgrounds, pickBackgrounds } from "./llm/backgroundPlanner";
 import { modelsOf, providersWithKeys, suggestWith, syncCustomServer } from "./llm/directBrain";
 import { geminiKeys } from "./geminiKeys";
 import { renderVideo, type RenderJob } from "./render/renderVideo";
+import { assertRenderJobPaths } from "./render/jobSafety";
 import { cacheStats, cleanUp, touch } from "./media/mediaCache";
 import { installExitHandlers, killAllTracked, reapOrphansFromLastSession } from "./process/childTree";
 import { abortAllWork, busyWith, closeQuestion, isBusy, startWork } from "./process/work";
@@ -682,8 +683,12 @@ ipcMain.handle("render:start", async (_e, job: RenderJob) => {
     }
   };
 
-  // The clips this render uses count as "just used", so a clean-up keeps them.
   try {
+    // Every file the job names goes through the path guard first, like every
+    // other handler: a project file from elsewhere cannot pull an arbitrary
+    // file on this PC into the video (review 16 Nov 2026, X1).
+    assertRenderJobPaths(job, (p) => guard().assertRead(p));
+    // The clips this render uses count as "just used", so a clean-up keeps them.
     await touch((job.backgrounds ?? []).map((b) => b.filePath).filter((p): p is string => !!p));
     const result = await renderVideo(job, {
       projectRoot: app.getAppPath(),
@@ -691,6 +696,7 @@ ipcMain.handle("render:start", async (_e, job: RenderJob) => {
       fontsDir: fontsDir(),
       onProgress: send,
       signal: controller.signal,
+      canRead: (p) => guard().canRead(p),
     });
     // On the Forge hub's list of everything made (tools/lib/forgeHub.mjs) —
     // what the Social Forge will post from.

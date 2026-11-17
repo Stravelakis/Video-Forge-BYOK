@@ -17,6 +17,7 @@ import type { ProjectPreset, SpeakerSlot } from "./templatesTypes";
 import { defaultProject } from "./defaults";
 import { defaultTrackWaveform } from "../lib/waveform/buildTracks";
 import { withCharacterColor } from "./characterColor";
+import { autosaveSnapshot, blankProject } from "../lib/project/projectFile";
 
 
 const SPEAKER_COLORS = ["#e8a24a", "#4ac2e8"]; // speaker1 / speaker2 from tailwind theme
@@ -347,7 +348,8 @@ export const useProjectStore = create<ProjectState & Actions>()(
 
   loadProject: (p) => {
     set(() => ({
-      ...defaultProject,
+      // blankProject: nothing of the previous project survives the merge
+      ...blankProject(defaultProject),
       ...migrateFade(p),
       // Nested objects get merged over the defaults rather than replacing them,
       // so a project saved before a field existed still opens with that field
@@ -362,7 +364,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
   },
 
   reset: () => {
-    set(defaultProject);
+    set(blankProject(defaultProject));
     wholeProjectHook.fn?.();
   },
     }),
@@ -375,44 +377,10 @@ export const useProjectStore = create<ProjectState & Actions>()(
       // give. The WAV it came from is still on disk, so App.tsx re-analyses it
       // on startup — a second of work rather than a quota error that silently
       // stops every future autosave.
-      partialize: (s) => ({
-        render: s.render,
-        musicWaveform: s.musicWaveform,
-        musicColor: s.musicColor,
-        cards: s.cards,
-        logo: s.logo,
-        subtitles: s.subtitles,
-        // Worth persisting: the clips themselves are already cached under
-        // userData by provider and id, so what is saved here is a few hundred
-        // bytes of timing that points at files still on disk. Losing it means
-        // re-planning and re-downloading a background set that never changed.
-        backgrounds: s.backgrounds,
-        backgroundDim: s.backgroundDim,
-        backgroundCrossfadeMs: s.backgroundCrossfadeMs,
-        scene: s.scene,
-        pauseSameMs: s.pauseSameMs,
-        pauseTurnMs: s.pauseTurnMs,
-        visemeFadeMs: s.visemeFadeMs,
-        fadeMigrated: s.fadeMigrated,
-        idleMotion: s.idleMotion,
-        fps: s.fps,
-        speakers: s.speakers,
-        script: s.script,
-        directions: s.directions,
-        language: s.language,
-        narration: s.narration
-          ? { filePath: s.narration.filePath, segments: s.narration.segments, analysis: null }
-          : null,
-        attachedAudio: s.attachedAudio
-          ? { filePath: s.attachedAudio.filePath, analysis: null }
-          : null,
-        // Same deal as the narration: the path survives, the megabytes don't.
-        // App.tsx re-analyses on startup.
-        music: s.music ? { filePath: s.music.filePath, analysis: null } : null,
-        musicVolume: s.musicVolume,
-        musicDuck: s.musicDuck,
-        sfx: s.sfx,
-      }),
+      //
+      // The same fields as the project file (lib/project/projectFile.ts), from
+      // the same list: blur and colour look used to be missing here only.
+      partialize: (s) => autosaveSnapshot(s),
 
       merge: (persisted, current) => {
         const p = migrateFade((persisted ?? {}) as Partial<ProjectState>);

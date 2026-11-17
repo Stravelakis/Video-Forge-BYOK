@@ -62,6 +62,9 @@ export const defaultProject: ProjectState = {
   // that softens every project's footage would be a decision made for people
   // who never asked for it.
   backgroundBlur: 0,
+  backgroundColorLook: "none",
+  // The Direct step starts empty for every new project.
+  directions: {},
   scene: null,
   backgroundCrossfadeMs: 600,
   language: "el",
