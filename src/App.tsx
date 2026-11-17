@@ -56,6 +56,7 @@ import { sampleAnalysis } from "./lib/waveform/audioAnalysis";
 import { useCornerFlare } from "./lib/motion/useCornerFlare";
 import { SparkField } from "./components/ui/SparkField";
 import { HistoryBar } from "./components/HistoryBar";
+import { UpdateNotice } from "./components/settings/AboutLine";
 import { TipLayer } from "./components/ui/TipLayer";
 import { autoClean } from "./lib/media/autoClean";
 import videoMark from "./assets/video-mark.png";
@@ -518,7 +519,7 @@ export default function App() {
           Video Forge
           <small>Talking-character videos</small>
         </div>
-        <div className="ml-auto"><HistoryBar /></div>
+        <div className="ml-auto flex items-center gap-3"><UpdateNotice /><HistoryBar /></div>
         <div className="flex gap-2 items-center" role="group" aria-label="Kind of video">
           <HudButton data-tip="Set up a video one decision at a time: style, characters, background, format, review." active={mode === "flow" && !settingsOpen} onClick={() => { setMode("flow"); setSettingsOpen(false); }}>Create</HudButton>
           <HudButton data-tip="Production: script, voices, final settings and render." active={mode === "puppet" && !settingsOpen} onClick={() => setMode("puppet")}>Production</HudButton>

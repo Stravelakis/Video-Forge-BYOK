@@ -42,6 +42,12 @@ declare global {
   interface Window {
     DecoNoir?: DecoNoirApi;
     byok: {
+      about: {
+        /** This copy's version and build: "personal", "public", or "dev" when run from source. */
+        info: () => Promise<{ version: string; build: string }>;
+        /** A newer release on GitHub, or null. Asks GitHub at most once a day; never downloads. */
+        updateCheck: () => Promise<{ version: string; url: string; beta: boolean } | null>;
+      };
       keys: {
         geminiCount: () => Promise<number>;
         list: () => Promise<string[]>;
