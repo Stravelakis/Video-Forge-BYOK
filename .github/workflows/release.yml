@@ -1,0 +1,95 @@
+# Builds the PUBLIC Windows installer and portable exe and puts them on a
+# GitHub Release. Starts when a tag like v0.4.0 or v0.4.0-beta.1 is pushed.
+#
+# The public build never carries the owner's personal content (brand packs,
+# music, Mixamo moves): this checkout does not have it, and the build script
+# refuses to pack it even if it were here (npm run build-exe:public).
+#
+# Release notes: the plain-English table from release-notes/<tag>.md on top
+# (STANDARDS §2: columns English and Devenglish), then GitHub's automatic list
+# of merged pull requests, grouped by .github/release.yml.
+# A tag with "-beta" (or any "-") becomes a pre-release.
+
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Tag, version and release notes agree
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match package.json version $version"
+            exit 1
+          fi
+          if [ ! -f "release-notes/$TAG.md" ]; then
+            echo "::error::release-notes/$TAG.md is missing: write the English/Devenglish table first"
+            exit 1
+          fi
+          if ! grep -q "## \[$version\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no entry for $version"
+            exit 1
+          fi
+
+      - name: Install
+        run: npm ci
+
+      - name: Check nothing is broken before shipping it
+        run: |
+          npm test
+          npx tsc --noEmit -p .
+
+      - name: Build the public installer
+        # Built outside the checkout: Windows Defender locks the freshly
+        # unpacked electron.exe inside a scanned folder and packing fails.
+        env:
+          VF_OUTPUT: ${{ runner.temp }}\vf-build
+        run: npm run build-exe:public
+
+      - name: Keep the files even if publishing fails
+        uses: actions/upload-artifact@v7
+        with:
+          name: video-forge-windows-${{ github.ref_name }}
+          path: ${{ runner.temp }}/vf-build/*.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish the GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pre=""
+          case "$TAG" in *-*) pre="--prerelease" ;; esac
+          shopt -s nullglob
+          files=("$RUNNER_TEMP"/vf-build/*.exe)
+          if [ ${#files[@]} -eq 0 ]; then echo "::error::no .exe was built"; exit 1; fi
+          # --notes-file goes on top; --generate-notes appends GitHub's list below it.
+          gh release create "$TAG" "${files[@]}" \
+            --verify-tag \
+            --title "Video Forge $TAG" \
+            --notes-file "release-notes/$TAG.md" \
+            --generate-notes \
+            $pre

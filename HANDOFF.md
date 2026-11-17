@@ -8,6 +8,16 @@
 - Needs a short planning session first: where colour is stored, per-show vs per-project style, side-by-side preview page.
 - Ultra reviews, then commits and merges. Do not commit before that.
 
+## 17 Nov 2026: two versions (Personal / Public) and releases (branch feat/personal-and-releases, PR open, not merged)
+- **Public** = the app only; GitHub Releases carry it. **Personal** = the app + the owner's content: brand packs, music, Mixamo moves and models.
+- Personal content lives in the private repo **DnD-World/Video-Forge-personal** (renamed from Video-Forge-brands 17 Nov; brands moved to `brands/`, plus `music/`, `characters/samples/kenney/builder/motions.json` and `.../models/`, same paths as in the app).
+- Get it: `npm run personal` (scripts/personal-content.mjs). Clones the repo beside the app folder (`../Video-Forge-personal`, never inside: the installer would keep broken links), links the folders in with junctions, copies motions.json. Safe to rerun; never deletes; anything in the way is moved to `<name>.before-personal-<date>`. Handles the old layout where `brands/` was itself a clone.
+- Build Personal: `npm run build-exe` (picks Personal when the content is present) → `release/Video Forge Personal Setup x.y.z.exe`. Separate app id, so it installs beside the Public one; saved data is shared.
+- Build Public: `npm run build-exe:public` → `release/Video Forge Setup x.y.z.exe`. Refuses if its settings would let personal content in, and checks the packed folder before making the installer. `npm run build-exe:check` = dry run with electron-builder's own file rules.
+- Settings shows "Video Forge <version> · Personal/Public build". Update notice: main process asks the GitHub Releases API at most once a day (`update-check.json` in the data folder); link only, no download.
+- Release: set `version` in package.json, CHANGELOG entry, `release-notes/v<version>.md` (English/Devenglish table), merge to main, then `git tag v<version> && git push origin v<version>`. `.github/workflows/release.yml` builds the Public installer + portable exe and publishes the Release (pre-release when the tag has a "-"). Not tagged yet: 0.4.0-beta.1 is ready for the owner to check.
+- Not verified: no exe was built locally (heavy); the release workflow has not run yet.
+
 ## 17 Nov 2026: post-production after every render (branch feat/post-production, PR open, not merged)
 Plan items A4, 1, 1b, 2, 3 (Blacksmith/FORGES-PLAN-2026-11-17.md).
 - Settings, presets and panning maths: `src/lib/post/postSettings.ts`. Filter graphs (pure, tested): `electron/post/postGraph.ts`. Running them: `electron/post/runPost.ts`.
@@ -34,7 +44,7 @@ From the 16 Nov review (Blacksmith/reviews-2026-11-16/VIDEO-FORGE-REVIEW.md), al
 - Public repo: **Stravelakis/video-forge**. History rewritten: only files the app needs, no private addresses, commit emails = GitHub noreply. Scan-history and gitleaks clean.
 - Old repo with full history: **DnD-World/Video-Forge-archive** (private). Backup bundle: `D:\Backups\video-forge-2026-11-16\`.
 - Moved out, kept on this PC (gitignored):
-  - `brands/` = private repo DnD-World/Video-Forge-brands
+  - `brands/` = private repo DnD-World/Video-Forge-brands (renamed Video-Forge-personal 17 Nov, see above)
   - `workshop/` = private repo DnD-World/Video-Forge-workshop (plans, research, labs, dev tools, test jobs, legal drafts, music copy)
   - `music/`, `CLAUDE.md`, `.claude/` stay local only
 - Branches/worktrees made before 16 Nov carry the OLD history. A push guard (`.git/guard-hooks/pre-push`) refuses them. To keep their work: cherry-pick the commits onto `clean-up`.

@@ -10,6 +10,7 @@ import { request } from "./net/http";
 import { rememberNarration, twinNarration } from "./tts/twinNarration";
 import { loadPronunciations, savePronunciations, type SayItLike } from "./tts/pronunciations";
 import { recordMade } from "../tools/lib/forgeHub.mjs";
+import { checkForUpdate, RELEASES_API, type ReleaseInfo, type UpdateState } from "../tools/lib/updateCheck.mjs";
 import { removePuppet, listPuppets, orderResult, placeOrder, shelfRoot } from "../tools/lib/forgeShelf.mjs";
 import { fetchSheet, parseCsv, runMany, type ManyEvent, type ManyRequest } from "./batch/manyVideos";
 import { resolveUserData, NEW_APP_NAME } from "./migrateUserData";
@@ -231,6 +232,59 @@ ipcMain.handle("project:startup", async () => {
 
 ipcMain.handle("keys:list", async () => {
   return keyStore.listKeys();
+});
+
+// ---------------------------------------------------------------------------
+// About this copy: version, which build (Personal / Public), and "a newer
+// version is out". The update check runs here, not in the window: the window's
+// content policy allows no network calls. At most one GitHub call a day; the
+// answer is remembered in update-check.json. Nothing is downloaded.
+// ---------------------------------------------------------------------------
+
+/** "personal" | "public" from the installer (scripts/build-exe.mjs), "dev" when run from source. */
+async function buildKind(): Promise<string> {
+  if (!app.isPackaged) return "dev";
+  try {
+    const pkg = JSON.parse(await fsp.readFile(path.join(app.getAppPath(), "package.json"), "utf8"));
+    return pkg.videoForgeBuild === "personal" || pkg.videoForgeBuild === "public" ? pkg.videoForgeBuild : "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
+ipcMain.handle("app:info", async () => ({ version: app.getVersion(), build: await buildKind() }));
+
+const updateStateFile = () => path.join(userDir(), "update-check.json");
+let updateRun: Promise<ReleaseInfo | null> | null = null;
+ipcMain.handle("app:updateCheck", () => {
+  updateRun ??= (async () => {
+    let state: UpdateState | null = null;
+    try {
+      state = JSON.parse(await fsp.readFile(updateStateFile(), "utf8"));
+    } catch {
+      /* first check */
+    }
+    const result = await checkForUpdate({
+      current: app.getVersion(),
+      now: Date.now(),
+      state,
+      fetchReleases: async () => {
+        // A plain product name as the user agent: GitHub requires one, and
+        // nothing about this computer or its user goes with the request.
+        const res = await request(RELEASES_API, {
+          headers: { "User-Agent": "Video-Forge-update-check", Accept: "application/vnd.github+json" },
+          timeoutMs: 15000,
+        });
+        if (res.status !== 200) throw new Error(`GitHub answered ${res.status}`);
+        return JSON.parse(res.body);
+      },
+    });
+    if (result.state !== state) await fsp.writeFile(updateStateFile(), JSON.stringify(result.state)).catch(() => {});
+    return result.update;
+  })().finally(() => {
+    updateRun = null;
+  });
+  return updateRun;
 });
 
 // There is deliberately no "keys:get": a key read by the window could be read

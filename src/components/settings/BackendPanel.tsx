@@ -1,4 +1,5 @@
 import { LanguageCard, SayItCard } from "./SayItCard";
+import { AboutLine } from "./AboutLine";
 import { plainError } from "../../lib/plainError";
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "../../store/useSettingsStore";
@@ -438,6 +439,8 @@ export default function BackendPanel() {
         Paste a key, press Save, then press Test to confirm it actually works —
         Test makes one real call to the provider.
       </p>
+
+      <AboutLine />
 
       <LocalAiCard />
       <PaidVoiceCard />

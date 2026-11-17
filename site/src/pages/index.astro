@@ -1,0 +1,82 @@
+---
+import DocsLayout from '../layouts/DocsLayout.astro';
+import VernacularPanels from '../components/VernacularPanels.astro';
+import FeatureCards from '../components/FeatureCards.astro';
+import Playground from '../components/Playground.astro';
+import ReviewStamp from '../components/ReviewStamp.astro';
+import Glossary from '../components/Glossary.astro';
+import { siteConfig } from '../../site.config.ts';
+
+import { Content as Dev, frontmatter as devFm } from '../docs/dev.md';
+import { Content as Plain, frontmatter as plainFm } from '../docs/plain.md';
+import { Content as Eli5, frontmatter as eli5Fm } from '../docs/eli5.md';
+
+// One source: GUIDE.md / INSTALL.md copied in by scripts/sync-docs.mjs.
+const features = [
+  {
+    "icon": "🎙️",
+    "title": "Two voice engines",
+    "text": "DramaBox acts from stage directions and runs on a rented GPU. Piper runs on your machine: flat, but fast enough to check timing."
+  },
+  {
+    "icon": "👄",
+    "title": "Lip-sync from the script",
+    "text": "Nine mouth shapes, driven by forced alignment against your script instead of a guess."
+  },
+  {
+    "icon": "📐",
+    "title": "One script, every shape",
+    "text": "Tall 9:16, square, portrait 4:5 or wide 16:9 from the same script. Or the same video in the other language."
+  },
+  {
+    "icon": "📊",
+    "title": "Many videos from a sheet",
+    "text": "One row per video in a Google Sheet or a CSV. They are made one after another into a folder."
+  },
+  {
+    "icon": "🏷️",
+    "title": "Honest AI label",
+    "text": "\"Made with Video Forge\" on the picture, on by default, and in the file notes."
+  },
+  {
+    "icon": "🖥️",
+    "title": "Renders locally",
+    "text": "Remotion and FFmpeg on your machine. What you arrange on the canvas is exactly what renders."
+  }
+];
+
+const sources = import.meta.glob<{ Content: any }>('../docs/source/*.md', { eager: true });
+const guide = sources['../docs/source/guide.md'];
+const install = sources['../docs/source/install.md'];
+---
+<DocsLayout title="Overview" home>
+  <section class="hero reveal" id="top">
+    <span class="eyebrow">Docs</span>
+    <h1 class="hero-title">{siteConfig.projectName}</h1>
+    <p class="hero-sub">{siteConfig.description}</p>
+  </section>
+
+  <FeatureCards features={features} title="What Video Forge does" />
+
+  <section class="doc-body reveal" id="docs" aria-label="Documentation" data-glossary>
+    <VernacularPanels>
+      <Fragment slot="dev"><ReviewStamp {...devFm} /><Dev /></Fragment>
+      <Fragment slot="plain"><ReviewStamp {...plainFm} /><Plain /></Fragment>
+      <Fragment slot="eli5"><ReviewStamp {...eli5Fm} /><Eli5 /></Fragment>
+    </VernacularPanels>
+  </section>
+
+  {install && (
+    <section class="doc-body doc-source reveal" id="install" aria-label="Install" data-glossary>
+      <install.Content />
+    </section>
+  )}
+  {guide && (
+    <section class="doc-body doc-source reveal" id="guide" aria-label="Guide" data-glossary>
+      <guide.Content />
+    </section>
+  )}
+
+  {siteConfig.playground.enabled && <Playground />}
+  <Glossary />
+</DocsLayout>

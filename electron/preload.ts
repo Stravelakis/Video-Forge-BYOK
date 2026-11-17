@@ -7,6 +7,13 @@ import { contextBridge, ipcRenderer } from "electron";
 // ---------------------------------------------------------------------------
 
 const api = {
+  about: {
+    /** This copy's version and build: "personal", "public", or "dev" when run from source. */
+    info: (): Promise<{ version: string; build: string }> => ipcRenderer.invoke("app:info"),
+    /** A newer release on GitHub, or null. Asks GitHub at most once a day; never downloads. */
+    updateCheck: (): Promise<{ version: string; url: string; beta: boolean } | null> => ipcRenderer.invoke("app:updateCheck"),
+  },
+
   keys: {
     list: (): Promise<string[]> => ipcRenderer.invoke("keys:list"),
     /** How many Gemini keys are saved, main plus extras (never the keys). */
