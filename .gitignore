@@ -50,6 +50,8 @@ youtube-token.json
 # Model weights downloaded by tools (timestamping etc.) — kept in the project, not in the user profile.
 # Root folder only: a bare "models/" also hid the 3D cast's public model sets.
 /models/
+# Downloaded AI model weights used by tools (e.g. the pose model), not source.
+tools/models/
 
 # Queue run state — machine-local progress, not source.
 jobs/.queue/
