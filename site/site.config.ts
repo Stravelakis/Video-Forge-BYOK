@@ -1,4 +1,5 @@
 import type { DotFieldOptions } from './src/scripts/dot-field';
+import { showcaseSlides } from './src/data/showcase';
 
 // Per-repo config. Most projects only touch this file and src/docs/*.md.
 
@@ -10,27 +11,31 @@ interface SocialLink {
 
 export const siteConfig = {
   projectName: "Video Forge",
-  description: "A desktop studio for narrated, subtitled, talking-character videos in Greek and English. You bring your own keys; everything renders on your own machine.",
+  description:
+    "A Windows app for videos where characters talk: narrated, subtitled, in Greek or English. Bring your own keys; the video is made on your own computer.",
   repoUrl: "https://github.com/Stravelakis/Video-Forge-BYOK",
   // Path under /public including the base path, e.g. '/repo-name/favicon.svg'. Empty = no favicon tag.
-  faviconHref: "/Video-Forge-BYOK/favicon.svg",
+  faviconHref: "/Video-Forge-BYOK/favicon.png",
 
   // What a link to the site shows when shared (Open Graph / Twitter cards).
   // seoTitle is the front page's <title> and share title; empty falls back to
   // "Overview · projectName". socialImage is a 1200x630 PNG in /public
   // (without the base path); empty means no image, and most platforms then
   // show a bare, easily-ignored link. Always set both before publishing.
-  seoTitle: "Video Forge: talking-character videos made on your own machine",
+  // Rebuild the image with: npx electron site/scripts/social/render.cjs (from the repo root).
+  seoTitle: "Video Forge: talking-character videos, made on your own computer",
   socialImage: "og-image.png",
-  socialImageAlt: "Video Forge: talking-character videos in Greek and English, made on your own machine.",
+  socialImageAlt: "The Video Forge logo, an anvil with a play button and film strip, beside the words: Video Forge. Talking-character videos, made on your own computer.",
   locale: 'en_GB',
 
   // Sidebar menu. Each id must match an element id on the page.
+  // "showcase" only appears when docs/media/ has screenshots (see src/pages/index.astro).
   nav: [
     { id: 'top', label: 'Overview' },
     { id: 'features', label: 'Features' },
+    { id: 'showcase', label: 'Showcase' },
     { id: 'docs', label: 'Docs' },
-  ],
+  ].filter((item) => item.id !== 'showcase' || showcaseSlides.length > 0),
 
   // Reading-level switch at the top of the sidebar. The ids are fixed (they
   // match src/docs/dev.md, plain.md, eli5.md); change labels only.
@@ -38,6 +43,7 @@ export const siteConfig = {
   defaultVernacular: 'plain',
 
   // Tally form link (STANDARDS §8). Empty = no "Send feedback" link.
+  // TODO: make the Video Forge Tally form (consent box, email optional) and paste its link here.
   feedbackUrl: '',
 
   vernaculars: [

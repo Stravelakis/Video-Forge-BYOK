@@ -18,11 +18,23 @@ rmSync(outDocs, { recursive: true, force: true });
 mkdirSync(outDocs, { recursive: true });
 mkdirSync(outData, { recursive: true });
 
+// Video Forge addition: links written for GitHub (INSTALL.md, docs/MOVE-TAGS.md,
+// LICENSE) would break on the site, so they are pointed at the right place:
+// GUIDE/INSTALL to their own sections on this page, anything else to GitHub.
+const REPO_BLOB = 'https://github.com/Stravelakis/Video-Forge-BYOK/blob/main/';
+const fixLinks = (md) =>
+  md.replace(/\]\((?!https?:|#|mailto:)([^)\s]+)\)/g, (_m, target) => {
+    const [file, hash] = target.split('#');
+    if (/^GUIDE\.md$/i.test(file)) return `](#${hash || 'guide'})`;
+    if (/^INSTALL\.md$/i.test(file)) return `](#${hash || 'install'})`;
+    return `](${REPO_BLOB}${file}${hash ? `#${hash}` : ''})`;
+  });
+
 const copied = [];
 for (const [file, slug] of [['GUIDE.md', 'guide'], ['INSTALL.md', 'install']]) {
   const src = join(repoRoot, file);
   if (!existsSync(src)) continue;
-  writeFileSync(join(outDocs, `${slug}.md`), readFileSync(src, 'utf8'));
+  writeFileSync(join(outDocs, `${slug}.md`), fixLinks(readFileSync(src, 'utf8')));
   copied.push(file);
 }
 

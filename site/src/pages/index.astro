@@ -2,61 +2,49 @@
 import DocsLayout from '../layouts/DocsLayout.astro';
 import VernacularPanels from '../components/VernacularPanels.astro';
 import FeatureCards from '../components/FeatureCards.astro';
+import Carousel from '../components/Carousel.astro';
 import Playground from '../components/Playground.astro';
 import ReviewStamp from '../components/ReviewStamp.astro';
 import Glossary from '../components/Glossary.astro';
 import { siteConfig } from '../../site.config.ts';
+import { showcaseSlides } from '../data/showcase';
 
 import { Content as Dev, frontmatter as devFm } from '../docs/dev.md';
 import { Content as Plain, frontmatter as plainFm } from '../docs/plain.md';
 import { Content as Eli5, frontmatter as eli5Fm } from '../docs/eli5.md';
 
-// One source: GUIDE.md / INSTALL.md copied in by scripts/sync-docs.mjs.
+// Every card is a fact from GUIDE.md (0.4.0-beta.1).
 const features = [
-  {
-    "icon": "🎙️",
-    "title": "Two voice engines",
-    "text": "DramaBox acts from stage directions and runs on a rented GPU. Piper runs on your machine: flat, but fast enough to check timing."
-  },
-  {
-    "icon": "👄",
-    "title": "Lip-sync from the script",
-    "text": "Nine mouth shapes, driven by forced alignment against your script instead of a guess."
-  },
-  {
-    "icon": "📐",
-    "title": "One script, every shape",
-    "text": "Tall 9:16, square, portrait 4:5 or wide 16:9 from the same script. Or the same video in the other language."
-  },
-  {
-    "icon": "📊",
-    "title": "Many videos from a sheet",
-    "text": "One row per video in a Google Sheet or a CSV. They are made one after another into a folder."
-  },
-  {
-    "icon": "🏷️",
-    "title": "Honest AI label",
-    "text": "\"Made with Video Forge\" on the picture, on by default, and in the file notes."
-  },
-  {
-    "icon": "🖥️",
-    "title": "Renders locally",
-    "text": "Remotion and FFmpeg on your machine. What you arrange on the canvas is exactly what renders."
-  }
+  { icon: '🧭', title: 'One decision at a time', text: 'Create walks you through style, characters, background and format, each shown with your own characters.' },
+  { icon: '🎭', title: 'Characters that act', text: '21 drawn styles, picture puppets from Image Forge, Kenney 3D people and pets. Drawn ones walk, wave, sit and point.' },
+  { icon: '🎙️', title: 'Voices, free or paid', text: 'Gemini and Fish Audio are free, Piper runs offline, ElevenLabs shows the cost and asks first.' },
+  { icon: '💬', title: 'Subtitles that follow', text: 'The spoken word lights up in the speaker\'s colour. .srt and .vtt files come with every video.' },
+  { icon: '🎚️', title: 'Studio sound', text: 'Cleaner voices at the loudness YouTube expects, voices placed left and right, an optional colour grade.' },
+  { icon: '📐', title: 'Every shape, many videos', text: 'Tall, square, portrait or wide from one script. Or one sheet row per video, made in a row.' },
 ];
 
+// One source: GUIDE.md / INSTALL.md copied in by scripts/sync-docs.mjs.
 const sources = import.meta.glob<{ Content: any }>('../docs/source/*.md', { eager: true });
 const guide = sources['../docs/source/guide.md'];
 const install = sources['../docs/source/install.md'];
 ---
 <DocsLayout title="Overview" home>
   <section class="hero reveal" id="top">
-    <span class="eyebrow">Docs</span>
+    <span class="eyebrow">Windows app · Greek &amp; English · bring your own keys</span>
     <h1 class="hero-title">{siteConfig.projectName}</h1>
     <p class="hero-sub">{siteConfig.description}</p>
+    <p class="hero-sub hero-links">
+      <a href={`${siteConfig.repoUrl}/releases/latest`}>Download for Windows</a>{' · '}
+      <a href="#install">How to install</a>{' · '}
+      <a href={siteConfig.repoUrl}>Source on GitHub</a>
+    </p>
   </section>
 
   <FeatureCards features={features} title="What Video Forge does" />
+
+  {showcaseSlides.length > 0 && <Carousel slides={showcaseSlides} label="Showcase" />}
+  {/* TODO: no screenshots in docs/media/ yet. The carousel and its menu entry
+      appear by themselves once real ones land there (src/data/showcase.ts). */}
 
   <section class="doc-body reveal" id="docs" aria-label="Documentation" data-glossary>
     <VernacularPanels>
@@ -66,17 +54,22 @@ const install = sources['../docs/source/install.md'];
     </VernacularPanels>
   </section>
 
+  {/* No "reveal" on Install and Guide: the reveal waits until 12% of a section
+      is on screen, which a section this long never reaches, so it stayed blank. */}
   {install && (
-    <section class="doc-body doc-source reveal" id="install" aria-label="Install" data-glossary>
+    <section class="doc-body doc-source" id="install" aria-label="Install" data-glossary>
       <install.Content />
     </section>
   )}
   {guide && (
-    <section class="doc-body doc-source reveal" id="guide" aria-label="Guide" data-glossary>
+    <section class="doc-body doc-source" id="guide" aria-label="Guide" data-glossary>
       <guide.Content />
     </section>
   )}
 
+  {/* Video Forge is a Windows desktop app with no browser mode, so nothing here
+      could honestly run in the page. The walkthrough lives in each reading level
+      ("Your first video") instead (STANDARDS §7). */}
   {siteConfig.playground.enabled && <Playground />}
   <Glossary />
 </DocsLayout>

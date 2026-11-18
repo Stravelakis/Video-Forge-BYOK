@@ -1,1 +1,248 @@
-[]
+[
+  {
+    "term": "BYOK",
+    "explainer": true,
+    "eli5": "You bring your own key. The app uses your account, not ours, so nobody else sees or pays for your stuff.",
+    "english": "Bring Your Own Key: you paste your own keys from online services. They stay on your computer, and each service bills you directly.",
+    "dev": "Client-held provider credentials, encrypted locally with Electron safeStorage; calls go straight from the app to each provider, no proxy."
+  },
+  {
+    "term": "API key",
+    "eli5": "A secret password that lets an app use someone else's service, like a library card for a robot.",
+    "english": "A private code that proves you may use an online service. Whoever has it can use your account, so keep it secret.",
+    "dev": "Bearer credential sent with each request to authenticate and bill calls to a provider's API."
+  },
+  {
+    "term": "source available",
+    "explainer": true,
+    "eli5": "You can look at how the app is made, but there is one rule when you share videos made with it.",
+    "english": "The code is public to read, but the licence is not a classic open-source one. Video Forge's rule is that published videos credit it.",
+    "dev": "Published under the Forge Attribution License (FAL) v1.2, not an OSI-approved licence. Attribution on every publicly distributed Output is the core condition."
+  },
+  {
+    "term": "FAL",
+    "eli5": "The rules for using Video Forge. The big one is saying \"Made with Video Forge\" when you share a video.",
+    "english": "Forge Attribution License: free to use, even for paid work, as long as every published video credits Video Forge with the link.",
+    "dev": "Forge Attribution License v1.2 (LICENSE). Free use; attribution with https://stravelakis.com/forge required on publicly distributed Outputs."
+  },
+  {
+    "term": "CC0",
+    "eli5": "A sticker that says \"free for everyone, no strings\".",
+    "english": "A licence that gives a work away to everyone. You can use it for anything, and no credit is needed.",
+    "dev": "Creative Commons CC0 1.0 public-domain dedication."
+  },
+  {
+    "term": "personal build",
+    "explainer": true,
+    "eli5": "The owner's own copy, with his own characters and music. Everyone else gets the public one.",
+    "english": "A version of the app only the owner makes, with his brand packs, music and the 3D Humans. The public build is the one anyone can download.",
+    "dev": "build-exe without --public: adds content linked in by npm run personal (private repo); separate appId; shares userData with Public."
+  },
+  {
+    "term": "public build",
+    "eli5": "The copy of the app anyone can download.",
+    "english": "The version on GitHub Releases. It has the app, the drawn characters, 3D Mini people and 3D Pets, but no personal content.",
+    "dev": "npm run build-exe:public; a guard (tools/lib/buildKind.mjs) refuses Mixamo-derived models and personal folders."
+  },
+  {
+    "term": "Windows protected your PC",
+    "explainer": true,
+    "eli5": "Windows says \"I don't know who made this\". Click More info, then Run anyway.",
+    "english": "A warning Windows shows for programs that are not code-signed yet. It does not mean the file is harmful. Click More info, then Run anyway.",
+    "dev": "Microsoft Defender SmartScreen prompt for unsigned or low-reputation executables. Signing via SignPath Foundation is planned."
+  },
+  {
+    "term": "code-signed",
+    "eli5": "A program with a stamp that says who made it.",
+    "english": "Signed with a certificate that tells Windows who made the program. Video Forge is not signed yet.",
+    "dev": "Authenticode signature on the .exe; absent in 0.4.0-beta.1."
+  },
+  {
+    "term": "pre-release",
+    "eli5": "A test version that is ready to try but not finished.",
+    "english": "A GitHub release marked as a beta. It works, but it is not the final version yet.",
+    "dev": "GitHub Release with prerelease=true; set by release.yml when the tag contains \"-\"."
+  },
+  {
+    "term": "version tag",
+    "eli5": "A name tag on one moment of the code, like v0.4.0, so everyone knows which version it is.",
+    "english": "A label like v0.4.0-beta.1 put on the code. Pushing one builds the installer and the docs.",
+    "dev": "Git tag vX.Y.Z[-beta.N]; triggers .github/workflows/release.yml and deploy-docs.yml."
+  },
+  {
+    "term": "Electron",
+    "eli5": "A kit that turns a web page into a real app with its own window.",
+    "english": "The framework Video Forge is built on. It runs web technology inside a normal desktop window.",
+    "dev": "Chromium + Node.js desktop shell (v45 here), built with electron-vite and packaged with electron-builder (NSIS + portable)."
+  },
+  {
+    "term": "Node.js",
+    "eli5": "A helper that lets your computer run the app's building tools.",
+    "english": "A program that runs JavaScript on your computer. You need it only to build Video Forge from source.",
+    "dev": "JavaScript runtime; the release build uses Node 22."
+  },
+  {
+    "term": "npm",
+    "eli5": "A shop that fetches the parts the app needs, and runs its little jobs.",
+    "english": "The tool that comes with Node.js. It downloads the app's parts and runs commands like npm run dev.",
+    "dev": "Node package manager; npm ci installs from package-lock.json, npm run <script> runs package.json scripts."
+  },
+  {
+    "term": "Git",
+    "eli5": "A tool that copies the project to your computer and remembers every change.",
+    "english": "The tool for downloading (cloning) the code from GitHub and keeping track of changes.",
+    "dev": "Distributed version control; git clone, branches, tags."
+  },
+  {
+    "term": "terminal",
+    "eli5": "A window where you type commands instead of clicking.",
+    "english": "A text window (PowerShell or Command Prompt on Windows) where you type commands such as npm run dev.",
+    "dev": "Shell session; PowerShell on Windows. Env vars are set per session."
+  },
+  {
+    "term": "gitleaks",
+    "eli5": "A guard that stops secrets from being saved into the project by mistake.",
+    "english": "A free checker that looks for passwords and keys before each save to the project, and blocks the save if it finds one.",
+    "dev": "Secret scanner run by githooks/pre-commit (gitleaks git --pre-commit --staged) and by secret-scan.yml in CI."
+  },
+  {
+    "term": "FFmpeg",
+    "eli5": "A tool that glues pictures and sound together into a video file.",
+    "english": "A free program that joins, converts and cleans up video and audio. The installer brings a full copy.",
+    "dev": "gyan.dev 9.0.2 essentials (GPL v3), pinned in tools/lib/ffmpegBundle.mjs. Picked in order: installer's own, full one on PATH, Remotion's bundled copy."
+  },
+  {
+    "term": "Remotion",
+    "eli5": "A tool that builds videos out of web pages, one picture at a time.",
+    "english": "A video-making tool that draws each frame like a web page and turns the frames into a video file.",
+    "dev": "React-based programmatic video framework (4.0.540); renders frames in headless Chromium."
+  },
+  {
+    "term": "headless browser",
+    "eli5": "A web browser with no window, used by the app behind the scenes.",
+    "english": "A browser that runs without showing anything. The app uses one to draw the frames of your video.",
+    "dev": "Chromium used for rendering; override its location with HYPERFRAMES_BROWSER_PATH."
+  },
+  {
+    "term": "viseme",
+    "explainer": true,
+    "eli5": "A mouth shape that goes with a sound, so the character's mouth moves the right way.",
+    "english": "One of a small set of mouth shapes used to animate speech. Video Forge uses nine, plus half-open in-betweens.",
+    "dev": "Visual phoneme class; 9 base shapes (0 NEUTRAL to 8 CH_SH) plus in-betweens 10-12, held about 100 ms."
+  },
+  {
+    "term": "viseme sheet",
+    "eli5": "One big picture with nine faces, each making a different mouth shape.",
+    "english": "A 3 by 3 grid of the same face with nine mouth shapes. The app flips between them while the character talks.",
+    "dev": "3072x3072 PNG, 3x3 grid of 1024 px cells; cell = index % 3, row = floor(index / 3)."
+  },
+  {
+    "term": "rig",
+    "eli5": "A face cut into parts (mouths, eyebrows, eyelids) so it can move.",
+    "english": "A puppet made from one portrait plus separate mouth, brow and eyelid pictures, with a file that says where each goes.",
+    "dev": "<name>.rig.json + rig/<name>/*.png, built by tools/make-rig-puppet.mjs from base/ + layers/<name>/placement.json."
+  },
+  {
+    "term": "inpaint",
+    "eli5": "Asking an image AI to redraw only one small part of a picture.",
+    "english": "Changing just one area of a picture with an image AI (here the mouth), so the rest stays exactly the same.",
+    "dev": "Masked regeneration (Midjourney Vary Region, Photoshop Generative Fill, ComfyUI); merge back with tools/merge-mouth.mjs."
+  },
+  {
+    "term": "stage direction",
+    "eli5": "A note that says how to say a line, like \"quietly\". It is never read out.",
+    "english": "Words in square brackets before the colon, like [in a hurry]. They tell the voice how to say the line.",
+    "dev": "Bracketed prefix before the colon in Name [direction]: text; passed to directable engines, never synthesised."
+  },
+  {
+    "term": "segment",
+    "eli5": "One line of the script, and everything that comes from it.",
+    "english": "One line of speech. It becomes one piece of audio, one or more subtitles, one scene and one moving mouth.",
+    "dev": "NarrationSegment { speakerId, text, startMs, endMs, words? }; the unit for subtitles, visemes and background picks."
+  },
+  {
+    "term": "LUFS",
+    "eli5": "A way to measure how loud a video sounds, so all videos sound about the same.",
+    "english": "A loudness unit. YouTube and TikTok aim for about -14 LUFS, so Video Forge sets the voices to that.",
+    "dev": "Loudness Units relative to Full Scale (EBU R128). Two-pass loudnorm to -14 LUFS integrated, -1 dBTP."
+  },
+  {
+    "term": "LUT",
+    "explainer": true,
+    "eli5": "A colour recipe that makes the whole video look warmer, colder or like an old film.",
+    "english": "A small file (.cube) that changes every colour in a set way. Colour packs sell or share them.",
+    "dev": "3D look-up table in .cube format, applied with FFmpeg lut3d plus eq for contrast and saturation."
+  },
+  {
+    "term": "ducking",
+    "eli5": "The music gets quiet when someone talks, then comes back.",
+    "english": "Turning the music down automatically while someone speaks, so the voice is easy to hear.",
+    "dev": "Music gain reduced under narration, driven by the voice analysis."
+  },
+  {
+    "term": "throat size",
+    "eli5": "How big the voice sounds, like a small cartoon or a big giant.",
+    "english": "The part of a voice's sound that tells you how big the speaker is. Changing it makes a voice sound younger or bigger without changing the pitch alone.",
+    "dev": "Formant shift in semitones (Rubber Band via FFmpeg); without rubberband the formants move with the pitch."
+  },
+  {
+    "term": "pictures per second",
+    "eli5": "How many pictures flash by each second to make things look like they move.",
+    "english": "The frame rate. More is smoother, but the file is bigger and slower to make.",
+    "dev": "fps; Quick draft uses 3 fps at one third of the size."
+  },
+  {
+    "term": "CSV",
+    "eli5": "A simple table saved as plain text.",
+    "english": "A spreadsheet saved as plain text, with commas between the cells. Excel and Google Sheets can make one.",
+    "dev": "RFC 4180-ish comma-separated values, UTF-8; parsed by electron/batch/sheet.ts, header names lower-cased."
+  },
+  {
+    "term": "JSON",
+    "eli5": "A tidy text file that a computer can read easily.",
+    "english": "A plain text file format for settings and data. Project files, puppets and brand packs are JSON files.",
+    "dev": "JavaScript Object Notation."
+  },
+  {
+    "term": "LocalAI",
+    "eli5": "A free AI that runs on your own computer, so nothing goes on the internet.",
+    "english": "A program that runs AI models on your own computer. Image Forge's puppet maker can use it.",
+    "dev": "Self-hosted OpenAI-compatible server (Docker), usually at http://127.0.0.1:8080."
+  },
+  {
+    "term": "Docker",
+    "eli5": "A box that holds a program and everything it needs, so it runs the same anywhere.",
+    "english": "A tool that runs programs in their own sealed box. LocalAI usually runs in one.",
+    "dev": "Container runtime."
+  },
+  {
+    "term": "OpenAI language",
+    "eli5": "A common way for apps to talk to AI helpers, so many helpers can plug in.",
+    "english": "The way most AI servers accept requests. Any server that speaks it (LM Studio, Ollama and others) works as \"Your own server\".",
+    "dev": "OpenAI-compatible /v1 chat completions API; the base URL gets /v1 added if missing."
+  },
+  {
+    "term": "Piper",
+    "eli5": "A voice that runs on your own computer. It is plain, but quick.",
+    "english": "A free voice engine that runs on your computer. Flat but fast, good for checking timing.",
+    "dev": "Local neural TTS (.onnx voices) run through a Python interpreter; no network, no per-use cost."
+  },
+  {
+    "term": "DramaBox",
+    "eli5": "A voice that can act, like whispering or laughing, when you tell it to.",
+    "english": "A voice engine that follows stage directions. It runs on a rented graphics machine, outside the app.",
+    "dev": "Directable TTS on a rented GPU; stage directions steer the performance. Not synthesised inside the app."
+  },
+  {
+    "term": "Mixamo",
+    "eli5": "A library of recorded body movements that can't be shared, so it stays in the owner's copy.",
+    "english": "Adobe's library of recorded movements. Its rules do not allow passing it on, so the 3D Humans are only in the personal build.",
+    "dev": "Adobe Mixamo animations; redistribution not permitted. models/animated/ and motions.json are gitignored and refused by the public build guard."
+  },
+  {
+    "term": "free tier",
+    "eli5": "The part of a service you can use without paying.",
+    "english": "An amount of use a service gives free, often per day or per month. Past it, it stops or starts charging.",
+    "dev": "Provider quota without billing; limits vary per provider and model."
+  }
+]

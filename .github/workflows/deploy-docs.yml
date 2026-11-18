@@ -1,8 +1,13 @@
 name: Deploy docs site
 
-# Builds on every version tag, or by hand from the Actions tab.
-# The docs site lives in /site (the shared docs-theme, STANDARDS section 7) and is
-# served at https://docs.stravelakis.com/Video-Forge-BYOK/ through the organisation site.
+# Builds on every version tag, or by hand from the Actions tab (same set-up as
+# Stravelakis/mystory). The docs site lives in /site (the shared docs-theme,
+# STANDARDS section 7). Its text comes from GUIDE.md, INSTALL.md and
+# docs/glossary.yml (site/scripts/sync-docs.mjs runs before the build).
+# GitHub Pages serves it under the organisation's custom domain at
+# https://docs.stravelakis.com/Video-Forge-BYOK/ (site/astro.config.mjs `base`).
+# One-time repo settings: Pages -> Source: GitHub Actions; Environments ->
+# github-pages -> allow tags v* to deploy. After a deploy, lighthouse.yml checks it.
 
 on:
   push:
