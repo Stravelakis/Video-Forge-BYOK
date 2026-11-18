@@ -1,95 +1,99 @@
+<div align="center">
 
-# Video Forge
+# 🎬 Video Forge
 
-Video Forge is the evolution of the app formerly called BYOK-Vid-Creator.
+### Type a script. Get a finished video with talking characters, voices and subtitles.
 
-**Bring Your Own Keys. Build cinematic, talking-avatar videos — locally, deterministically, beautifully.**
+A Windows app that turns your words into a cartoon video: characters that talk, move and lip-sync,
+voices in Greek and English, subtitles that light up word by word. On your own PC, with your own keys.
 
-<p align="center">
-  <a href="#features">Features</a> ·
-  <a href="#quick-start">Quick Start</a> ·
-  <a href="#roadmap">Roadmap</a>
-</p>
+<br>
+
+[![Download for Windows](https://img.shields.io/badge/⬇%20Download%20for%20Windows-Video%20Forge-42A9A4?style=for-the-badge)](https://github.com/Stravelakis/Video-Forge-BYOK/releases/latest)
+&nbsp;
+[![Read the guide](https://img.shields.io/badge/📖%20Read%20the%20guide-in%20plain%20words-344080?style=for-the-badge)](https://docs.stravelakis.com/video-forge/)
+
+<sub>New to all this? Open the guide and pick <b>ELI5</b> at the top: it explains everything like you're five.</sub>
+
+<br><br>
+
+![Two characters talking with lip-sync and subtitles](docs/media/06-characters-talk-with-lip-sync.gif)
+
+**Two characters talk. Their mouths follow every word, and the subtitles light up as they speak.**
+
+</div>
 
 ---
 
-## What is this?
+## What it does, in six clips
 
-Video Forge is a **desktop studio** for producing narrated, subtitled,
-avatar-driven videos with animated audio waveforms — in Greek and English.
+| | |
+|---|---|
+| ![Pick your cast](docs/media/01-pick-your-cast.gif)<br>**Pick your cast.** Ready-made 3D people, pets and drawn characters. Click one, it joins your video. | ![Pick a format](docs/media/02-pick-a-format.gif)<br>**Pick a format.** One person talking, a storyteller, an interview, big faces. Tall, wide, square or feed. |
+| ![Customise a 3D character](docs/media/03-customise-a-3d-character.gif)<br>**Make them yours.** Colours, moods, moves and props, with a live preview in the scene. | ![Voice characters](docs/media/04-voice-characters.gif)<br>**Give each one a voice.** Then a voice character: chibi, warm narrator, deep and dramatic, radio. |
+| ![Subtitle styles](docs/media/05-subtitle-styles.gif)<br>**Subtitles your way.** Bold box, karaoke, one word at a time. Greek and English. | ![Characters talk with lip-sync](docs/media/06-characters-talk-with-lip-sync.gif)<br>**Press play.** The preview is the video: what you see is what renders. |
 
-It is **not** a generative-video toy. Every frame is **deterministic**:
-what you arrange on the canvas is exactly what renders. You bring your own
-API keys for TTS and stock media; everything runs and renders **on your
-machine** via a bundled Remotion + FFmpeg pipeline.
+## Before → After
 
-> Designed for creators who want **repeatable, polished output** — not
-> a slot machine.
+**Without Video Forge:** you record your voice, find or draw characters, animate mouths frame by frame,
+type subtitles by hand, and stitch it all together in an editor. Days for a few minutes.
 
-## ✨ Features
+**With Video Forge:** you write the script, pick the characters and the look, and press Make.
+The voices, lip-sync, subtitles, music and studio sound are done for you.
 
-- 🎙️ **Two voice engines.** **DramaBox** acts — stage directions in the script
-  control the performance and never appear in the audio — and runs on a rented
-  GPU. **Piper** runs locally: correct, flat, and fast enough to check timing.
-- 🎚️ **Every voice knob, per character and per line.** Acting, pace, obedience
-  and ten more, on sliders. A `[VOICE: acting=2.4]` line in the script overrides
-  them for one block.
-- 👄 **Viseme lip-sync** — 9-shape mouth animation, driven by forced alignment
-  against the script rather than an estimate
-- 🧑‍🤝‍🧑 **Puppets with live faces** — pick from the Cast "+" menu (ready-made, made in Image Forge, or your library); they blink, talk, nod and gesture on their own (question = shrug, "this/here" = point), with a "How much they gesture" slider
-- 👄 **Smoother mouths** — shapes held ~100 ms, look-alikes merged in fast speech, half-open in-betweens
-- 📝 **Subtitle engine** — word-level timing, active-word glow, `.srt` and `.vtt` files beside every video
-- 📐 **One script, every shape** — Make → Also as: Tall 9:16, Square 1:1, Portrait 4:5, Wide 16:9
-- 🌍 **Twin language video** — Also in English/Greek: script translated, same cast, matching subtitles
-- 🏷️ **Honest AI label** — "Made with Video Forge" on the picture (on by default) and in the file's notes
-- 🔤 **Greek stress fixer** — adds missing accents before the voice speaks; a "Say it like this" list for stubborn words
-- 📊 **Many videos from a sheet** — a Google Sheet link or CSV, one row per video, made one after another into a folder named `<sheet> · <date> · <n> videos`
-- 🎭 **Drawn characters** — 21 art styles, 56 clothes, 21 costume packs; they walk, sit, gesture and hold props from script tags like `[walks in]`, `[gives the box to Maria]`
-- 🛋️ **Sets** — news desk, conference room, stage, podcast (facing or split screen), game show
-- ✨ **Pop-up icons** — `[pop red flag]` or `[🎉]` in a line; 52 animated icons
-- 🔠 **Caption styles** — 8 one-click looks, from karaoke to one-word-at-a-time
-- 💬 **Hover help on every control**
-- 🌊 **6 waveform styles** × 5 positions × 6 behavior modes (only active speakers animate)
-- 🎼 **Smart audio** — auto-ducking, Freesound/Pixabay library, pinned custom uploads
-- 🎞️ **AI background automation** — contextual stock clips with a Relevancy↔Frequency dial
-- 🖥️ **Local rendering** — Remotion + FFmpeg, up to 10-min videos, 9:16 & 16:9
-- 🎛️ **Tactile UI** — charcoal-metal chassis, chunky clear-plastic controls, amber glow
+## 🔒 Your data, in plain words
 
-## 🚀 Quick Start
+- **Your keys stay on your PC.** They are saved encrypted by Windows, for your user only ([electron/keyStore.ts](electron/keyStore.ts)).
+- **No tracking.** No analytics, no ads, no account. The app's pages can't send data to the internet on their own ([content-security policy](electron.vite.config.ts)).
+- **Your videos are made on your PC.** Only the AI helpers you choose (voices, pictures) get the text they need, with your own keys.
+- **Free to use**, also for paid work, with one condition: credit "Made with Video Forge" ([licence](#-licence)).
 
-```bash
-git clone https://github.com/DnD-World/Video-Forge.git
-cd Video-Forge
-npm install
-npm run dev
-```
+<div align="center">
 
-> Open the Backend Panel → paste your API keys → add a speaker, give them a puppet and a script → hit Render.
-> The app ships with no characters of its own. Make your own ([docs/PUPPET-MAKING.md](docs/PUPPET-MAKING.md)),
-> or switch on a brand pack — a creator's cast, sample project and clips — with `npm run brand -- <name>`
-> ([docs/BRAND-PACKS.md](docs/BRAND-PACKS.md)).
-> Recommended specs: NVIDIA 8GB GPU · 32GB RAM · ~1 hr render / 10 min video.
+[![Latest release](https://img.shields.io/github/v/release/Stravelakis/Video-Forge-BYOK?include_prereleases&label=version&color=42A9A4)](https://github.com/Stravelakis/Video-Forge-BYOK/releases)
+[![Licence: FAL v1.2](https://img.shields.io/badge/licence-FAL%20v1.2-344080)](LICENSE)
+[![Secret scan](https://github.com/Stravelakis/Video-Forge-BYOK/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/Stravelakis/Video-Forge-BYOK/actions/workflows/secret-scan.yml)
 
-## Guides
-- [Make a video, in plain words](docs/eli5/make-a-video.md)
-- [Writing scripts](docs/WRITING-SCRIPTS.md) · [Making puppets](docs/PUPPET-MAKING.md) · [Install](docs/INSTALL.md)
-- [Handoff (current state)](HANDOFF.md) · [Changelog](CHANGELOG.md)
+</div>
 
-## 🗺️ Roadmap
-- Template gallery: lesson, news desk, podcast, promo
-- Interface in Greek, French, German, Spanish and Portuguese (Settings → Language shows them as coming soon)
-- Rendering a series in one process, instead of paying browser startup per video
-- Expanded transition library
+---
 
-**Not on the roadmap, decided:** Azure Speech, Edge TTS and
-Chatterbox. Every extra engine multiplies what can break, and DramaBox plus
-Piper cover expressive and fast. Chatterbox shipped and was removed in
-August 2026.
+## ✨ Everything it can do
+
+- 🧭 **One decision at a time.** The Create flow walks you through style, characters, background and format, each shown with your own characters.
+- 🎭 **Characters that act.** Drawn characters, picture puppets, Kenney 3D people, pets and props. They walk, wave, sit, point, and move smoothly from one pose to the next.
+- 🎙️ **Voices, free or paid.** Gemini and Fish Audio, Piper offline, ElevenLabs when you want it (it shows the cost and asks first).
+- 🎚️ **Studio sound.** Cleaner voices at the loudness YouTube expects, voice characters, voices placed left and right, an optional colour grade.
+- 💬 **Subtitles that follow the voice.** The spoken word lights up in the speaker's colour. `.srt` and `.vtt` files come with every video.
+- 📐 **Every shape.** Tall 9:16, wide 16:9, square 1:1, feed 4:5, from one script.
+- 📚 **Many videos at once.** One sheet row per video, made in a row. Good for whole courses.
+- 🖼️ **Works with Image Forge**, its twin app for pictures and puppets.
+
+All of it, step by step: **[the guide](https://docs.stravelakis.com/video-forge/)** (Dev, English or ELI5).
+
+## 🚀 Get it
+
+1. **[Download the latest release](https://github.com/Stravelakis/Video-Forge-BYOK/releases/latest)** (`Video Forge Setup ….exe`, or the portable `.exe`).
+2. Double-click it. Windows may say *"Windows protected your PC"*: click **More info**, then **Run anyway**. The app isn't code-signed yet.
+3. Add a key (a free Gemini key is enough to start) and press **Create**.
+
+Full steps, and building from the source: [INSTALL.md](INSTALL.md).
+
+## 📖 Docs
+
+| For | Where |
+|---|---|
+| Everyone | [docs.stravelakis.com/video-forge](https://docs.stravelakis.com/video-forge/): pick **ELI5**, **English** or **Dev** |
+| The full manual | [GUIDE.md](GUIDE.md) |
+| Installing | [INSTALL.md](INSTALL.md) |
+| Script move tags | [docs/MOVE-TAGS.md](docs/MOVE-TAGS.md) |
+| What changed | [CHANGELOG.md](CHANGELOG.md) |
+| Picking up the work | [HANDOFF.md](HANDOFF.md) |
 
 ## 🤖 Built With AI
 This project was designed and engineered in collaboration with AI systems:
 - You.com — orchestration & research
-- Anthropic Claude Opus 4.8 — architecture, code generation, lip-sync design
+- Anthropic Claude — architecture, code generation, lip-sync design
 - Hermes Agent — automation
 - Google Flow — media workflow support
 - Human direction & product vision: Stravelakis.
@@ -101,13 +105,13 @@ Animated Characters, Furniture Kit) are by
 so much to everyone who makes things. If these help you too, consider
 [supporting Kenney](https://kenney.nl/donate).
 
-A few props are by [Quaternius](https://quaternius.com) (CC0). The 3D Humans'
+A few props are by [Quaternius](https://quaternius.com) (CC0). Thank you. The 3D Humans'
 motion library uses Mixamo motions, which may not be shared, so the Humans are in
 the owner's personal build only. The Windows installer carries
 [FFmpeg](https://ffmpeg.org) 9.0.2 (gyan.dev build, GPL v3) as a separate program
 for post-production. Details, licences and source links: [NOTICE](NOTICE).
 
-## 📄 License
+## 📄 Licence
 Video Forge is **source available** under the [Forge Attribution License (FAL) v1.2](LICENSE).
 
 - ✅ Free for personal, school and paid work, including running it as an online service.
@@ -119,4 +123,4 @@ Video Forge is **source available** under the [Forge Attribution License (FAL) v
 FAL is not an OSI-approved open-source licence.
 Copies taken before 26 Oct 2026 keep the MIT licence they came with.
 
-Props also come from [Quaternius](https://quaternius.com). Thank you.
+<!-- TODO: "Send feedback" link once the Tally form exists (STANDARDS §8). -->

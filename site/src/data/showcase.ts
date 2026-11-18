@@ -3,8 +3,6 @@
 // Name them NN-what-it-shows.png (or .jpg/.webp). Stills are used when there are
 // any; otherwise the README's GIF clips. No files = no carousel and no menu entry.
 //
-// TODO: when docs/media/ is filled, give each file a plain one-sentence caption
-// in CAPTIONS below (the file name is used until then).
 
 const stills = import.meta.glob<string>('../../../docs/media/*.{png,jpg,jpeg,webp}', {
   eager: true,
@@ -19,7 +17,10 @@ const clips = import.meta.glob<string>('../../../docs/media/*.gif', {
 
 /** File name without number and extension -> a plain caption. */
 const CAPTIONS: Record<string, { title: string; caption: string }> = {
-  // 'make-a-video': { title: 'Make a video', caption: 'Five steps, one decision at a time.' },
+  "choose-characters": { title: "Pick your cast", caption: "Ready-made 3D people, pets and drawn characters. Click one, it joins your video." },
+  "choose-a-format": { title: "Pick a format", caption: "One person talking, a storyteller, an interview, big faces. Tall, wide, square or feed." },
+  "character-customiser": { title: "Make them yours", caption: "Colours, moods, moves and props, with a live preview in the scene." },
+  "subtitles-and-talking-preview": { title: "Press play", caption: "Characters talk with lip-sync while the subtitles light up word by word." },
 };
 
 const pick = Object.keys(stills).length ? stills : clips;
