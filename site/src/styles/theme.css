@@ -921,3 +921,23 @@ html[data-vern="eli5"] .lvl-eli5, html[data-vern="plain"] .lvl-plain, html[data-
     height: calc(100dvh - var(--bar-h));
   }
 }
+
+/* ---------- Video Forge: nothing smaller than 13px (owner's readability rule) ---------- */
+pre code,
+pre code span {
+  font-size: 13px;
+}
+.eyebrow,
+.sidebar-footer-label {
+  font-size: 13px;
+}
+.pairing-bar {
+  font-size: 13px;
+}
+
+/* ---------- Video Forge: wide tables scroll inside themselves, never the page ---------- */
+.doc-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
