@@ -10,6 +10,8 @@ import { kenneyAsset } from "../canvas/KenneyLive";
 import { KENNEY_MOODS, type KenneyCard, type KenneySet } from "../../lib/kenney/actor";
 import type { SpeakerConfig } from "../../store/types";
 import { defaultTrackWaveform } from "../../lib/waveform/buildTracks";
+import { useKenneyAvailability } from "../canvas/useKenneyAvailability";
+import { setNote } from "../../lib/kenney/available";
 
 interface Item { id: string; label: string; thumb: string; skin?: string; colours?: { hex: string }[]; anims?: string[]; moves?: string[] }
 interface Prop { id: string; label: string; cat: string; by: string; thumb: string; msize?: number | null; hand: string; kind: string }
@@ -46,13 +48,17 @@ const nice = (label: string) => label.replace(/^(.+?)(male|female)$/i, (_m, a: s
 /** The add-a-speaker shelf. */
 export function KenneyShelf({ count, onAdd }: { count: number; onAdd: (s: Partial<SpeakerConfig> & { label: string }) => void }) {
   const { d, err } = useData();
+  const avail = useKenneyAvailability();
   const [set, setSet] = useState<KenneySet>("mini");
   if (err) return <p className="text-sm text-amber-300" data-tip="The 3D character files are missing from this copy of the app.">The 3D characters could not be loaded.</p>;
   if (!d) return <p className="text-sm text-neutral-500" data-tip="Reading the 3D cast. This takes a moment the first time.">Loading…</p>;
   return (
     <>
       <div className="flex gap-2 flex-wrap" role="group" aria-label="3D family">
-        {SETS.map(([k, label, tip]) => <button key={k} className={chip(k === set)} onClick={() => setSet(k)} data-tip={tip}>{label}</button>)}
+        {SETS.map(([k, label, tip]) => {
+          const off = setNote(k, avail);
+          return <button key={k} className={`${chip(k === set)} ${off ? "personal-only" : ""}`} aria-disabled={!!off || undefined} onClick={() => { if (!off) setSet(k); }} data-tip={off ? `${label}: ${off}` : tip}>{label}</button>;
+        })}
       </div>
       <div className="forge-shelf">
         {d.sets[set].items.map((it) => (
@@ -75,6 +81,7 @@ export function KenneyShelf({ count, onAdd }: { count: number; onAdd: (s: Partia
 /** Everything about one 3D speaker. */
 export function KenneyEditor({ sp, update }: { sp: SpeakerConfig; update: (p: Partial<SpeakerConfig>) => void }) {
   const { d, err } = useData();
+  const avail = useKenneyAvailability();
   const card = sp.kenney!;
   const set = (patch: Partial<KenneyCard>) => update({ kenney: { ...card, ...patch } });
   const [slot, setSlot] = useState<"right" | "left" | "mouth">(card.set === "pets" ? "mouth" : "right");
@@ -96,6 +103,8 @@ export function KenneyEditor({ sp, update }: { sp: SpeakerConfig; update: (p: Pa
 
   if (err) return <p className="text-sm text-amber-300">The 3D character files could not be loaded.</p>;
   if (!d || !item) return <p className="text-sm text-neutral-500" data-tip="Reading the 3D cast. This takes a moment the first time.">Loading…</p>;
+  const off = setNote(card.set, avail);
+  if (off) return <p className="text-sm text-amber-300 personal-only" data-tip={`This speaker is one of the 3D Humans. ${off} Swap them for a Mini person or a Pet to see and render them here.`}>3D Humans are in the personal build only.</p>;
   const props = card.props ?? {};
   const own = (item.anims ?? []).filter((n) => !/attack|shoot|die|wheelchair|static|Targeting|mixamo/i.test(n));
 

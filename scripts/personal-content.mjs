@@ -12,9 +12,14 @@
  * 1. Clones the private repo DnD-World/Video-Forge-personal beside the app
  *    folder, or updates it (fast-forward only; local changes are never
  *    overwritten).
- * 2. Links brands/, music/ and the Mixamo models folder into the app with a
- *    Windows junction (a folder shortcut programs follow), and copies
- *    motions.json (a single file cannot be a junction).
+ * 2. Links brands/, music/ and the Mixamo model set (models/animated) into the
+ *    app with a Windows junction (a folder shortcut programs follow), and
+ *    copies motions.json (a single file cannot be a junction). The other model
+ *    sets (mini, pets, props) are Kenney CC0 and come with the public repo.
+ *
+ * Before 18 Nov 2026 the whole models/ folder was one link. That old link is
+ * removed (a link holds no data), the public model sets come back from git,
+ * and only models/animated is linked.
  *
  * Safe to run again and again: a link that is already right is left alone.
  * Nothing is ever deleted. Real content in the way is moved aside to
@@ -173,7 +178,22 @@ for (const item of ITEMS) {
   }
   const src = itemPath(CLONE, item.rel);
   const dst = itemPath(APP, item.rel);
-  const plan = planItem(APP, CLONE, item, { copy: COPY });
+  let plan = planItem(APP, CLONE, item, { copy: COPY });
+  if (plan.action === "unlink-parent") {
+    say(`  ${plan.parent}: the old whole-folder link. Remove the link (links hold no data), then bring back the public model sets from git`);
+    if (DRY) {
+      say(`  ${item.rel}: link (after that)`);
+      continue;
+    }
+    removeLink(itemPath(APP, plan.parent));
+    const tracked = git(APP, ["ls-files", "--", plan.parent]);
+    if (tracked.ok && tracked.out) {
+      const back = git(APP, ["checkout", "--", plan.parent]);
+      const n = tracked.out.split(/\r?\n/).length;
+      say(back.ok ? `    ✓ ${n} public file(s) restored from git` : `    ! git could not restore them (${back.err.split(/\r?\n/)[0]}); run: git checkout -- ${plan.parent}`);
+    } else fs.mkdirSync(itemPath(APP, plan.parent), { recursive: true });
+    plan = planItem(APP, CLONE, item, { copy: COPY });
+  }
   const line = `  ${item.rel}: ${plan.action} (${plan.why})`;
   if (plan.action === "stop") {
     stopped++;

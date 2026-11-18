@@ -235,3 +235,5 @@
 .flow-invideo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 .flow-invideo-row { display: flex; gap: 20px; align-items: center; }
 .flow-invideo-row > p { max-width: 360px; }
+.personal-only { opacity: .45; filter: grayscale(.8); cursor: not-allowed; }
+.personal-only:hover { transform: none; box-shadow: none; }

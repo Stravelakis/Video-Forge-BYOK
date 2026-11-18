@@ -10,6 +10,8 @@ import { LiveFace } from "../panels/LiveFace";
 import { PuppetShelf } from "../panels/PuppetShelf";
 import { KenneyEditor } from "../panels/KenneyPanel";
 import { kenneyAsset } from "../canvas/KenneyLive";
+import { useKenneyAvailability } from "../canvas/useKenneyAvailability";
+import { PERSONAL_ONLY_NOTE, setNote } from "../../lib/kenney/available";
 import { useCreatorStore } from "../../store/useCreatorStore";
 import { useFlowStore, type FlowStyle, type ParamId } from "../../store/useFlowStore";
 import { useProjectStore } from "../../store/useProjectStore";
@@ -110,6 +112,8 @@ function KenneyShelf({ set, add, q }: { set: Extract<FlowStyle, { family: "3d" }
   useEffect(() => { fetch(kenneyAsset("manifest.json")).then((r) => r.json()).then((m) => setItems(m.sets[set].items)).catch(() => setItems([])); }, [set]);
   const n = useProjectStore((s) => s.speakers.length);
   const t = q.trim().toLowerCase();
+  const off = setNote(set, useKenneyAvailability());
+  if (off) return <p className="flow-note personal-only" data-tip={`3D Humans: ${PERSONAL_ONLY_NOTE} Pick 3D Mini people or 3D Pets in the first step instead.`}>3D Humans are in the personal build only.</p>;
   return (
     <div className="flow-tiles">
       {items.filter((i) => !t || nice(i.label).toLowerCase().includes(t)).map((it) => {

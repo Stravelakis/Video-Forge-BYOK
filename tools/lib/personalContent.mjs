@@ -4,7 +4,10 @@
 // temp folders without git or the network.
 //
 // The private repo DnD-World/Video-Forge-personal mirrors the app folder:
-// brands/, music/ and the Mixamo files sit at the same relative paths. It is
+// brands/, music/ and the Mixamo files (motions.json and models/animated/) sit
+// at the same relative paths. Since 18 Nov 2026 only the "animated" model set
+// is linked: models/mini, pets and props are Kenney CC0 and live in the public
+// repo, so the models folder itself is a real folder again. It is
 // cloned NEXT TO the app folder (../Video-Forge-personal), never inside it:
 // electron-builder copies a link that points outside the app as real files, but
 // keeps a link that points inside the app as a link, which the installed app
@@ -93,6 +96,9 @@ const same = (a, b) => {
  *   "ok"            already linked to the clone, or the same file
  *   "link"          nothing there: make the link (copy mode, or a file: copy)
  *   "relink"        a link to somewhere else: replace the link (links hold no data)
+ *   "unlink-parent" a folder above it is a link from the old layout (the whole
+ *                   models/ folder): remove that link, bring the public files
+ *                   back from git, then plan again
  *   "migrate-clone" the old brands clone: check it is saved, move it aside, link
  *   "set-aside"     real content that is safe to move aside (a folder whose every
  *                   file is also in the clone, or a different copy of the file):
@@ -103,6 +109,10 @@ const same = (a, b) => {
 export function planItem(appRoot, cloneDir, item, { copy = false, oldClone = null } = {}) {
   const src = itemPath(cloneDir, item.rel);
   const dst = itemPath(appRoot, item.rel);
+  // Checked first: through a linked parent, "dst" is really inside the clone,
+  // and judging it as app content could set the clone's own files aside.
+  const parent = linkedParent(appRoot, item.rel);
+  if (parent) return { action: "unlink-parent", why: `${parent} is a link from the old layout (links hold no data)`, parent };
   if (!fs.existsSync(src)) return { action: "skip", why: "not in the personal repo" };
   const here = whatIsAt(dst);
   if (here.type === "none") return { action: "link", why: "not in the app yet" };
@@ -120,6 +130,21 @@ export function planItem(appRoot, cloneDir, item, { copy = false, oldClone = nul
   const extra = filesNotIn(dst, src);
   if (extra.length === 0) return { action: copy ? "refresh-copy" : "set-aside", why: "everything in it is also in the repo" };
   return { action: "stop", why: `${extra.length} file(s) only in the app copy, e.g. ${extra.slice(0, 3).join(", ")}` };
+}
+
+/**
+ * The nearest folder above `rel` inside the app that is a link (junction or
+ * symlink), as a relative path, or null. Before 18 Nov 2026 the whole
+ * models/ folder was linked; now only models/animated is, and the public
+ * model sets are real files from git.
+ */
+export function linkedParent(appRoot, rel) {
+  const parts = rel.split("/");
+  for (let n = 1; n < parts.length; n++) {
+    const up = parts.slice(0, n).join("/");
+    if (whatIsAt(itemPath(appRoot, up)).type === "link") return up;
+  }
+  return null;
 }
 
 /** Same size and bytes. */

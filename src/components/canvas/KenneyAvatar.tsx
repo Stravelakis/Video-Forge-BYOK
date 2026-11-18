@@ -10,6 +10,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { KenneyActor, type Framing, type KenneyCard, type KenneySignal } from "../../lib/kenney/actor";
 import type { TagSpan } from "../../lib/kenney/motions";
+import { PERSONAL_ONLY_NOTE, isPersonalOnly } from "../../lib/kenney/available";
 
 interface Props {
   card: KenneyCard;
@@ -37,6 +38,7 @@ export function KenneyAvatar({ card, size, timeMs, asset, signalAt, signalKey, t
   const actor = useRef<KenneyActor | null>(null);
   const [ready, setReady] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [personalOnly, setPersonalOnly] = useState(false);
   const cardKey = JSON.stringify([card, tags ?? []]);
   // a render is exact; the preview doubles up on sharp screens
   const scale = hold ? 1 : Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1) * 2;
@@ -52,7 +54,11 @@ export function KenneyAvatar({ card, size, timeMs, asset, signalAt, signalKey, t
     a.load().then(() => {
       if (gone) { a.dispose(); return; }
       actor.current = a; setReady((n) => n + 1);
-    }).catch((e) => { console.error(e); setError(String(e?.message ?? e)); }).finally(() => release?.());
+    }).catch((e) => {
+      // a Humans character in the Public build: a quiet note, not an error
+      if (isPersonalOnly(e)) { setPersonalOnly(true); return; }
+      console.error(e); setError(String(e?.message ?? e));
+    }).finally(() => release?.());
     return () => { gone = true; actor.current?.dispose(); actor.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardKey]);
@@ -66,6 +72,7 @@ export function KenneyAvatar({ card, size, timeMs, asset, signalAt, signalKey, t
   return (
     <div style={{ width: size, height: size, position: "relative" }}>
       <canvas ref={canvas} data-ready={ready} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+      {personalOnly && !hold && <div data-tip={`3D Humans: ${PERSONAL_ONLY_NOTE}`} style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#bbb", fontSize: 13, textAlign: "center" }}>3D Humans: {PERSONAL_ONLY_NOTE.toLowerCase()}</div>}
       {error && <div data-tip="This 3D character could not be loaded." style={{ position: "absolute", inset: 0, color: "#f88", fontSize: 14 }}>{error}</div>}
     </div>
   );
