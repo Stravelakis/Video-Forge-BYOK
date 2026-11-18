@@ -48,7 +48,8 @@ client_secret*.json
 youtube-token.json
 
 # Model weights downloaded by tools (timestamping etc.) — kept in the project, not in the user profile.
-models/
+# Root folder only: a bare "models/" also hid the 3D cast's public model sets.
+/models/
 
 # Queue run state — machine-local progress, not source.
 jobs/.queue/
@@ -84,9 +85,11 @@ brands/*/characters/.backup/
 # Personal content (17 Nov 2026): private repo DnD-World/Video-Forge-personal,
 # cloned beside the app folder and linked in by scripts/personal-content.mjs.
 # The names without a slash also cover the links (a junction is not a folder to git).
+# Only the Mixamo set is private: models/mini, pets and props are Kenney CC0 and
+# ship in the public repo (18 Nov 2026).
 /brands
 /music
-characters/samples/kenney/builder/models
+characters/samples/kenney/builder/models/animated
 # what personal-content.mjs moved aside instead of deleting
 *.before-personal-*
 
@@ -100,3 +103,8 @@ workshop/
 music/
 CLAUDE.md
 .claude/
+
+# The full ffmpeg the installer carries: downloaded at build time by
+# scripts/fetch-ffmpeg.mjs (pinned version, SHA-256 checked), never committed.
+/build/ffmpeg/
+/build/ffmpeg-cache/

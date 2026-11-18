@@ -1,0 +1,69 @@
+Video Forge
+Copyright (c) 2026 Stravelakis
+
+Video Forge is source available under the Forge Attribution License (FAL)
+v1.2. See LICENSE. FAL is not an OSI-approved open-source licence.
+
+This product includes or runs the third-party material below. Each part keeps
+its own licence; nothing here changes it.
+
+
+3D CHARACTERS, PETS AND PROPS
+-----------------------------
+Folder: characters/samples/kenney/builder/
+
+Kenney (https://kenney.nl), released under CC0 1.0 (public domain):
+  - Mini Characters        models/mini/
+  - Cube Pets              models/pets/
+  - Props (28 of 42)       models/props/ (sword, shields, food, tools...)
+  - Furniture Kit          rooms/furniture/
+  - Animated Characters    the 3D Humans skins and thumbnails
+Thank you, Kenney. https://kenney.nl/donate
+
+Quaternius (https://quaternius.com), released under CC0 1.0:
+  - Props: shield-wood, scroll, book, chalice, candle (models/props/)
+
+Made for Video Forge (covered by LICENSE):
+  - Props: bow, staff, wand, torch, phone, mic, bone, ball, stick
+  - The face cards and rounded parts added to the Kenney models
+
+Each item's maker is also listed in props.json ("by") and manifest.json.
+
+The 3D Humans' bodies and the motion library (models/animated/ and
+motions.json) use motions from Adobe Mixamo, which may not be passed on. They
+are only in the owner's Personal build and are not in this repository or in
+the Public installer.
+
+
+FFMPEG (Windows installer only)
+-------------------------------
+What it is: FFmpeg 9.0.2, a separate program for converting and filtering
+audio and video. The "essentials" Windows build made by gyan.dev
+(https://www.gyan.dev/ffmpeg/builds/).
+
+Where it is: resources/ffmpeg/ffmpeg.exe in the installed app, with its own
+licence (resources/ffmpeg/LICENSE.txt) and the builder's README
+(resources/ffmpeg/README.txt), which lists the exact configuration and the
+version of every library inside it.
+
+How Video Forge uses it: as a separate program. Video Forge starts ffmpeg.exe
+as its own process and passes it files and options; ffmpeg is not linked into
+Video Forge and Video Forge is not part of ffmpeg. You may replace it with any
+other ffmpeg build.
+
+Licence: GNU General Public License, version 3 (the build includes GPL parts
+such as x264, x265 and Rubber Band). See resources/ffmpeg/LICENSE.txt or
+https://www.gnu.org/licenses/gpl-3.0.html.
+
+Source code:
+  - FFmpeg source for this build:  https://github.com/FFmpeg/FFmpeg/commit/946fcce07b
+  - FFmpeg 9.0.2 release source:   https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
+  - The exact binary package used: https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-essentials_build.zip
+    (SHA-256 60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba)
+  - The builder's notes and library list: https://www.gyan.dev/ffmpeg/builds/
+
+FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
+Video Forge is not made or endorsed by the FFmpeg project or by gyan.dev.
+
+Remotion also ships its own reduced ffmpeg and ffprobe inside
+node_modules/@remotion/compositor-win32-x64-msvc, under that package's licence.

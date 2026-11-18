@@ -14,10 +14,13 @@
  *   Public   → release/"Video Forge Setup x.y.z.exe" + portable
  *
  * Steps:
- * 1. builds the app                                  → out/
- * 2. packs it into a folder                          → release/win-unpacked/
- * 3. Public only: checks that folder holds nothing personal, and stops if it does
- * 4. makes the installer and the portable exe from that same folder
+ * 1. gets the full ffmpeg (pinned, SHA-256 checked) → build/ffmpeg/
+ *    (scripts/fetch-ffmpeg.mjs; both kinds carry it in resources/ffmpeg/)
+ * 2. builds the app                                  → out/
+ * 3. packs it into a folder                          → release/win-unpacked/
+ * 4. checks the folder: the full ffmpeg is in, and (Public only) nothing
+ *    personal is; stops if either fails
+ * 5. makes the installer and the portable exe from that same folder
  *
  * WHY THE APP IS NOT PACKED INTO AN ASAR ARCHIVE, which is electron-builder's
  * default and makes the install smaller. Rendering works by handing
@@ -40,7 +43,9 @@ import {
   isSetAside,
   findPersonalFiles,
   makeBuildConfig,
+  modelSetsIn,
 } from "../tools/lib/buildKind.mjs";
+import { FFMPEG, FFMPEG_DIR } from "../tools/lib/ffmpegBundle.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const argv = process.argv.slice(2);
@@ -128,7 +133,20 @@ if (argv.includes("--check")) {
   if (kind === "public" && personal.length) fail(`personal files would go in:\n  ${personal.slice(0, 20).join("\n  ")}`);
   if (kind === "public") ok("no personal files would go in");
   else console.log(`  ${personal.length} of them are personal content`);
+  const sets = modelSetsIn(taken);
+  console.log(`  3D model sets that would go in: ${sets.join(", ") || "none"}`);
+  const motions = taken.includes("characters/samples/kenney/builder/motions.json");
+  console.log(`  Mixamo motion library (motions.json): ${motions ? "yes" : "no"}`);
+  if (kind === "public" && (sets.includes("animated") || motions)) fail("the Mixamo set or moves would go in");
+  const ff = path.join(ROOT, ...FFMPEG_DIR.split("/"), "ffmpeg.exe");
+  console.log(`  full ffmpeg ${FFMPEG.version}: ${fs.existsSync(ff) ? `ready in ${FFMPEG_DIR}/` : "not fetched yet (a real build fetches it first)"}`);
   process.exit(0);
+}
+
+step(`getting the full ffmpeg ${FFMPEG.version} (pinned, checksum checked)`);
+{
+  const r = spawnSync(process.execPath, [path.join(ROOT, "scripts", "fetch-ffmpeg.mjs")], { cwd: ROOT, stdio: "inherit" });
+  if (r.status !== 0) fail("the full ffmpeg could not be fetched — scroll up for why");
 }
 
 // electron-builder reads this file instead of package.json's build block.
@@ -151,6 +169,13 @@ if (fs.existsSync(unpacked)) fs.rmSync(unpacked, { recursive: true, force: true 
 step("packing the app folder (the first run downloads ~150 MB)");
 run("electron-builder", ["--config", cfgFile, "--win", "dir", "--x64", "--publish", "never"], "packing");
 const appDir = path.join(unpacked, "resources", "app");
+
+for (const name of Object.values(FFMPEG.take)) {
+  if (!fs.existsSync(path.join(unpacked, "resources", "ffmpeg", name))) {
+    fail(`STOPPED: resources/ffmpeg/${name} is missing from the packed app. No installer was made.`);
+  }
+}
+ok(`the packed app carries the full ffmpeg ${FFMPEG.version} and its licence`);
 
 if (kind === "public") {
   const found = findPersonalFiles(appDir, { setAside: true });

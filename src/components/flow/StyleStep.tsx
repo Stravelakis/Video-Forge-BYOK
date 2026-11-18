@@ -10,6 +10,9 @@ import { useProjectStore } from "../../store/useProjectStore";
 import type { KenneyCard } from "../../lib/kenney/actor";
 import { GROUPS, STYLES, styleOf, type StyleInfo } from "./styles";
 import { KenneyDemo, PopOn } from "./HoverPop";
+import { kenneyAsset } from "../canvas/KenneyLive";
+import { useKenneyAvailability } from "../canvas/useKenneyAvailability";
+import { PERSONAL_ONLY_NOTE, setAvailable } from "../../lib/kenney/available";
 
 const clip = (id: string) => CLIPS.find((c) => c.id === id) ?? CLIPS[0];
 const demoCard = (look: string) => normalizeCard({ ...(DRAWN_PRESETS.find((p) => p.subjects.includes("everyday")) ?? DRAWN_PRESETS[0]).card, name: "Demo", look }).card;
@@ -29,8 +32,13 @@ function usePuppetSample() {
   return p;
 }
 
-function Demo({ s }: { s: StyleInfo }) {
+/** A still picture for a 3D set this build does not have (no model to load). */
+const Still = ({ size }: { size?: number }) => <img src={kenneyAsset("thumbs/anim-skaterFemaleA.png")} alt="3D Humans" style={size ? { width: size, height: size, objectFit: "contain" } : undefined} />;
+const missing3d = (s: StyleInfo, ok: (set: string) => boolean) => s.style.family === "3d" && !ok(s.style.set);
+
+function Demo({ s, off }: { s: StyleInfo; off?: boolean }) {
   const puppet = usePuppetSample();
+  if (off) return <div className="flow-demo flow-demo-3d" data-tip={PERSONAL_ONLY_NOTE}><Still /></div>;
   if (s.style.family === "drawn") {
     const look = lookById(s.style.look);
     return <div className="flow-demo" style={{ background: (look as { stage?: string }).stage }}><LiveFigure card={demoCard(s.style.look)} look={look} clip={clip("talk")} framing="waist" fps={12} /></div>;
@@ -39,7 +47,8 @@ function Demo({ s }: { s: StyleInfo }) {
   return <div className="flow-demo flow-demo-puppet" data-tip="Picture puppets come from Image Forge: Pixar-like, lifelike, photo, flat, clay, paper, anime, doodle or stick.">{puppet ? <LiveFace path={puppet} label="Puppet" size={180} talking /> : "🖼️"}</div>;
 }
 
-function Big({ s, size }: { s: StyleInfo; size: number }) {
+function Big({ s, size, off }: { s: StyleInfo; size: number; off?: boolean }) {
+  if (off) return <Still size={size} />;
   if (s.style.family === "drawn") {
     const look = lookById(s.style.look);
     return <div style={{ width: size, height: size, background: (look as { stage?: string }).stage }}><LiveFigure card={demoCard(s.style.look)} look={look} clip={clip("wave")} framing="full" fps={30} pad={0.04} /></div>;
@@ -56,6 +65,8 @@ export function StyleStep() {
   const restore = useFlowStore((f) => f.restore);
   const removeTemplate = useFlowStore((f) => f.removeTemplate);
   const chosen = styleOf(cur)?.id;
+  const avail = useKenneyAvailability();
+  const ok = (set: string) => setAvailable(set, avail);
   const groups = useMemo(() => GROUPS.map((g) => ({ ...g, items: STYLES.filter((s) => s.group === g.id) })), []);
   const useTemplate = (t: FlowTemplate) => { useProjectStore.setState(t.project as never); restore(t); };
   return (
@@ -82,10 +93,13 @@ export function StyleStep() {
             {g.items.map((s) => {
               const name = s.name ?? (s.style.family === "drawn" ? lookById(s.style.look).name : s.id);
               const blurb = s.style.family === "drawn" ? lookById(s.style.look).blurb : undefined;
+              const off = missing3d(s, ok);
               return (
-                <PopOn key={s.id} label={name} note={blurb} render={(size) => <Big s={s} size={size} />}>
-                  <button className={`flow-style ${chosen === s.id ? "on" : ""}`} onClick={() => { setStyle(s.style); setStep(2); }} data-tip={`Make this video in ${name}, then choose the characters.`}>
-                    <Demo s={s} />
+                <PopOn key={s.id} label={name} note={off ? PERSONAL_ONLY_NOTE : blurb} render={(size) => <Big s={s} size={size} off={off} />}>
+                  <button className={`flow-style ${chosen === s.id ? "on" : ""} ${off ? "personal-only" : ""}`} aria-disabled={off || undefined}
+                    onClick={() => { if (off) return; setStyle(s.style); setStep(2); }}
+                    data-tip={off ? `${name}: ${PERSONAL_ONLY_NOTE} Their motions come from a library that cannot be shared.` : `Make this video in ${name}, then choose the characters.`}>
+                    <Demo s={s} off={off} />
                     <b>{name}</b>
                     <ul className="flow-pros">{s.pros.map((p) => <li key={p}>{p}</li>)}</ul>
                     <ul className="flow-cons">{s.cons.map((p) => <li key={p}>{p}</li>)}</ul>

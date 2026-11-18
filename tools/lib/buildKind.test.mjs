@@ -14,7 +14,9 @@ import {
   findPersonalFiles,
   isSetAside,
   makeBuildConfig,
+  modelSetsIn,
   patternReaches,
+  PUBLIC_MODEL_SETS,
 } from "./buildKind.mjs";
 
 const pkg = JSON.parse(fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
@@ -130,4 +132,68 @@ test("a packed folder is checked for personal files, and the kind follows what i
   assert.ok(findPersonalFiles(root, { setAside: true }).includes("characters/samples/kenney/builder/models.before-personal-2026-11-17"));
   assert.ok(PERSONAL_PATHS.includes("brands"));
   fs.rmSync(root, { recursive: true, force: true });
+});
+
+test("the 3D cast: Kenney sets are public, the Mixamo set and moves are not (18 Nov 2026)", () => {
+  // the guard's two lists
+  assert.ok(PERSONAL_PATHS.includes("characters/samples/kenney/builder/models/animated"));
+  assert.ok(PERSONAL_PATHS.includes("characters/samples/kenney/builder/motions.json"));
+  assert.ok(!PERSONAL_PATHS.includes("characters/samples/kenney/builder/models"), "the whole models folder is no longer personal");
+  assert.deepEqual(PUBLIC_MODEL_SETS, ["mini", "pets", "props"]);
+  for (const set of PUBLIC_MODEL_SETS) {
+    assert.ok(!PERSONAL_PATHS.some((p) => `characters/samples/kenney/builder/models/${set}`.startsWith(p)), `${set} is treated as personal`);
+  }
+
+  const cfg = makeBuildConfig(pkg.build, "public", "1.0.0");
+  assert.deepEqual(checkPublicConfig(cfg), []);
+  // dropping the animated shut-out is caught
+  const open = cfg.files.filter((f) => !f.includes("models/animated"));
+  assert.ok(checkPublicConfig({ ...cfg, files: open }).some((p) => /animated/.test(p)));
+
+  const require = createRequire(new URL("../../package.json", import.meta.url));
+  let FileMatcher;
+  try {
+    ({ FileMatcher } = require("app-builder-lib/out/fileMatcher"));
+  } catch {
+    return;
+  }
+  const root = tmp();
+  const at = (rel) => path.join(root, ...rel.split("/"));
+  const fileStat = { isDirectory: () => false, isSymbolicLink: () => false };
+  const linkStat = { isDirectory: () => false, isSymbolicLink: () => true };
+  const pub = new FileMatcher(root, root, (s) => s, cfg.files).createFilter();
+  const per = new FileMatcher(root, root, (s) => s, makeBuildConfig(pkg.build, "personal", "1.0.0").files).createFilter();
+  const files = [
+    "characters/samples/kenney/builder/models/mini/character-alien.glb",
+    "characters/samples/kenney/builder/models/pets/animal-dog.glb",
+    "characters/samples/kenney/builder/models/props/sword.glb",
+    "characters/samples/kenney/builder/models/animated/animated.glb",
+    "characters/samples/kenney/builder/models/animated/lib-talk.glb",
+    "characters/samples/kenney/builder/motions.json",
+  ];
+  const takenPublic = files.filter((rel) => pub(at(rel), fileStat));
+  assert.deepEqual(modelSetsIn(takenPublic), ["mini", "pets", "props"]);
+  assert.ok(!takenPublic.some((f) => f.endsWith("motions.json")));
+  // the animated set linked in by personal-content.mjs (a junction) stays out too
+  assert.equal(pub(at("characters/samples/kenney/builder/models/animated"), linkStat), false);
+  // Personal takes all of it
+  assert.deepEqual(modelSetsIn(files.filter((rel) => per(at(rel), fileStat))), ["animated", "mini", "pets", "props"]);
+  assert.ok(per(at("characters/samples/kenney/builder/motions.json"), fileStat));
+
+  // a packed folder holding only the public sets is clean; animated is found
+  for (const rel of files.slice(0, 3)) {
+    fs.mkdirSync(path.dirname(at(rel)), { recursive: true });
+    fs.writeFileSync(at(rel), "glb");
+  }
+  assert.deepEqual(findPersonalFiles(root), []);
+  assert.equal(chooseKind([], root), "public");
+  fs.mkdirSync(at("characters/samples/kenney/builder/models/animated"));
+  assert.deepEqual(findPersonalFiles(root), ["characters/samples/kenney/builder/models/animated"]);
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
+test("modelSetsIn reads set names from packed paths", () => {
+  assert.deepEqual(modelSetsIn(["characters/samples/kenney/builder/models/pets/a.glb", "characters/samples/kenney/builder/models/mini/b.glb", "characters/samples/kenney/builder/manifest.json", "characters/samples/kenney/builder/models/x"]), ["mini", "pets"]);
+  assert.deepEqual(modelSetsIn([["characters", "samples", "kenney", "builder", "models", "props", "a.glb"].join("\\")]), ["props"]);
+  assert.deepEqual(modelSetsIn([]), []);
 });

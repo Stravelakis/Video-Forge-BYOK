@@ -95,11 +95,17 @@ This project was designed and engineered in collaboration with AI systems:
 - Human direction & product vision: Stravelakis.
 
 ## 💚 Thank you, Kenney
-The 3D characters, pets and furniture in the Kenney cast tests (Mini Characters,
-Cube Pets, Animated Characters, Furniture Kit) are by
+The 3D characters, pets, props and furniture (Mini Characters, Cube Pets,
+Animated Characters, Furniture Kit) are by
 **Kenney** — [kenney.nl](https://kenney.nl) — released as CC0. Thank you for giving
 so much to everyone who makes things. If these help you too, consider
 [supporting Kenney](https://kenney.nl/donate).
+
+A few props are by [Quaternius](https://quaternius.com) (CC0). The 3D Humans'
+motion library uses Mixamo motions, which may not be shared, so the Humans are in
+the owner's personal build only. The Windows installer carries
+[FFmpeg](https://ffmpeg.org) 9.0.2 (gyan.dev build, GPL v3) as a separate program
+for post-production. Details, licences and source links: [NOTICE](NOTICE).
 
 ## 📄 License
 Video Forge is **source available** under the [Forge Attribution License (FAL) v1.2](LICENSE).

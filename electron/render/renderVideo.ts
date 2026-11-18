@@ -385,6 +385,13 @@ export async function renderVideo(
     // 3D characters: their models, faces and motions ride along in the render folder
     if (job.speakers.some((sp) => sp.kenney)) {
       await fsp.cp(path.join(projectRoot, "characters", "samples", "kenney", "builder"), path.join(publicDir, "kenney"), { recursive: true });
+      // The 3D Humans (Mixamo-based) ship in the Personal build only.
+      if (job.speakers.some((sp) => sp.kenney?.set === "animated")) {
+        const humans = path.join(projectRoot, "characters", "samples", "kenney", "builder", "models", "animated", "animated.glb");
+        if (!(await fsp.stat(humans).then(() => true, () => false))) {
+          warnings.push("[video-forge] 3D Humans are in the personal build only, so those speakers are left out of this video. Swap them for Mini people or Pets.");
+        }
+      }
     }
 
     const speakers: RenderSpeaker[] = [];

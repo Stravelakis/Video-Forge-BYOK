@@ -1,8 +1,9 @@
 // The two versions of Video Forge, made from one codebase.
 //
 //   Personal = the app + the owner's own content (brand packs, music, the
-//              Mixamo-derived moves and models). Only ever built on the owner's
-//              PC, from the private repo DnD-World/Video-Forge-personal.
+//              Mixamo-derived moves and the "animated" model set). Only ever
+//              built on the owner's PC, from the private repo
+//              DnD-World/Video-Forge-personal.
 //   Public   = the app only. This is what GitHub Releases carry.
 //
 // scripts/build-exe.mjs turns package.json's electron-builder `build` block
@@ -15,14 +16,22 @@
 import fs from "node:fs";
 import path from "node:path";
 
-/** Everything personal, as paths relative to the app folder (forward slashes). */
+/** Everything personal, as paths relative to the app folder (forward slashes).
+ *  Of the 3D cast only the Mixamo-derived parts are personal: the "animated"
+ *  model set and motions.json. Adobe does not allow redistributing them. */
 export const PERSONAL_PATHS = [
   "brands",
   "music",
   "brand.local.json",
   "characters/samples/kenney/builder/motions.json",
-  "characters/samples/kenney/builder/models",
+  "characters/samples/kenney/builder/models/animated",
 ];
+
+/** The 3D model sets both builds carry: Kenney CC0 characters and pets, and the
+ *  props (Kenney and Quaternius CC0, plus a few made for Video Forge). They
+ *  live in the public repo (18 Nov 2026). */
+export const MODELS_DIR = "characters/samples/kenney/builder/models";
+export const PUBLIC_MODEL_SETS = ["mini", "pets", "props"];
 
 export const BUILD_KINDS = ["personal", "public"];
 
@@ -190,4 +199,17 @@ export function chooseKind(argv, appRoot) {
   if (argv.includes("--public")) return "public";
   if (argv.includes("--personal")) return "personal";
   return findPersonalFiles(appRoot).length ? "personal" : "public";
+}
+
+/** The 3D model sets (folder names under models/) a list of packed file paths holds. */
+export function modelSetsIn(files) {
+  const sets = new Set();
+  for (const f of files) {
+    const rel = norm(f);
+    if (rel.startsWith(MODELS_DIR + "/")) {
+      const set = rel.slice(MODELS_DIR.length + 1).split("/")[0];
+      if (set && rel.length > MODELS_DIR.length + 1 + set.length) sets.add(set);
+    }
+  }
+  return [...sets].sort();
 }

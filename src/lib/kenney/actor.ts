@@ -16,6 +16,7 @@ import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js"
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { findMotion, type Library, type MotionSpan, type TagSpan } from "./motions";
+import { PersonalOnlyError } from "./available";
 
 export type KenneySet = "mini" | "animated" | "pets";
 export interface KenneyCard {
@@ -132,7 +133,9 @@ export class KenneyActor {
     this.moods = moods; this.emotes = emotes;
     const item = man.sets[card.set].items.find((i: Json) => i.id === card.base);
     if (!item) throw new Error(`Unknown 3D character: ${card.set}/${card.base}`);
-    const g = await glb(A(item.file));
+    // The Humans (Mixamo-based) ship in the Personal build only: without their
+    // model file this is a plain note, not a failure.
+    const g = await glb(A(item.file)).catch((e) => { throw card.set === "animated" ? new PersonalOnlyError() : e; });
     const root = SkeletonUtils.clone(g.scene); this.root = root;
     const pending: { o: THREE.Mesh; ud: Json }[] = [];
     let colormap: THREE.Texture | null = null;
@@ -222,7 +225,8 @@ export class KenneyActor {
   private async ensureClip(name: string, motions: Library) {
     if (this.actions.has(name) || this.card.set !== "animated") return;
     const cat = Object.keys(motions).find((k) => motions[k].some((m) => m.file === name)); if (!cat) return;
-    const g = await glb(this.asset(`models/animated/lib-${cat}.glb`));
+    // a motion file this copy lacks: they keep their own motions instead
+    const g = await glb(this.asset(`models/animated/lib-${cat}.glb`)).catch(() => null); if (!g) return;
     const src = g.animations.find((a) => a.name === name); if (!src || !this.mixer) return;
     const clip = src.clone();
     const hip = clip.tracks.find((t) => t.name === "Hips.position");     // the speaker stays in their spot

@@ -4,6 +4,8 @@
 # The public build never carries the owner's personal content (brand packs,
 # music, Mixamo moves): this checkout does not have it, and the build script
 # refuses to pack it even if it were here (npm run build-exe:public).
+# It does carry the Kenney CC0 3D sets (in the repo) and a full ffmpeg
+# (downloaded below, pinned and checksum checked).
 #
 # Release notes: the plain-English table from release-notes/<tag>.md on top
 # (STANDARDS §2: columns English and Devenglish), then GitHub's automatic list
@@ -60,6 +62,18 @@ jobs:
         run: |
           npm test
           npx tsc --noEmit -p .
+
+      # The full ffmpeg the installer carries (GPL v3, a separate program; see
+      # NOTICE). Pinned in tools/lib/ffmpegBundle.mjs and checked against its
+      # SHA-256 before it is unpacked; the zip is cached between releases.
+      - name: Keep the ffmpeg download between releases
+        uses: actions/cache@v6
+        with:
+          path: build/ffmpeg-cache/*.zip
+          key: ffmpeg-${{ hashFiles('tools/lib/ffmpegBundle.mjs') }}
+
+      - name: Fetch the full ffmpeg (pinned, checksum checked)
+        run: npm run ffmpeg
 
       - name: Build the public installer
         # Built outside the checkout: Windows Defender locks the freshly

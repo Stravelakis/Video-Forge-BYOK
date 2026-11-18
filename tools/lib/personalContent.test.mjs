@@ -15,6 +15,7 @@ import {
   filesNotIn,
   isOurRemote,
   itemPath,
+  linkedParent,
   parseStatus,
   planItem,
   whatIsAt,
@@ -32,7 +33,7 @@ const item = (rel) => ITEMS.find((i) => i.rel === rel);
 test("the items mirror the app's paths", () => {
   assert.deepEqual(
     ITEMS.map((i) => `${i.rel}:${i.kind}`),
-    ["brands:dir", "music:dir", "characters/samples/kenney/builder/motions.json:file", "characters/samples/kenney/builder/models:dir"],
+    ["brands:dir", "music:dir", "characters/samples/kenney/builder/motions.json:file", "characters/samples/kenney/builder/models/animated:dir"],
   );
 });
 
@@ -83,7 +84,7 @@ test("plans: link, already linked, relink, set aside, stop — and run twice cha
 
   // nothing there yet
   assert.equal(planItem(app, clone, item("music")).action, "link");
-  assert.equal(planItem(app, clone, item("characters/samples/kenney/builder/models")).action, "skip");
+  assert.equal(planItem(app, clone, item("characters/samples/kenney/builder/models/animated")).action, "skip");
 
   // linked to the clone: nothing to do (the second run)
   linkDir(path.join(clone, "music"), path.join(app, "music"));
@@ -128,5 +129,34 @@ test("set-aside names never overwrite an earlier one", () => {
   assert.equal(asideName(p, "2026-11-17"), `${p}.before-personal-2026-11-17`);
   fs.mkdirSync(`${p}.before-personal-2026-11-17`);
   assert.equal(asideName(p, "2026-11-17"), `${p}.before-personal-2026-11-17-2`);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test("old layout: the whole models folder linked; only models/animated is personal now", () => {
+  const base = tmp();
+  const app = path.join(base, "app");
+  const clone = path.join(base, "Video-Forge-personal");
+  const M = "characters/samples/kenney/builder/models";
+  put(clone, `${M}/animated/animated.glb`, "mixamo");
+  put(clone, `${M}/mini/character-alien.glb`, "kenney");
+  put(app, "package.json", "{}");
+  fs.mkdirSync(path.join(app, "characters/samples/kenney/builder"), { recursive: true });
+  linkDir(path.join(clone, ...M.split("/")), path.join(app, ...M.split("/")));
+  const animated = item(`${M}/animated`);
+  assert.equal(linkedParent(app, animated.rel), M);
+  // never "set-aside" or "ok": through the link those are the clone's own files
+  const plan = planItem(app, clone, animated);
+  assert.equal(plan.action, "unlink-parent");
+  assert.equal(plan.parent, M);
+  // after the link is gone and the public sets are real files: link animated alone
+  fs.unlinkSync(path.join(app, ...M.split("/")));
+  put(app, `${M}/mini/character-alien.glb`, "kenney");
+  assert.equal(linkedParent(app, animated.rel), null);
+  assert.equal(planItem(app, clone, animated).action, "link");
+  linkDir(path.join(clone, ...`${M}/animated`.split("/")), path.join(app, ...`${M}/animated`.split("/")));
+  assert.equal(planItem(app, clone, animated).action, "ok");
+  // the clone was never touched
+  assert.ok(fs.existsSync(path.join(clone, ...`${M}/animated/animated.glb`.split("/"))));
+  fs.unlinkSync(path.join(app, ...`${M}/animated`.split("/")));
   fs.rmSync(base, { recursive: true, force: true });
 });

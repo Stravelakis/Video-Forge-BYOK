@@ -8,6 +8,16 @@
 - Needs a short planning session first: where colour is stored, per-show vs per-project style, side-by-side preview page.
 - Ultra reviews, then commits and merges. Do not commit before that.
 
+## 18 Nov 2026: public 3D cast and a full ffmpeg in the installer (branch fix/public-3d-and-ffmpeg, PR open, not merged)
+- **3D sets now public:** `characters/samples/kenney/builder/models/{mini,pets,props}` are in this repo (86 .glb, 20.4 MB). Checked: no "mixamo" in any file; part names and motion names are Kenney's Mini Characters / Cube Pets ones (not compared byte for byte with Kenney's downloads: these were re-exported from Blender with face cards). Props: 28 Kenney, 5 Quaternius (CC0), 9 made for Video Forge (props.json "by"). Credits in README and the new NOTICE.
+- **Still private:** `models/animated/` and `motions.json` (Mixamo). `.gitignore` now ignores only those (the old bare `models/` rule is `/models/`, root AI weights only). `npm run personal` links only `models/animated`; it removes the old whole-`models` link (links hold no data) and brings the public sets back from git. Guard (`tools/lib/buildKind.mjs`) refuses animated + motions.json, allows the three sets; `npm run build-exe:check` prints the sets that would go in.
+- **On the owner's PC, when this is merged:** `git pull`, then `npm run personal`. (The pull writes the three sets through the old link into the private clone first; they are identical files, so nothing changes there. The private repo can drop mini/pets/props later.)
+- **Public build without the Humans:** the 3D Humans style, shelf button, cast tiles and editor are greyed with the hover note "In the personal build only." (`src/lib/kenney/available.ts`, HEAD check of `models/animated/animated.glb` + `motions.json`). A Humans speaker in an old project shows the note instead of an error; a render skips them with a warning.
+- **Full ffmpeg:** gyan.dev 9.0.2 essentials (GPL v3), pinned in `tools/lib/ffmpegBundle.mjs` (URL, size, SHA-256). `npm run ffmpeg` downloads it once to `build/ffmpeg-cache/`, checks it, unpacks ffmpeg.exe + LICENSE.txt + README.txt to `build/ffmpeg/` (gitignored), and runs it to confirm version and filters. `build-exe` does this first and refuses to make an installer without `resources/ffmpeg/`; the release workflow fetches it too (cached).
+- **Which ffmpeg runs** (`electron/process/ffmpegChoice.ts`): installer's own → full one on PATH → Remotion's. Post-production still asks the chosen one for its filters and warns about missing ones.
+- **Size:** ffmpeg.exe is 105 MB installed; installer and portable exe each grow about 28 MB (measured LZMA size of ffmpeg.exe).
+- Not done: no installer built locally; release workflow not run; the greyed-out tiles not looked at in the running app.
+
 ## 17 Nov 2026: two versions (Personal / Public) and releases (branch feat/personal-and-releases, PR open, not merged)
 - **Public** = the app only; GitHub Releases carry it. **Personal** = the app + the owner's content: brand packs, music, Mixamo moves and models.
 - Personal content lives in the private repo **DnD-World/Video-Forge-personal** (renamed from Video-Forge-brands 17 Nov; brands moved to `brands/`, plus `music/`, `characters/samples/kenney/builder/motions.json` and `.../models/`, same paths as in the app).
