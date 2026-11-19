@@ -129,7 +129,7 @@ interface Actions {
   setVisemeFadeMs: (v: number) => void;
   setIdleMotion: (v: number) => void;
   /** Post-production settings (Render step). Nested parts merge. */
-  setPost: (p: { studioSound?: boolean; stereo?: Partial<PostSettings["stereo"]>; grade?: Partial<PostSettings["grade"]> }) => void;
+  setPost: (p: { studioSound?: boolean; stereo?: Partial<PostSettings["stereo"]>; grade?: Partial<PostSettings["grade"]>; swears?: Partial<PostSettings["swears"]> }) => void;
   setFps: (fps: Fps) => void;
   setScene: (scene: ProjectState["scene"]) => void;
   setScript: (text: string) => void;
@@ -209,6 +209,7 @@ export const useProjectStore = create<ProjectState & Actions>()(
           studioSound: p.studioSound ?? cur.studioSound,
           stereo: { ...cur.stereo, ...(p.stereo ?? {}) },
           grade: { ...cur.grade, ...(p.grade ?? {}) },
+          swears: { ...(cur.swears ?? defaultPost().swears), ...(p.swears ?? {}) },
         },
       };
     }),

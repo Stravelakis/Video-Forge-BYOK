@@ -5,6 +5,9 @@ Versions follow [SemVer](https://semver.org/). 0.4.0-beta.1 is the first tagged 
 
 ## [Unreleased]
 
+### Added (19 Nov 2026)
+- Swear-word clean-up in Post-production, Greek and English: No clean-up (default), Bleep, Mute, or Softer word. Bleep and Mute star out the subtitles (picture and .srt/.vtt). Each project can let built-in words through and add its own.
+
 ## [0.4.0-beta.1] - 2026-11-17
 
 ### Added (17 Nov 2026)

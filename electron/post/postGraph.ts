@@ -207,6 +207,26 @@ export function parseLoudnorm(stderr: string): Loudness | null {
   }
 }
 
+// ---- where the voice is heard ---------------------------------------------------
+
+/** silencedetect's report → the stretches between the quiet gaps, in ms. The
+ *  last stretch runs to the last quiet gap's start, or on to END when the file
+ *  ends while someone is still talking. */
+export function islandsFrom(stderr: string): [number, number][] {
+  const out: [number, number][] = [];
+  let from = 0;
+  for (const m of stderr.matchAll(/silence_(start|end): (-?[\d.]+)/g)) {
+    const t = Math.max(0, parseFloat(m[2]) * 1000);
+    if (!Number.isFinite(t)) continue;
+    if (m[1] === "start") {
+      if (Number.isFinite(from) && t - from > 30) out.push([Math.round(from), Math.round(t)]);
+      from = NaN;
+    } else from = t;
+  }
+  if (Number.isFinite(from)) out.push([Math.round(from), END * 1000]);
+  return out;
+}
+
 // ---- the whole speech graph ----------------------------------------------------
 
 export interface SpeechInput {
@@ -219,6 +239,8 @@ export interface SpeechInput {
   measured?: Loudness | null;
   /** Length of the narration; the result is padded or trimmed to exactly this. */
   durationSec?: number | null;
+  /** Swear clean-up: the stretches (seconds) to bleep or mute (swearWindows). */
+  censor?: { kind: "bleep" | "mute"; windows: [number, number][] } | null;
 }
 
 export interface SpeechGraph {
@@ -287,6 +309,21 @@ export function speechGraph(input: SpeechInput): SpeechGraph {
   }
 
   const tail: string[] = [];
+  // SWEAR CLEAN-UP, part 1: the words go silent before studio sound. Only in
+  // the writing pass: the loudness is measured on the whole voice, so the
+  // voice comes out exactly as loud as without clean-up (measuring with the
+  // gaps in left it 1.5 dB quiet on a test line, 19 Nov 2026). A bleep is
+  // added after (part 2).
+  const censor = input.mode === "apply" && input.censor && input.censor.windows.length ? input.censor : null;
+  let bleep = false;
+  if (censor) {
+    if (caps.has("asetnsamples")) tail.push(`asetnsamples=n=${RATE / 100}`);
+    tail.push(`volume=volume=0:enable='${windowExpr(censor.windows)}'`);
+    if (censor.kind === "bleep") {
+      if (caps.has("sine")) bleep = true;
+      else warnings.push("[video-forge] post-production: this ffmpeg has no sine, so the swear words were muted instead of bleeped.");
+    }
+  }
   if (job.studioSound) {
     const st = studioChain(caps);
     tail.push(...st.filters);
@@ -307,7 +344,20 @@ export function speechGraph(input: SpeechInput): SpeechGraph {
     if (d && d > 0 && caps.has("apad") && caps.has("atrim")) tail.push(`apad=whole_dur=${n3(d)}`, `atrim=end=${n3(d)}`);
     tail.push("aformat=sample_fmts=s16:channel_layouts=stereo");
   }
-  parts.push(`[${mixed}]${tail.length ? tail.join(",") : "anull"}[out]`);
+  if (bleep) {
+    // part 2: a 1 kHz tone, heard only over the muted words. ffmpeg's tone is
+    // 1/8 full scale; ×1.4 puts it near -18 dB, a little under a -14 LUFS voice,
+    // so it reads as a bleep, not an alarm.
+    const end = input.durationSec && input.durationSec > 0 ? input.durationSec : Math.max(...censor!.windows.map((w) => w[1])) + 1;
+    parts.push(`[${mixed}]${tail.join(",")}[speech]`);
+    parts.push(
+      `sine=frequency=1000:sample_rate=${RATE}:duration=${n3(end)},volume=volume=1.4,` +
+        `volume=volume=0:enable='not(${windowExpr(censor!.windows)})',pan=stereo|c0=c0|c1=c0,aformat=sample_fmts=s16:channel_layouts=stereo[tone]`,
+    );
+    parts.push(`[speech][tone]amix=inputs=2:normalize=0:duration=first,aformat=sample_fmts=s16:channel_layouts=stereo[out]`);
+  } else {
+    parts.push(`[${mixed}]${tail.length ? tail.join(",") : "anull"}[out]`);
+  }
 
   if (missing.size) {
     warnings.push(

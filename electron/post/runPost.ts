@@ -20,8 +20,9 @@ import os from "node:os";
 import { spawnSync } from "node:child_process";
 import { ffmpegBin } from "../process/ffmpegPath";
 import { killTree, spawnTracked } from "../process/childTree";
-import { filtersFrom, gradeFilter, parseLoudnorm, speechGraph, speechInputs, type Caps, type Seg } from "./postGraph";
+import { filtersFrom, gradeFilter, islandsFrom, parseLoudnorm, speechGraph, speechInputs, type Caps, type Seg, type SpeechInput } from "./postGraph";
 import { cleanVoiceCharacter, type PostJob, type VoiceCharacter } from "../../src/lib/post/postSettings";
+import { defaultSwears } from "../../src/lib/post/swears";
 
 let capsCache: { bin: string; caps: Set<string> } | null = null;
 
@@ -64,6 +65,8 @@ export interface SpeechOptions {
   job: PostJob;
   segments: Seg[];
   durationSec?: number | null;
+  /** Swear clean-up windows to bleep or mute (from renderVideo). */
+  censor?: SpeechInput["censor"];
   signal?: AbortSignal;
 }
 
@@ -76,7 +79,7 @@ export async function processSpeech(o: SpeechOptions): Promise<{ warnings: strin
     let measured = null;
     const warnings: string[] = [];
     if (o.job.studioSound && caps.has("loudnorm")) {
-      const m = speechGraph({ job: o.job, segments: o.segments, caps, mode: "measure" });
+      const m = speechGraph({ job: o.job, segments: o.segments, caps, mode: "measure", censor: o.censor });
       await fsp.writeFile(path.join(work, "measure.txt"), m.graph, "utf8");
       const r = await run(["-hide_banner", "-nostats", "-v", "info", ...speechInputs(o.inputPath, m), "-/filter_complex", "measure.txt", "-map", "[out]", "-f", "null", "-"], { cwd: work, signal: o.signal });
       if (o.signal?.aborted) throw new Error("Stopped.");
@@ -84,7 +87,7 @@ export async function processSpeech(o: SpeechOptions): Promise<{ warnings: strin
       measured = parseLoudnorm(r.err);
       if (!measured) warnings.push("[video-forge] post-production: the loudness could not be measured, so it was set in one pass.");
     }
-    const g = speechGraph({ job: o.job, segments: o.segments, caps, mode: "apply", measured, durationSec: o.durationSec });
+    const g = speechGraph({ job: o.job, segments: o.segments, caps, mode: "apply", measured, durationSec: o.durationSec, censor: o.censor });
     warnings.push(...g.warnings);
     await fsp.writeFile(path.join(work, "apply.txt"), g.graph, "utf8");
     const r = await run(["-y", "-hide_banner", "-v", "error", ...speechInputs(o.inputPath, g), "-/filter_complex", "apply.txt", "-map", "[out]", "-c:a", "pcm_s16le", "-ar", "48000", o.outputPath], { cwd: work, signal: o.signal });
@@ -163,6 +166,7 @@ export async function processVoiceTest(wav: Buffer, character: VoiceCharacter | 
       studioSound,
       stereo: { on: false, amount: 0 },
       grade: { on: false, lutPath: null, contrast: 1, saturation: 1 },
+      swears: defaultSwears(),
       voices: [{ speakerId: "test", x: 0.5, character: c }],
     };
     const g = speechGraph({ job, segments: [{ speakerId: "test", startMs: 0, endMs: 1e9 }], caps: postCaps(), mode: "apply", measured: null });
@@ -173,4 +177,15 @@ export async function processVoiceTest(wav: Buffer, character: VoiceCharacter | 
   } finally {
     await fsp.rm(work, { recursive: true, force: true }).catch(() => {});
   }
+}
+
+/** Where the voice is heard in a file, in ms: the stretches between quiet gaps
+ *  (ffmpeg's silencedetect, one quick read of the audio). Used to place swear
+ *  bleeps when the narration has no measured word times. Null when it cannot
+ *  be read; the caller then estimates from letter counts. */
+export async function speechIslands(file: string, signal?: AbortSignal): Promise<[number, number][] | null> {
+  if (!postCaps().has("silencedetect")) return null;
+  const r = await run(["-hide_banner", "-nostats", "-v", "info", "-i", file, "-af", "silencedetect=n=-40dB:d=0.12", "-f", "null", "-"], { signal });
+  if (r.code !== 0) return null;
+  return islandsFrom(r.err);
 }

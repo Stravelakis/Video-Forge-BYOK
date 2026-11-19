@@ -963,6 +963,7 @@ Find it in Make → Render, under the render buttons.
 |---|---|---|
 | **Studio sound** | Cleans the voices: less rumble, even loud and quiet words, softer sharp S sounds. Then sets the loudness YouTube and TikTok expect (−14 LUFS, peaks under −1 dB). Music and effects are not touched. | On for new projects |
 | **Voices left and right** | Each voice leans a little to the side its speaker stands on (or their seat in a set). The far side gets at most 30% quieter; the near side never gets louder. Needs two or more speakers. | Off |
+| **Swear words** | Greek and English swear words, four ways: **No clean-up**, **Bleep** (a beep over the word), **Mute** (silence over it), or **Softer word** (the voice says a milder word, like shit → shoot). Bleep and Mute also star out the subtitles (`f***`). Click a word in the list to let it through in this project; add your own in the box as `word = softer word`. | No clean-up |
 | **Colour grade** | A colour look for the finished picture: a LUT file (`.cube`) from a colour pack, plus **contrast** and **colour strength** (0 = black and white). No LUT files ship with the app yet. | Off |
 
 Good to know:
@@ -971,6 +972,9 @@ Good to know:
 - The grade shows in the rendered video, not in the preview. Intro and outro cards are left as they are.
 - The grade costs one extra pass over the video at the end.
 - Projects saved before post-production existed open with all of it off.
+- **Softer word** changes what the voice says, so make the voices again after turning it on. Until then the words are bleeped, and the render says so.
+- A `*` at the end of a word means every word that starts like it: `damn* = darn*` turns *damned* into *darned*. Capitals and Greek accents don't matter.
+- The bleep is placed from when each word is said. With measured word times it sits on the word; otherwise it is placed from where the voice is heard in the sound, so it can be a little wider than the word.
 - Each speaker's voice character is set in Characters → Voice (see [Voice characters](#voice-characters)).
 
 ---

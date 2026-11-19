@@ -40,7 +40,8 @@ import { buildCues } from "../../src/lib/subtitles/wordTiming";
 import { toSrt, toVtt } from "../../src/lib/subtitles/subtitleFiles";
 import { gradeIsActive, speechIsActive, type PostJob } from "../../src/lib/post/postSettings";
 import { seatsFor } from "../../src/lib/motion/seats";
-import { processSpeech, gradeVideo } from "../post/runPost";
+import { processSpeech, gradeVideo, speechIslands } from "../post/runPost";
+import { swearPlan, swearsActive } from "../post/swearPlan";
 
 export interface RenderJob {
   musicWaveform: RenderProps["musicWaveform"];
@@ -225,6 +226,12 @@ export async function renderVideo(
   const stopped = () => {
     if (ctx.signal?.aborted) throw new Error("Stopped.");
   };
+  // Swear clean-up: what to bleep or mute, and the starred-out subtitles.
+  // Every subtitle below (picture and files) reads `shownSegments`.
+  const islands = swearsActive(job.post) && job.audioFilePath ? await speechIslands(job.audioFilePath, ctx.signal).catch(() => null) : null;
+  const swears = swearPlan(job.post, job.narrationSegments ?? [], job.narrationPauses ?? [], islands);
+  warnings.push(...swears.warnings);
+  const shownSegments = swears.segments;
 
   try {
     stopped();
@@ -234,7 +241,7 @@ export async function renderVideo(
       // the narration (it knows who says what); a hand-attached file may be
       // music and is left alone. A failure costs the treatment, not the video.
       const segs = job.narrationSegments ?? [];
-      if (job.post && speechIsActive(job.post) && segs.length) {
+      if (job.post && (speechIsActive(job.post) || swears.censor) && segs.length) {
         onProgress(STAGE.browser.from, "Post-production: studio sound and voices…");
         try {
           const res = await processSpeech({
@@ -243,6 +250,7 @@ export async function renderVideo(
             job: withSeatPlaces(job.post, job),
             segments: segs,
             durationSec: job.analysis?.durationMs ? job.analysis.durationMs / 1000 : null,
+            censor: swears.censor,
             signal: ctx.signal,
           });
           warnings.push(...res.warnings);
@@ -640,7 +648,7 @@ export async function renderVideo(
       subtitleFont,
       visemeFadeMs: job.visemeFadeMs ?? 70, // picture mouths fade (Ak, 11 Nov 2026)
       idleMotion: job.idleMotion ?? 0,
-      narrationSegments: job.narrationSegments ?? [],
+      narrationSegments: shownSegments,
       narrationPauses: job.narrationPauses ?? [],
       aiLabel: job.aiLabel ?? false,
     };
@@ -803,9 +811,9 @@ export async function renderVideo(
 
     // SUBTITLE FILES beside the video, same cues as the picture, shifted by
     // any intro card joined in front (Ak, 13 Oct 2026).
-    if (job.narrationSegments?.length) {
+    if (shownSegments.length) {
       try {
-        const cues = buildCues(job.narrationSegments, job.subtitles.maxChars, job.narrationPauses ?? []);
+        const cues = buildCues(shownSegments, job.subtitles.maxChars, job.narrationPauses ?? []);
         const stem = joined.outputPath.replace(/\.mp4$/i, "");
         await fsp.writeFile(`${stem}.srt`, toSrt(cues, joined.introSec * 1000), "utf8");
         await fsp.writeFile(`${stem}.vtt`, toVtt(cues, joined.introSec * 1000), "utf8");
