@@ -35,6 +35,13 @@
 - Release: set `version` in package.json, CHANGELOG entry, `release-notes/v<version>.md` (English/Devenglish table), merge to main, then `git tag v<version> && git push origin v<version>`. `.github/workflows/release.yml` builds the Public installer + portable exe and publishes the Release (pre-release when the tag has a "-"). Not tagged yet: 0.4.0-beta.1 is ready for the owner to check.
 - Not verified: no exe was built locally (heavy); the release workflow has not run yet.
 
+## 19 Nov 2026: swear-word clean-up (branch feat/swear-cleanup, plan 10b)
+- Rules, lists, matching, swap/mask, bleep windows, word times from heard stretches: `src/lib/post/swears.ts` (pure, `tools/lib/swears.test.mjs`).
+- Per render: `electron/post/swearPlan.ts` (windows + starred subtitles), `speechIslands` in `runPost.ts` (silencedetect), bleep/mute in `speechGraph` (`censor`). Mute only in the writing pass, so loudness matches a clean render.
+- Softer word: applied to the text the voice is asked for (`spokenText` in `resolveSegments.ts`, app and batch). Words still in old voices are bleeped with a warning.
+- Screen: `src/components/render/SwearCleanup.tsx`. Default off; old projects open off.
+- Checked 19 Nov: real speech (Windows voice) through bleep/mute/off: silences end where planned to the ms, bleep is 1 kHz at about -18 dB, studio sound alone = -14.0 LUFS, peaks -1.0. Not checked: a full video render with it on; Greek on real Greek speech.
+
 ## 17 Nov 2026: post-production after every render (branch feat/post-production, PR open, not merged)
 Plan items A4, 1, 1b, 2, 3 (Blacksmith/FORGES-PLAN-2026-11-17.md).
 - Settings, presets and panning maths: `src/lib/post/postSettings.ts`. Filter graphs (pure, tested): `electron/post/postGraph.ts`. Running them: `electron/post/runPost.ts`.

@@ -56,6 +56,7 @@ import {
 } from "../../src/store/types";
 import { withCharacterColor } from "../../src/store/characterColor";
 import { postJobFor, type PostSettings, type VoiceCharacter } from "../../src/lib/post/postSettings";
+import { spokenText } from "../../src/lib/narration/resolveSegments";
 
 /** One member of the cast, as a job file describes them.
  *
@@ -573,7 +574,8 @@ export async function runBatchJob(
     return {
       speakerId: seg.speakerId,
       speakerLabel: seg.speakerLabel,
-      text: seg.text,
+      // swear clean-up "Softer word": the voice says the softer word
+      text: spokenText(seg.text, (job.post ?? preset.post)?.swears),
       language,
       engine:
         c.engine === "elevenlabs"

@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------
 // Render step → Post-production: what happens to the video after the frames
-// are drawn. Studio sound on the speech, voices left/right, and a colour grade.
+// are drawn. Studio sound on the speech, voices left/right, swear clean-up,
+// and a colour grade.
 // The voice characters are chosen per speaker in the Cast (Voice section).
 // Settings: src/lib/post/postSettings.ts. The work: electron/post.
 // ---------------------------------------------------------------------------
@@ -9,6 +10,7 @@ import { Toggle } from "../ui/Toggle";
 import { Slider } from "../ui/Slider";
 import { useProjectStore } from "../../store/useProjectStore";
 import { defaultPost, MAX_PAN } from "../../lib/post/postSettings";
+import { SwearCleanup } from "./SwearCleanup";
 
 const fileName = (p: string | null) => (p ? p.split(/[\\/]/).pop() : null);
 
@@ -62,6 +64,8 @@ export function PostProduction() {
             <p className="text-sm text-amber-300" data-tip="Left and right needs at least two speakers to place.">Only one speaker: nothing to place.</p>
           )}
         </div>
+
+        <SwearCleanup />
 
         <div className="space-y-2">
           <Toggle

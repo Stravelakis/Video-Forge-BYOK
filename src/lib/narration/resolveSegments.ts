@@ -12,6 +12,15 @@ import { engineOf, geminiModeOf, DEFAULT_GEMINI_MODEL, DEFAULT_GEMINI_VOICE } fr
 import { parseScript, type ScriptSegment } from "./parseScript";
 import { voicedSpeaker } from "./characterVoice";
 import { parseDramaboxScript } from "./parseDramaboxScript";
+import { activeRules, cleanSwears, swapSwears, type SwearSettings } from "../post/swears";
+
+/** Swear clean-up "Softer word": the voice is asked for the softer word, so the
+ *  voice and the subtitles say the same thing (src/lib/post/swears.ts). Every
+ *  other mode leaves the words to post-production. */
+export function spokenText(text: string, swears: SwearSettings | null | undefined): string {
+  const s = cleanSwears(swears);
+  return s.mode === "swap" ? swapSwears(text, activeRules(s)) : text;
+}
 
 /** "Name: words" lines, or the prose style where a character is found by the
  *  phrase they open with. */
@@ -32,7 +41,8 @@ export function narrationInputFor(
   seg: { speakerId: string; speakerLabel: string; text: string; direction?: string },
   speaker: Speaker,
   language: string,
-  piperPythonPath: string
+  piperPythonPath: string,
+  swears?: SwearSettings | null
 ): NarrationInput {
   // the character's own voice, unless this project overrides it
   const sp = voicedSpeaker(speaker);
@@ -40,7 +50,7 @@ export function narrationInputFor(
   return {
     speakerId: seg.speakerId,
     speakerLabel: seg.speakerLabel,
-    text: seg.text,
+    text: spokenText(seg.text, swears),
     language,
     engine,
     pitch: sp.pitch ?? 0,

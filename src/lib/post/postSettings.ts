@@ -15,9 +15,11 @@
 // SOUND of a voice (pitch, the size of the "throat", brightness, room). It
 // cannot change the acting. Sadness, joy and timing come from the voice engine.
 //
-// No runtime imports on purpose: tools/lib/postProduction.test.mjs runs this
-// file directly.
+// Imports only ./swears.ts (itself import-free), so tools/lib/postProduction.test.mjs
+// can run this file directly.
 // ---------------------------------------------------------------------------
+
+import { cleanSwears, defaultSwears, type SwearSettings } from "./swears.ts";
 
 export type VoicePresetId = "natural" | "chibi" | "bright" | "warm" | "deep" | "radio";
 
@@ -40,6 +42,8 @@ export interface PostSettings {
   stereo: { on: boolean; amount: number };
   /** The colour grade, applied once to the finished picture. */
   grade: { on: boolean; lutPath: string | null; contrast: number; saturation: number };
+  /** Swear-word clean-up (./swears.ts). Off unless the project turns it on. */
+  swears: SwearSettings;
 }
 
 /** At most this much of a voice leaves the far speaker (30%): subtle on
@@ -52,6 +56,7 @@ export function defaultPost(): PostSettings {
     studioSound: true,
     stereo: { on: false, amount: 0.6 },
     grade: { on: false, lutPath: null, contrast: 1, saturation: 1 },
+    swears: defaultSwears(),
   };
 }
 
@@ -69,7 +74,7 @@ const fin = (v: unknown, d: number) => (typeof v === "number" && Number.isFinite
 export function cleanPost(v: unknown): PostSettings {
   const off = postOff();
   if (!v || typeof v !== "object") return off;
-  const o = v as { studioSound?: unknown; stereo?: { on?: unknown; amount?: unknown }; grade?: { on?: unknown; lutPath?: unknown; contrast?: unknown; saturation?: unknown } };
+  const o = v as { swears?: unknown; studioSound?: unknown; stereo?: { on?: unknown; amount?: unknown }; grade?: { on?: unknown; lutPath?: unknown; contrast?: unknown; saturation?: unknown } };
   return {
     studioSound: o.studioSound === true,
     stereo: {
@@ -82,6 +87,7 @@ export function cleanPost(v: unknown): PostSettings {
       contrast: clamp(fin(o.grade?.contrast, 1), 0.5, 1.5),
       saturation: clamp(fin(o.grade?.saturation, 1), 0, 2),
     },
+    swears: cleanSwears(o.swears),
   };
 }
 
@@ -223,6 +229,7 @@ export interface PostJob {
   studioSound: boolean;
   stereo: { on: boolean; amount: number };
   grade: { on: boolean; lutPath: string | null; contrast: number; saturation: number };
+  swears: SwearSettings;
   voices: { speakerId: string; x: number; character: VoiceCharacter }[];
 }
 

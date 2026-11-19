@@ -224,7 +224,10 @@ test("render job: the LUT goes through the path guard; post numbers are cleaned"
 });
 
 test("project file: post is saved and opened; an older file opens with it all off", () => {
-  const post = { studioSound: true, stereo: { on: true, amount: 0.4 }, grade: { on: true, lutPath: "C:/l.cube", contrast: 1.1, saturation: 0.9 } };
+  const post = {
+    studioSound: true, stereo: { on: true, amount: 0.4 }, grade: { on: true, lutPath: "C:/l.cube", contrast: 1.1, saturation: 0.9 },
+    swears: { mode: "bleep", english: true, greek: false, allowed: ["damn*"], own: [{ word: "heck", swap: "hmm" }] },
+  };
   const s = { render: {}, speakers: [{ id: "a", voiceCharacter: { preset: "chibi", pitch: 1, brightness: 0, sparkle: 0.5 } }], post, narration: null, music: null, attachedAudio: null };
   const opened = docToProject(JSON.parse(JSON.stringify(projectToDoc(s))));
   assert.deepEqual(opened.project.post, post);
@@ -291,6 +294,81 @@ test("ffmpeg accepts every voice preset's graph (two speakers, left/right, studi
         assert.equal(out.readUInt32LE(24), 48000, "48 kHz");
         const secs = (out.length - 44) / (48000 * 4);
         assert.ok(Math.abs(secs - 3) < 0.05, `${name} / ${preset.id}: length kept (${secs.toFixed(3)} s)`);
+      }
+    }
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// ---- swear clean-up (src/lib/post/swears.ts, electron/post/swearPlan.ts) -------
+
+const SINE = new Set([...FULL, "sine"]);
+const W = [[1, 1.5]];
+
+test("speechGraph: mute = silence over the words, before studio sound", () => {
+  const g = speechGraph({ job: job(), segments: two, caps: FULL, mode: "apply", durationSec: 3, censor: { kind: "mute", windows: W } });
+  assert.match(g.graph, /volume=volume=0:enable='between\(t,1,1\.5\)'.*highpass=f=80/s);
+  assert.doesNotMatch(g.graph, /sine=/);
+});
+
+test("speechGraph: bleep = mute plus a tone over the same words, only in the writing pass (measuring sees the whole voice)", () => {
+  const a = speechGraph({ job: job(), segments: two, caps: SINE, mode: "apply", durationSec: 3, censor: { kind: "bleep", windows: W } });
+  assert.match(a.graph, /sine=frequency=1000:sample_rate=48000:duration=3,volume=volume=1\.4,volume=volume=0:enable='not\(between\(t,1,1\.5\)\)'/);
+  assert.match(a.graph, /\[speech\]\[tone\]amix=inputs=2:normalize=0:duration=first.*\[out\]$/s);
+  const m = speechGraph({ job: job(), segments: two, caps: SINE, mode: "measure", censor: { kind: "bleep", windows: W } });
+  // the loudness is measured on the whole voice, so it matches a clean render
+  assert.equal(m.graph, speechGraph({ job: job(), segments: two, caps: SINE, mode: "measure" }).graph);
+});
+
+test("speechGraph: an ffmpeg with no tone maker mutes instead, and says so", () => {
+  const g = speechGraph({ job: job(), segments: two, caps: STRIPPED, mode: "apply", durationSec: 3, censor: { kind: "bleep", windows: W } });
+  assert.doesNotMatch(g.graph, /sine=/);
+  assert.match(g.graph, /volume=volume=0:enable='between\(t,1,1\.5\)'/);
+  assert.ok(g.warnings.some((w) => /muted instead of bleeped/.test(w)));
+});
+
+test("speechGraph: no swear windows = graph unchanged", () => {
+  const plain = speechGraph({ job: job(), segments: two, caps: SINE, mode: "apply", durationSec: 3 });
+  const empty = speechGraph({ job: job(), segments: two, caps: SINE, mode: "apply", durationSec: 3, censor: { kind: "bleep", windows: [] } });
+  assert.equal(empty.graph, plain.graph);
+});
+
+/** Loudness (RMS of the left channel) and zero crossings per second, between a and b seconds. */
+function measureWav(buf, a, b) {
+  const rate = 48000;
+  const from = 44 + Math.floor(a * rate) * 4;
+  const to = 44 + Math.floor(b * rate) * 4;
+  let sum = 0, n = 0, cross = 0, prev = 0;
+  for (let i = from; i < to && i + 1 < buf.length; i += 4) {
+    const v = buf.readInt16LE(i) / 32768;
+    sum += v * v; n++;
+    if (n > 1 && (v >= 0) !== (prev >= 0)) cross++;
+    prev = v;
+  }
+  return { rms: Math.sqrt(sum / Math.max(1, n)), crossPerSec: cross / (b - a) };
+}
+
+test("ffmpeg: mute is silent over the word; bleep is a 1 kHz tone there; the rest is untouched", (t) => {
+  const bins = binaries().filter((b) => b.caps.has("sine"));
+  if (!bins.length) return t.skip("no ffmpeg with a tone maker on this machine");
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "vf-swear-"));
+  try {
+    toneWav(path.join(dir, "in.wav"));
+    const { bin, caps } = bins[0];
+    for (const kind of ["mute", "bleep"]) {
+      const a = speechGraph({ job: job(), segments: two, caps, mode: "apply", durationSec: 3, censor: { kind, windows: W } });
+      fs.writeFileSync(path.join(dir, "a.txt"), a.graph);
+      const r = spawnSync(bin, ["-y", "-hide_banner", "-v", "error", ...speechInputs("in.wav", a), "-/filter_complex", "a.txt", "-map", "[out]", "-c:a", "pcm_s16le", "out.wav"], { cwd: dir, encoding: "utf8", windowsHide: true });
+      assert.equal(r.status, 0, `${kind}: ${r.stderr.slice(-600)}`);
+      const out = fs.readFileSync(path.join(dir, "out.wav"));
+      const inside = measureWav(out, 1.05, 1.45);
+      const before = measureWav(out, 0.3, 0.9);
+      assert.ok(before.rms > 0.02, `${kind}: the voice before the word is kept (${before.rms.toFixed(3)})`);
+      if (kind === "mute") assert.ok(inside.rms < 0.001, `mute: silent over the word (${inside.rms.toFixed(4)})`);
+      else {
+        assert.ok(inside.rms > 0.02, `bleep: a tone over the word (${inside.rms.toFixed(3)})`);
+        assert.ok(Math.abs(inside.crossPerSec - 2000) < 100, `bleep: 1 kHz (${inside.crossPerSec.toFixed(0)} crossings/s)`);
       }
     }
   } finally {

@@ -166,7 +166,7 @@ export default function NarrationPanel() {
     }
 
     try {
-      const resolvedSegments = segments.map((seg) => narrationInputFor(seg, speakerById.get(seg.speakerId)!, language, piperPythonPath));
+      const resolvedSegments = segments.map((seg) => narrationInputFor(seg, speakerById.get(seg.speakerId)!, language, piperPythonPath, useProjectStore.getState().post?.swears));
 
       const res = await window.byok.tts.generateNarration(
         resolvedSegments,
@@ -221,7 +221,7 @@ export default function NarrationPanel() {
           narrationPath: narration.filePath,
           segments: narration.segments,
           index: i,
-          input: narrationInputFor(line, sp, language, piperPythonPath),
+          input: narrationInputFor(line, sp, language, piperPythonPath, useProjectStore.getState().post?.swears),
           speakerOrder: speakers.map((x) => x.id),
         },
         { pricePer1000: useSettingsStore.getState().elevenPricePer1000Usd }
