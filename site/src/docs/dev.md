@@ -153,8 +153,6 @@ Four files are copies of each other. The header of each says "THE SAME FILE": ch
 
 `tools/lib/hoverHelp.test.mjs` fails on a control with no tip. The two apps meet only through those plain folders and files: nothing has to be open at the same moment, and Video Forge never reads Image Forge's keys directly.
 
-> **Watch out** `tools/lib/forgeLink.mjs` (the older "drop a request in Image Forge's inbox" route) has a test and an `npm run test:link` script but **no import anywhere in the app**. The live link is the shelf plus shared keys. Do not build on `forgeLink` without wiring it first.
-
 ## Batch: Many videos and job files
 
 - **Many videos** (`electron/batch/manyVideos.ts`, `sheet.ts`): a Google Sheet link (turned into its CSV export, no key) or a CSV file. The parser accepts `,`, `;` and tab as separators, lower-cases the header, and knows aliases (`name`: title, video, file, όνομα; `script`: text, σενάριο; `topic`: about, θέμα; and so on). Only `script` is required. Columns: `name, script, topic, template, format, music, backgrounds, language`.
