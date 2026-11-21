@@ -480,10 +480,8 @@ Maria: Press the clicker the moment he sits.
 Nikos: The moment. Not two seconds later.
 ```
 
-- The name is a file name (without its ending) in the app's `sfx/library` folder.
-  The public download ships that folder empty: add your own sound files there.
-  You can also add sounds by time in Look → Sounds.
-- **An unknown name stops the render.** That beats finding a missing bark by watching ten minutes of video.
+- **These cue lines work only in batch runs from the command line (`--job`).** In the app the line is skipped. To add a sound in the app, use Look → Sounds.
+- In a batch run the name is a file name (without its ending) in the `sfx/library` folder, which the public download ships empty. An unknown name stops that render.
 - The sound plays at the start of the line below it.
 
 ### Moves for drawn and 3D characters
@@ -582,7 +580,7 @@ The **+** menu shows every character with a live face (it blinks, and talks when
 - **Ready-made:** characters from a brand pack, voice and all.
 - **Made in Image Forge:** puppets Image Forge made on this computer.
 - **My library:** speakers you saved with **Save to library**.
-- **Order it from Image Forge:** describe a new puppet. Image Forge makes it and it arrives on the shelf by itself.
+- **Order a new puppet…:** describe a new puppet. Image Forge makes it and it arrives on the shelf by itself.
 - **Open Image Forge:** make the puppet yourself there (Wizards → Make a puppet).
 - **From a character file…:** one person from their own file: face, usual outfit, main colour and voice. The file is not changed.
 
@@ -646,7 +644,7 @@ Each of your characters, part by part.
 
 The public download has no picture puppets of its own.
 Make one in Image Forge (easiest), or build one yourself with the tools below.
-The tools run from a terminal in the app's source folder (see [INSTALL.md](INSTALL.md), "Build it from source").
+The command-line tools named below (`make-rig-puppet`, `make-puppet`, `build-puppet-cells`, `build-viseme-sheet`, `merge-mouth`, `slice-grid`, `viseme-coverage`) are **not included in this release**: the method here still describes how a puppet is built, but the commands cannot be run from this download.
 
 **Short answer:** draw one portrait with a resting face on a flat magenta background.
 Cut the mouths, brows and eyelids out as separate pictures.
@@ -839,7 +837,7 @@ Pick one per speaker in Characters → **Voice**.
 | **Fish Audio** | Free (OpenRouter key) | A funny foreign accent. |
 | **ElevenLabs** | Charged per character | A paid voice. The app shows the cost and asks first. |
 | **Piper** | Free, offline | Runs on your computer. Correct and flat. Good for checking timing. |
-| **DramaBox** | Rented graphics machine | Acts from stage directions. Made outside this app; some brand-pack speakers use it. The app cannot make or remake those lines itself. TODO: how to bring DramaBox sound into a project in this version. |
+| **DramaBox** | Retired | Dropped on 10 Oct 2026. Old projects that used it fall back to Gemini. |
 
 With Gemini, `[laughs]`, `[whispers]` and `[sighs]` inside a line are acted.
 Each line is checked word by word and made again if it drifts from the script.
@@ -944,7 +942,7 @@ Sound effects placed by time:
 - **Add from disk:** a sound file from your computer.
 - Each sound has a time (seconds from the start) and a volume.
 
-For sounds tied to a line, use `[SFX: name]` in the script (see [Sound effects](#sound-effects)).
+`[SFX: name]` lines in the script work only in batch runs (see [Sound effects](#sound-effects)).
 
 ### Motion
 
@@ -1088,7 +1086,7 @@ Extras you can tick:
 
 - **Open it:** the Image Forge mark in the top bar, or **Open Image Forge** in the Characters and Background steps.
   The app looks for Image Forge in its normal install place (`%LOCALAPPDATA%\Programs\Image Forge`).
-- **Order a puppet:** in Characters → **+**, describe the character and press **Order it from Image Forge**.
+- **Order a puppet:** in Characters → **+**, choose **Order a new puppet…**, describe the character and press **Send the order to Image Forge**.
   Image Forge opens, notices the order within about 20 seconds, makes the puppet, and it lands on your shelf by itself.
 - **A drawn character can become an order:** the order opens already filled in from the drawing. Check the words, then send it.
 - **Shared keys:** a key saved in one app works in the other (Windows only).
@@ -1208,10 +1206,10 @@ Optional settings for people who start the app from a terminal. All optional; se
 | Setting | What it does |
 |---|---|
 | `VIDEOFORGE_USER_DATA` | A separate data folder, for a test copy that does not touch your real projects. |
+| `VIDEOFORGE_SECRETS_DIR` | Folder holding YouTube sign-in files. Listed in `.env.example`, but the code that reads it is not part of this release. TODO: describe the YouTube feature this belongs to. |
 | `VIDEOFORGE_RENDER_CPU` | `1` = render on the processor instead of the graphics card. Slower; for a misbehaving graphics card. |
 | `VIDEOFORGE_CARD_SATURATION` | Colour boost for intro and outro cards, 0.5 to 2. The in-app setting wins. |
 | `HYPERFRAMES_BROWSER_PATH` | Full path to a headless browser for rendering, if the app cannot find one. |
-| `VIDEOFORGE_SECRETS_DIR` | Folder holding the YouTube sign-in files. TODO: describe the YouTube feature this belongs to. |
 
 ---
 
@@ -1247,7 +1245,7 @@ Shared with Image Forge: `%APPDATA%\Forge\` (shared keys, puppet shelf, orders).
 | Gemini voice stops after a few lines | Voice-only models give 10 free lines a day | Pick a Live model, or add extra Gemini keys. |
 | The voice reads my stage direction aloud | The direction is after the colon | Put it before the colon: `Name [quietly]: words`. |
 | A Greek word sounds wrong | Stress or spelling the voice does not know | Add it to **Settings → Say it like this**. |
-| Render stops: unknown sound | `[SFX: name]` names no file in `sfx/library` | Fix the name, or add the sound file. |
+| A sound effect never plays | `[SFX: name]` lines are skipped in the app | Add the sound in Look → Sounds. |
 | Render stops: "pick it again" | The project names a file from another computer | Pick that file again in the app. |
 | 3D Humans are greyed out | They are in the personal build only | Use 3D Mini people or 3D Pets. |
 | Directions disappeared from a line | You changed the line's words | Direct the line again. |

@@ -73,7 +73,7 @@
     "term": "Electron",
     "eli5": "A kit that turns a web page into a real app with its own window.",
     "english": "The framework Video Forge is built on. It runs web technology inside a normal desktop window.",
-    "dev": "Chromium + Node.js desktop shell (v45 here), built with electron-vite and packaged with electron-builder (NSIS + portable)."
+    "dev": "Chromium + Node.js desktop shell (^45), built with electron-vite and packaged with electron-builder (NSIS + portable)."
   },
   {
     "term": "Node.js",
@@ -113,15 +113,33 @@
   },
   {
     "term": "Remotion",
-    "eli5": "A tool that builds videos out of web pages, one picture at a time.",
-    "english": "A video-making tool that draws each frame like a web page and turns the frames into a video file.",
-    "dev": "React-based programmatic video framework (4.0.540); renders frames in headless Chromium."
+    "eli5": "A tool that builds videos out of web pages, one picture at a time. Video Forge keeps it as a second way to make the video.",
+    "english": "A video-making tool that draws each frame like a web page. Video Forge uses a different one (HyperFrames) by default.",
+    "dev": "React-based video framework (^4.0.540). The older render path, used only when a job says engine \"remotion\"; HyperFrames is the default."
+  },
+  {
+    "term": "HyperFrames",
+    "eli5": "The tool that draws your video's pictures one by one and glues them into a video file.",
+    "english": "The video-making tool Video Forge uses by default. It draws each frame in a hidden browser and uses your graphics card when there is one.",
+    "dev": "Apache-2.0 renderer driven by electron/render/hyperframes/. Stages bg-track.mp4, banner.mp4, mix.wav and a bundled React page, then runs its CLI with --gpu --browser-gpu (VIDEOFORGE_RENDER_CPU=1 turns that off)."
   },
   {
     "term": "headless browser",
     "eli5": "A web browser with no window, used by the app behind the scenes.",
     "english": "A browser that runs without showing anything. The app uses one to draw the frames of your video.",
-    "dev": "Chromium used for rendering; override its location with HYPERFRAMES_BROWSER_PATH."
+    "dev": "Chromium used for rendering; renderBrowser.ts looks in the usual places, HYPERFRAMES_BROWSER_PATH overrides."
+  },
+  {
+    "term": "DPAPI",
+    "eli5": "A lock built into Windows that only opens for you.",
+    "english": "Windows' own per-user encryption. Video Forge and Image Forge use it to share keys that only your Windows account can read.",
+    "dev": "Windows Data Protection API, called through PowerShell for %APPDATA%\\Forge\\shared-keys.bin (tools/lib/forgeKeys.mjs). Off Windows there is no sharing."
+  },
+  {
+    "term": "IPC",
+    "eli5": "The way the app's window asks the app's engine room to do things.",
+    "english": "Messages between the app's window and its background part. The window cannot touch your files or keys directly; it asks.",
+    "dev": "Electron ipcMain/ipcRenderer channels, exposed to the sandboxed window as window.byok by electron/preload.ts. There is deliberately no channel that returns a key."
   },
   {
     "term": "viseme",
@@ -140,13 +158,13 @@
     "term": "rig",
     "eli5": "A face cut into parts (mouths, eyebrows, eyelids) so it can move.",
     "english": "A puppet made from one portrait plus separate mouth, brow and eyelid pictures, with a file that says where each goes.",
-    "dev": "<name>.rig.json + rig/<name>/*.png, built by tools/make-rig-puppet.mjs from base/ + layers/<name>/placement.json."
+    "dev": "<name>.rig.json plus rig/<name>/*.png, loaded with Characters > Puppet > Choose face."
   },
   {
     "term": "inpaint",
     "eli5": "Asking an image AI to redraw only one small part of a picture.",
     "english": "Changing just one area of a picture with an image AI (here the mouth), so the rest stays exactly the same.",
-    "dev": "Masked regeneration (Midjourney Vary Region, Photoshop Generative Fill, ComfyUI); merge back with tools/merge-mouth.mjs."
+    "dev": "Masked regeneration (Midjourney Vary Region, Photoshop Generative Fill, ComfyUI)."
   },
   {
     "term": "stage direction",
@@ -229,9 +247,9 @@
   },
   {
     "term": "DramaBox",
-    "eli5": "A voice that can act, like whispering or laughing, when you tell it to.",
-    "english": "A voice engine that follows stage directions. It runs on a rented graphics machine, outside the app.",
-    "dev": "Directable TTS on a rented GPU; stage directions steer the performance. Not synthesised inside the app."
+    "eli5": "An old voice that could act. It was dropped on 10 Oct 2026, and old projects use Gemini instead.",
+    "english": "A voice engine that was retired on 10 Oct 2026. Old projects that used it fall back to Gemini.",
+    "dev": "Retired 10 Oct 2026; buildNarration.ts accepts only piper, elevenlabs, gemini and fish, and old projects fall back to Gemini."
   },
   {
     "term": "Mixamo",
