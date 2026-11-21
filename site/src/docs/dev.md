@@ -154,6 +154,8 @@ Five files are copies of each other. The header of each says "THE SAME FILE": ch
 
 `tools/lib/hoverHelp.test.mjs` fails on a control with no tip. The two apps meet only through those plain folders and files: nothing has to be open at the same moment, and Video Forge never reads Image Forge's keys directly.
 
+> **Watch out** `tools/lib/forgeLink.mjs` (the older "drop a request in Image Forge's inbox" route) is present, has a test that runs in `npm test`, and has a `test:link` script, but **nothing in the app imports it**. The live link is the shelf plus shared keys. Image Forge's docs mention an `npm run ask-forge` command on this side; there is no such script in `package.json` on this branch. Do not build on `forgeLink` without wiring it first.
+
 ## Batch: Many videos and job files
 
 - **Many videos** (`electron/batch/manyVideos.ts`, `sheet.ts`): a Google Sheet link (turned into its CSV export, no key) or a CSV file. The parser accepts `,`, `;` and tab as separators, lower-cases the header, and knows aliases (`name`: title, video, file, όνομα; `script`: text, σενάριο; `topic`: about, θέμα; and so on). Only `script` is required. Columns: `name, script, topic, template, format, music, backgrounds, language`.
@@ -182,7 +184,7 @@ One codebase, two installers. `tools/lib/buildKind.mjs` lists the personal paths
 
 ## Environment variables
 
-All optional, none loaded from a `.env` file; set them in the terminal before starting (see `.env.example`). `.env.example` is incomplete: it does not list `VIDEOFORGE_SHELVES`, `VIDEOFORGE_KEEP_RENDER` or `VIDEOFORGE_SFX_DIR`.
+All optional, none loaded from a `.env` file; set them in the terminal before starting (see `.env.example`). `.env.example` lists `VIDEOFORGE_SECRETS_DIR`, `VIDEOFORGE_USER_DATA`, `VIDEOFORGE_RENDER_CPU`, `VIDEOFORGE_CARD_SATURATION` and `HYPERFRAMES_BROWSER_PATH`. It is incomplete: it does not list `VIDEOFORGE_SHELVES`, `VIDEOFORGE_KEEP_RENDER` or `VIDEOFORGE_SFX_DIR`.
 
 | Name | Effect |
 |---|---|
@@ -190,6 +192,7 @@ All optional, none loaded from a `.env` file; set them in the terminal before st
 | `VIDEOFORGE_RENDER_CPU` | `1` renders on the processor |
 | `VIDEOFORGE_CARD_SATURATION` | Colour boost for intro and outro cards, 0.5 to 2; the in-app setting wins |
 | `HYPERFRAMES_BROWSER_PATH` | Full path to a headless browser |
+| `VIDEOFORGE_SECRETS_DIR` | Folder with the YouTube sign-in files, per `.env.example` (`electron/net/youtube.ts`). That file is not in this release, so nothing here reads the variable |
 | `VIDEOFORGE_SHELVES` | A folder of picture shelves served read-only at `forge-kenney://shelf/` and used for stickers; default `~/Tools/assets/_shelves`, and a computer without it simply shows no shelf |
 | `VIDEOFORGE_KEEP_RENDER` | `1` keeps a render's work folder for debugging and logs its path (`renderVideo.ts`) |
 | `VIDEOFORGE_SFX_DIR` | Overrides the shipped sound-effects folder for the explainer's sound lookup (`tools/lib/explainerRun.mjs`) |

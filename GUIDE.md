@@ -1206,6 +1206,7 @@ Optional settings for people who start the app from a terminal. All optional; se
 | Setting | What it does |
 |---|---|
 | `VIDEOFORGE_USER_DATA` | A separate data folder, for a test copy that does not touch your real projects. |
+| `VIDEOFORGE_SECRETS_DIR` | Folder holding YouTube sign-in files. Listed in `.env.example`, but the code that reads it is not part of this release. TODO: describe the YouTube feature this belongs to. |
 | `VIDEOFORGE_RENDER_CPU` | `1` = render on the processor instead of the graphics card. Slower; for a misbehaving graphics card. |
 | `VIDEOFORGE_CARD_SATURATION` | Colour boost for intro and outro cards, 0.5 to 2. The in-app setting wins. |
 | `HYPERFRAMES_BROWSER_PATH` | Full path to a headless browser for rendering, if the app cannot find one. |
