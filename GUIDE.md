@@ -582,7 +582,7 @@ The **+** menu shows every character with a live face (it blinks, and talks when
 - **Ready-made:** characters from a brand pack, voice and all.
 - **Made in Image Forge:** puppets Image Forge made on this computer.
 - **My library:** speakers you saved with **Save to library**.
-- **Order it from Image Forge:** describe a new puppet. Image Forge makes it and it arrives on the shelf by itself.
+- **Order a new puppet…:** describe a new puppet. Image Forge makes it and it arrives on the shelf by itself.
 - **Open Image Forge:** make the puppet yourself there (Wizards → Make a puppet).
 - **From a character file…:** one person from their own file: face, usual outfit, main colour and voice. The file is not changed.
 
@@ -1088,7 +1088,7 @@ Extras you can tick:
 
 - **Open it:** the Image Forge mark in the top bar, or **Open Image Forge** in the Characters and Background steps.
   The app looks for Image Forge in its normal install place (`%LOCALAPPDATA%\Programs\Image Forge`).
-- **Order a puppet:** in Characters → **+**, describe the character and press **Order it from Image Forge**.
+- **Order a puppet:** in Characters → **+**, choose **Order a new puppet…**, describe the character and press **Send the order to Image Forge**.
   Image Forge opens, notices the order within about 20 seconds, makes the puppet, and it lands on your shelf by itself.
 - **A drawn character can become an order:** the order opens already filled in from the drawing. Check the words, then send it.
 - **Shared keys:** a key saved in one app works in the other (Windows only).
@@ -1211,7 +1211,6 @@ Optional settings for people who start the app from a terminal. All optional; se
 | `VIDEOFORGE_RENDER_CPU` | `1` = render on the processor instead of the graphics card. Slower; for a misbehaving graphics card. |
 | `VIDEOFORGE_CARD_SATURATION` | Colour boost for intro and outro cards, 0.5 to 2. The in-app setting wins. |
 | `HYPERFRAMES_BROWSER_PATH` | Full path to a headless browser for rendering, if the app cannot find one. |
-| `VIDEOFORGE_SECRETS_DIR` | Folder holding the YouTube sign-in files. TODO: describe the YouTube feature this belongs to. |
 
 ---
 
