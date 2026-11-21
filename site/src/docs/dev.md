@@ -4,13 +4,13 @@ Video Forge is a **Windows desktop app that renders narrated, subtitled, charact
 
 | Runtime | Entry | What it is |
 |---|---|---|
-| App window | `electron/main.ts` → `src/main.tsx` | The only interactive runtime. **No browser mode and no local web address for the UI.** |
+| App window | `electron/main.ts` → `src/main.tsx` | The only interactive runtime. **No browser mode and, in a packaged build, no local web address for the UI** (`npm run dev` serves a Vite address for the dev window). |
 | Headless render | `electron . --job <file>` (`npm run job`) | One video, no window. Same pipeline as the app (`electron/batch/runJob.ts`) |
 | Sound-effect jobs | `--sfx <wanted.csv>`, `--sfx-free <wanted.csv>` | Make or gather a course's sound effects before rendering (`electron/audio/`) |
 | Repair job | `--add-outros [--only …] [--apply]` | Re-adds a missing outro to finished lessons. Needs a brand pack with `addOutros` set |
 | Open a project | `--project <file>` | Opens the app on a saved project instead of the autosave (`project:startup`) |
 
-Stack, from `package.json`: Electron ^45, React 19, Zustand 5, Tailwind 4, Vite 8, TypeScript ^7, `electron-vite` 6, `electron-builder` 26, three.js 0.170.0 (pinned), HyperFrames ^0.9.16, Remotion ^4.0.540, `ws` (the Gemini Live socket), FFmpeg 9.0.2 as a separate process. About 52 test files run under Node's built-in runner. Windows only: DPAPI, NSIS, NVENC flags.
+Stack, from `package.json`: Electron ^45, React 19, Zustand 5, Tailwind 4, Vite 8, TypeScript ^7, `electron-vite` 6, `electron-builder` 26, three.js 0.170.0 (pinned), HyperFrames ^0.9.16, Remotion ^4.0.540, `ws` (the Gemini Live socket), FFmpeg 9.0.2 as a separate process. About 51 test files run under Node's built-in runner. Windows only: DPAPI, NSIS, NVENC flags.
 
 > **Watch out** If this page and the code disagree, the code wins. [HANDOFF.md](https://github.com/Stravelakis/Video-Forge-BYOK/blob/HEAD/HANDOFF.md) is the running log; [GUIDE.md](https://github.com/Stravelakis/Video-Forge-BYOK/blob/HEAD/GUIDE.md) is the user manual, longer than this page and from the same code.
 
@@ -23,7 +23,7 @@ git config core.hooksPath githooks   # pre-commit: gitleaks must pass
 npm ci
 npm run dev                          # electron-vite dev --watch: builds, opens the window
 npm test                             # node --test over an explicit list of files
-npx tsc --noEmit -p .                # typecheck (CI and release.yml run it)
+npx tsc --noEmit -p .                # typecheck (only release.yml runs it)
 npm run build-exe:public             # public installer + portable exe → release\
 ```
 
@@ -64,7 +64,7 @@ Use **Node 22**: that is what `release.yml` and the docs workflow use. `electron
 
 - **The window is sandboxed**: `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true` (`electron/main.ts`). The renderer can reach only what `electron/preload.ts` exposes as `window.byok`.
 - **Everything that touches the network, disk or a child process is in the main process.** The renderer holds state and draws it.
-- **Pure logic is shared on purpose**: files under `src/lib/**` and `tools/lib/*.mjs` import no Electron, so `node --test` runs the real code. Several `tools/lib/*.mjs` files are also imported by the main process (`forgeKeys`, `forgeShelf`, `forgeHub`, `updateCheck`).
+- **Pure logic is shared on purpose**: files under `src/lib/**` and almost all of `tools/lib/*.mjs` import no Electron (`explainerRun.mjs` is the exception), so `node --test` runs the real code. Several `tools/lib/*.mjs` files are also imported by the main process (`forgeKeys`, `forgeShelf`, `forgeHub`, `updateCheck`).
 - **`forge-kenney://`** (`electron/kenneyProtocol.ts`) serves the 3D models, faces and thumbnails read-only from `characters/samples/kenney/builder`, because a `file://` page cannot fetch files. It refuses any path that escapes that folder.
 
 > **Why** One rule shapes the repo: logic that can be pure is pure, and logic that must touch the world sits behind one named IPC channel and one guard. Every time a path or a key crossed that line casually, a review found it.
@@ -92,8 +92,8 @@ Use **Node 22**: that is what `release.yml` and the docs workflow use. `electron
 
 ## Data flow: script to video
 
-1. **Script → segments.** `parseScript.ts` reads `Name: text`, `Name [direction]: text` (direction before the colon, never spoken) and `[SFX: stem]` lines. A name is matched to a speaker case-insensitively but **exactly otherwise**: accents count, Latin never matches Greek (`electron/tts/scriptMatch.ts`). Speakers may carry `aliases`.
-2. **Voice per segment.** `buildNarration.ts` sends each segment to its speaker's engine (`ttsEngine`: `gemini`, `fish`, `elevenlabs`, `piper`, `dramabox`). Before synthesis a Greek accent fixer (`greekAccents*.ts`) and the user's pronunciation list (`pronunciations.ts`) run. Gemini Live lines are checked word by word against the script and retaken on drift.
+1. **Script → segments.** `parseScript.ts` reads `Name: text`, `Name [direction]: text` (direction before the colon, never spoken) lines. A name is matched to a speaker in `parseScript.ts` case-insensitively but **exactly otherwise**: accents count, Latin never matches Greek. Speakers may carry `aliases`. (`electron/tts/scriptMatch.ts` is a different, forgiving check: it compares what a Gemini Live voice said with the script.) `[SFX: stem]` cue lines are read only by headless `--job` runs (`runJob.ts`); in the app they are skipped as unmatched.
+2. **Voice per segment.** `buildNarration.ts` sends each segment to its speaker's engine (four engines: `gemini`, `fish`, `elevenlabs`, `piper`; `buildNarration.ts` accepts only these). DramaBox was retired on 10 Oct 2026 and old projects fall back to Gemini. Before synthesis a Greek accent fixer (`greekAccents*.ts`) and the user's pronunciation list (`pronunciations.ts`) run. Gemini Live lines are checked word by word against the script and retaken on drift.
 3. **Timing.** Segment starts and ends come from the audio. Word times are spread by word length and re-anchored at pauses heard in the audio (`wordTiming.ts`); exact word times are used when an engine supplies them.
 4. **Tracks.** Visemes (nine shapes plus half-open in-betweens, held about 100 ms, look-alikes merged in fast speech), brows and head from punctuation, gestures, move tags, pop-ups, directions and camera.
 5. **Render.** `renderVideo.ts` stages every asset into one folder, builds the composition's props, then renders. **HyperFrames is the default engine; Remotion is the older path**, chosen only when the job says `engine: "remotion"` (`renderVideo.ts`, `RenderJob.engine`). The `render.engine` field in `defaultProject` (`"remotion"`) is a legacy project value; the render job does not use it to pick.
@@ -142,7 +142,7 @@ Settings and presets: `src/lib/post/postSettings.ts`. Filter graphs (pure, teste
 
 ## Shared with Image Forge
 
-Four files are copies of each other. The header of each says "THE SAME FILE": change one, copy it to the other repo, and run both repos' tests.
+Five files are copies of each other. The header of each says "THE SAME FILE": change one, copy it to the other repo, and run both repos' tests.
 
 | Here | In Image Forge | Job |
 |---|---|---|
@@ -150,6 +150,7 @@ Four files are copies of each other. The header of each says "THE SAME FILE": ch
 | `tools/lib/forgeShelf.mjs` | `electron/forgeShelf.mjs` | Orders and puppets. Video Forge places orders and reads puppets; Image Forge takes orders and writes puppets. Everything read from there is validated |
 | `tools/lib/forgeHub.mjs` | `electron/forgeHub.mjs` | `recordMade` into `made/register.jsonl`, appended only |
 | `src/components/ui/TipLayer.tsx` | `src/components/TipLayer.tsx` | The hover bubble for the whole window (`data-tip`, `data-tip-more`, or `title`), also on keyboard focus |
+| `tools/lib/hoverHelp.mjs` | `scripts/hoverHelp.mjs` | The check that lists any clickable thing with no hover help (used by `hoverHelp.test.mjs`) |
 
 `tools/lib/hoverHelp.test.mjs` fails on a control with no tip. The two apps meet only through those plain folders and files: nothing has to be open at the same moment, and Video Forge never reads Image Forge's keys directly.
 
@@ -181,7 +182,7 @@ One codebase, two installers. `tools/lib/buildKind.mjs` lists the personal paths
 
 ## Environment variables
 
-All optional, none loaded from a `.env` file; set them in the terminal before starting (see `.env.example`). `.env.example` also lists `VIDEOFORGE_SECRETS_DIR` (YouTube sign-in files), but nothing in the released code reads it.
+All optional, none loaded from a `.env` file; set them in the terminal before starting (see `.env.example`). `.env.example` is incomplete: it does not list `VIDEOFORGE_SHELVES`, `VIDEOFORGE_KEEP_RENDER` or `VIDEOFORGE_SFX_DIR`.
 
 | Name | Effect |
 |---|---|
@@ -190,6 +191,8 @@ All optional, none loaded from a `.env` file; set them in the terminal before st
 | `VIDEOFORGE_CARD_SATURATION` | Colour boost for intro and outro cards, 0.5 to 2; the in-app setting wins |
 | `HYPERFRAMES_BROWSER_PATH` | Full path to a headless browser |
 | `VIDEOFORGE_SHELVES` | A folder of picture shelves served read-only at `forge-kenney://shelf/` and used for stickers; default `~/Tools/assets/_shelves`, and a computer without it simply shows no shelf |
+| `VIDEOFORGE_KEEP_RENDER` | `1` keeps a render's work folder for debugging and logs its path (`renderVideo.ts`) |
+| `VIDEOFORGE_SFX_DIR` | Overrides the shipped sound-effects folder for the explainer's sound lookup (`tools/lib/explainerRun.mjs`) |
 
 ## Gotchas
 
@@ -197,7 +200,7 @@ All optional, none loaded from a `.env` file; set them in the terminal before st
 - **Piper** runs as a lazily spawned local Python HTTP server per voice model (`piperEngine.ts`); `pythonAllowed` accepts only a Python interpreter, and leftover servers from a crashed session are reaped at start-up.
 - **Child processes** are started with `spawnTracked` and `childEnv()`. Do not hand-build an environment.
 - **Greek names:** `Καιτη` is not `Καίτη`, and `Kaiti` matches nothing unless it is an alias. The "no voice for this line" report is almost always this.
-- **An unknown `[SFX: name]` stops the render** by design; the public download ships `sfx/library` empty.
+- **`[SFX: name]` cues work only in headless `--job` runs.** There, an unknown name stops the render by design; in the app the line is skipped as unmatched, so sounds go through Look → Sounds. The public download ships `sfx/library` empty.
 - **Mixed languages in one script** do not read well; the Language setting is one choice per script. "Also in English / Greek" translates with the Gemini key at render time.
 - **A render stopped half-way** discards the partial file and keeps the narration.
 - **Never move the data folder.** Renames once made saved data look gone; the migration keeps the old folder in place on purpose.

@@ -276,7 +276,7 @@ You used a free voice. Here is how the others compare.
 | Fish Audio | free | an OpenRouter key (free) | a funny foreign accent |
 | Piper | free, offline | Python and voice files on your computer | checking timing, no internet |
 | ElevenLabs | paid, per character | a key with money on the account | very natural voices |
-| DramaBox | a rented graphics machine | made outside the app | acting from directions |
+| DramaBox | retired on 10 Oct 2026 | old projects use Gemini instead | nothing: it is gone |
 
 **What happens when something costs money.** Before a narration buys anything, a box shows how many characters it will use and the estimated cost, and waits for your yes. In **Many videos**, a paid voice is refused unless you switch it on in Settings, because a batch can run overnight with nobody to ask. If you do nothing, nothing is spent.
 
@@ -339,9 +339,9 @@ The note is after the colon. Move it before: `Maria [quietly]: words`.
 </details>
 
 <details>
-<summary>The render stops with a message about a sound</summary>
+<summary>A sound effect I wrote never plays</summary>
 
-A line like `[SFX: name]` points at a sound file that is not in the app's `sfx/library` folder. Fix the name, or add the file. The public download has that folder empty.
+`[SFX: name]` lines are skipped in the app: they only work in batch runs from the command line. To add a sound, use **Look → Sounds** (a sound from Freesound, or a file from your computer).
 
 </details>
 

@@ -47,7 +47,7 @@ export const siteConfig = {
 
   // The three cards under the hero. They switch the reading level.
   levelCards: [
-    { id: 'dev', tag: 'Dev', title: 'How it is built', text: 'Architecture, data flow, the engine layer, the agent tools, build, test and release.' },
+    { id: 'dev', tag: 'Dev', title: 'How it is built', text: 'Architecture, data flow, the render engine, post-production, build, test and release.' },
     { id: 'plain', tag: 'English', title: 'How to use it', text: 'For people who are comfortable with tech but do not write code. Setup, daily use, money, fixes.' },
     { id: 'eli5', tag: 'ELI5', title: 'Start from zero', text: 'Slow and complete. Every word explained, every click spelled out, from "what is this" to your first video.' },
   ],

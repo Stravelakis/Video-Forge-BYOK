@@ -158,13 +158,13 @@
     "term": "rig",
     "eli5": "A face cut into parts (mouths, eyebrows, eyelids) so it can move.",
     "english": "A puppet made from one portrait plus separate mouth, brow and eyelid pictures, with a file that says where each goes.",
-    "dev": "<name>.rig.json + rig/<name>/*.png, built by tools/make-rig-puppet.mjs from base/ + layers/<name>/placement.json."
+    "dev": "<name>.rig.json plus rig/<name>/*.png, loaded with Characters > Puppet > Choose face."
   },
   {
     "term": "inpaint",
     "eli5": "Asking an image AI to redraw only one small part of a picture.",
     "english": "Changing just one area of a picture with an image AI (here the mouth), so the rest stays exactly the same.",
-    "dev": "Masked regeneration (Midjourney Vary Region, Photoshop Generative Fill, ComfyUI); merge back with tools/merge-mouth.mjs."
+    "dev": "Masked regeneration (Midjourney Vary Region, Photoshop Generative Fill, ComfyUI)."
   },
   {
     "term": "stage direction",
@@ -247,9 +247,9 @@
   },
   {
     "term": "DramaBox",
-    "eli5": "A voice that can act, like whispering or laughing, when you tell it to.",
-    "english": "A voice engine that follows stage directions. It runs on a rented graphics machine, outside the app.",
-    "dev": "Directable TTS on a rented GPU; stage directions steer the performance. Not synthesised inside the app."
+    "eli5": "An old voice that could act. It was dropped on 10 Oct 2026, and old projects use Gemini instead.",
+    "english": "A voice engine that was retired on 10 Oct 2026. Old projects that used it fall back to Gemini.",
+    "dev": "Retired 10 Oct 2026; buildNarration.ts accepts only piper, elevenlabs, gemini and fish, and old projects fall back to Gemini."
   },
   {
     "term": "Mixamo",

@@ -43,7 +43,7 @@ If a message in the app says a key is missing, it has an **Open Settings** butto
 | **Groq** | A fast AI for directing and explainers |
 | **Pixabay** and **Pexels** | Stock background video and pictures |
 
-Other boxes: OpenRouter (the Fish Audio voice, more AIs), NVIDIA, Cerebras, Mistral, OpenAI (paid), ElevenLabs (paid voices), your own server, and Freesound (sound effects, CC0 only). Each box has a badge: free, paid, or needs approval first.
+Other boxes: OpenRouter (the Fish Audio voice, more AIs), NVIDIA, Cerebras, Mistral, OpenAI (paid), ElevenLabs (paid voices), your own server, and Freesound (sound effects, CC0 only). Each box has a badge: free, paid, or needs approval first. (ElevenLabs shows "FREE · INSTANT" on its badge, but its voices are paid; check the price on its site.)
 
 <details>
 <summary>More than one Gemini key</summary>
@@ -94,14 +94,13 @@ Maria: Good morning! Today we talk about chocolate and dogs.
 Nikos: Even a little?
 Maria [quietly, like a secret]: Even a little.
 Maria: [laughs] I did not see that coming.
-[SFX: clicker-training]
 Maria: [walks in] Hello again!
 ```
 
 - **The name must match** the character's name: capitals do not matter, spelling and accents do. Greek `Καιτη` does not match `Καίτη`, and Latin `Kaiti` does not match a Greek name.
 - **A stage direction goes before the colon**, in square brackets. Everything after the colon is spoken aloud.
 - **`[laughs]`, `[whispers]`** inside a line are acted, never read out.
-- **`[SFX: name]`** on its own line plays a recording from the app's `sfx/library` folder. An unknown name stops the render. The public download ships that folder empty, so add your own sound files.
+- **Sound effects:** `[SFX: name]` lines only work in batch runs from the command line. In the app, such a line is skipped, so add effects in **Look → Sounds** instead (a sound from Freesound, or a file from your PC).
 - **Moves** like `[walks in]` or `[waves shyly]` work for drawn and 3D characters. The full list is in [MOVE-TAGS](https://github.com/Stravelakis/Video-Forge-BYOK/blob/HEAD/docs/MOVE-TAGS.md).
 - **Punctuation is acting.** `?` raises the eyebrows, `!` sharpens them, `...` lets the head droop.
 - **Short lines cut faster:** six short lines give six background changes.
@@ -130,7 +129,7 @@ The **+** menu in Production → Characters adds ready-made characters, puppets 
 | **Fish Audio** | Free (OpenRouter key) | A funny foreign accent |
 | **ElevenLabs** | Paid per character | The app shows the cost and asks first |
 | **Piper** | Free, offline | Runs on your PC. Flat but fast, good for checking timing |
-| **DramaBox** | Rented graphics machine | Acts from directions, made outside the app. Some ready-made characters use it; the app cannot make those lines itself |
+| **DramaBox** | Retired | Dropped on 10 Oct 2026. Old projects that used it fall back to Gemini |
 
 Per speaker you can change speed, pitch and a **voice character** (natural, chibi, bright and young, warm narrator, deep and dramatic, radio). **🔊 Test the voice** lets you hear a sentence; it never spends paid or rented voices.
 
@@ -161,7 +160,7 @@ Runs by itself on every render, including Many videos. Find it in **Make → Ren
 - **Also as:** tick more shapes (**Tall 9:16** 1080×1920, **Square 1:1**, **Portrait 4:5** 1080×1350, **Wide 16:9** 1920×1080). They are made one after another.
 - **Also in English / Greek:** a second copy in the other language, translated with your Gemini key.
 - **Made with Video Forge:** a small label in a corner, on by default. You can untick it, but you must still credit Video Forge when you publish.
-- The button counts the videos: two shapes and the other language says **Render 6 videos**.
+- The button counts the videos: your own shape plus two extra shapes, and the other language, says **Render 6 videos**.
 - **Stop** ends it. What is half made is thrown away; the narration is kept. When it is done: **Play it** and **Open folder**.
 
 You get an `.mp4` and `.srt` and `.vtt` subtitle files beside it.
@@ -185,8 +184,8 @@ Only a `script` column is required. Others: `name`, `topic`, `template`, `format
 
 [Image Forge](https://github.com/Stravelakis/image-forge) is the sister app that makes pictures and puppets. If both are installed on one Windows account:
 
-- **Keys are shared.** A key saved in one works in the other.
-- **Order a puppet:** in Characters → **+**, choose **Order a new puppet…**, describe it, and press **Send the order to Image Forge**. Image Forge opens, picks it up and makes it; the app says this takes about half an hour on this computer. The puppet appears on your shelf by itself.
+- **Some keys are shared.** Gemini (including extra Gemini keys), OpenRouter, NVIDIA, Mistral, Cloudflare, Pollinations, OpenAI, Groq, ElevenLabs and Fish: a key saved in one app works in the other. Pixabay, Pexels, Freesound, Cerebras and "your own server" are not shared.
+- **Order a puppet:** in Characters → **+**, press **Order one from Image Forge**. That opens the **Puppets from Image Forge** panel: press **Order a new puppet…**, describe it, and press **Send the order to Image Forge**. Image Forge opens, picks it up and makes it; the app says this takes about half an hour on this computer. The puppet appears on your shelf by itself.
 - The Image Forge mark in the top bar opens it.
 
 ## Money and privacy
@@ -211,7 +210,7 @@ Everything lives in `%APPDATA%\video-forge`: `renders\` (your videos), `media\` 
 - **Test fails.** Wrong key, or the service is down or out of allowance. Paste again and check your account on the service's site.
 - **Gemini voice stops after a few lines.** Voice-only models give 10 free lines a day. Pick a Live model or add extra Gemini keys.
 - **The voice reads my direction aloud.** It is after the colon. Move it before: `Name [quietly]: words`.
-- **Render stops: unknown sound.** `[SFX: name]` names no file in `sfx/library`.
+- **A sound effect never plays.** `[SFX: name]` lines are skipped in the app. Add the sound in **Look → Sounds** instead.
 - **Render stops: "pick it again".** The project names a file from another computer. Pick it again in the app.
 - **Nothing to direct.** Make the narration in the Script step first.
 - **Many videos skips a row.** Its script does not match your characters; fix the row and read the sheet again.
