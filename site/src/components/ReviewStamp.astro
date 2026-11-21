@@ -13,7 +13,7 @@ const { checkedAgainst, checkedOn } = Astro.props;
 // ("2026-11-18T00:00:00.000Z"): keep the day only.
 const date = checkedOn instanceof Date ? checkedOn.toISOString().slice(0, 10) : checkedOn ? String(checkedOn).slice(0, 10) : undefined;
 const ok = Boolean(checkedAgainst && date);
-// Video Forge: the date is shown as "18 Nov 2026" (easier to read than 2026-11-18).
+// The date is shown as "18 Nov 2026" (easier to read than 2026-11-18).
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const shown = (() => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date ?? ''));

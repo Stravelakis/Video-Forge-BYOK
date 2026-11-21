@@ -3,11 +3,14 @@ import DocsLayout from '../layouts/DocsLayout.astro';
 import VernacularPanels from '../components/VernacularPanels.astro';
 import FeatureCards from '../components/FeatureCards.astro';
 import Carousel from '../components/Carousel.astro';
+import LevelPicker from '../components/LevelPicker.astro';
 import Playground from '../components/Playground.astro';
 import ReviewStamp from '../components/ReviewStamp.astro';
 import Glossary from '../components/Glossary.astro';
 import { siteConfig } from '../../site.config.ts';
 import { showcaseSlides } from '../data/showcase';
+// Read from the app itself so the version shown cannot go stale.
+import pkg from '../../../package.json';
 
 import { Content as Dev, frontmatter as devFm } from '../docs/dev.md';
 import { Content as Plain, frontmatter as plainFm } from '../docs/plain.md';
@@ -29,16 +32,23 @@ const guide = sources['../docs/source/guide.md'];
 const install = sources['../docs/source/install.md'];
 ---
 <DocsLayout title="Overview" home>
-  <section class="hero reveal" id="top">
-    <span class="eyebrow">Windows app · Greek &amp; English · bring your own keys</span>
+  <section class="frame hero reveal" id="top">
+    <span class="label">Docs · v{pkg.version}</span>
     <h1 class="hero-title">{siteConfig.projectName}</h1>
     <p class="hero-sub">{siteConfig.description}</p>
-    <p class="hero-sub hero-links">
-      <a href={`${siteConfig.repoUrl}/releases/latest`}>Download for Windows</a>{' · '}
-      <a href="#install">How to install</a>{' · '}
-      <a href={siteConfig.repoUrl}>Source on GitHub</a>
-    </p>
+    <div class="btns">
+      {siteConfig.heroLinks.map((l) => (
+        <a class:list={['btn', { primary: l.primary }]} href={l.href}>{l.label}</a>
+      ))}
+    </div>
+    <div class="pills">
+      {siteConfig.heroPills.map((t) => (
+        <span class="pill"><i></i>{t}</span>
+      ))}
+    </div>
   </section>
+
+  <LevelPicker />
 
   <FeatureCards features={features} title="What Video Forge does" />
 

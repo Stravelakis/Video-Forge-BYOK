@@ -71,7 +71,7 @@ version tag:
 Electron:
   eli5: A kit that turns a web page into a real app with its own window.
   english: The framework Video Forge is built on. It runs web technology inside a normal desktop window.
-  dev: Chromium + Node.js desktop shell (v45 here), built with electron-vite and packaged with electron-builder (NSIS + portable).
+  dev: Chromium + Node.js desktop shell (^45), built with electron-vite and packaged with electron-builder (NSIS + portable).
 
 Node.js:
   eli5: A helper that lets your computer run the app's building tools.
@@ -104,14 +104,29 @@ FFmpeg:
   dev: "gyan.dev 9.0.2 essentials (GPL v3), pinned in tools/lib/ffmpegBundle.mjs. Picked in order: installer's own, full one on PATH, Remotion's bundled copy."
 
 Remotion:
-  eli5: A tool that builds videos out of web pages, one picture at a time.
-  english: A video-making tool that draws each frame like a web page and turns the frames into a video file.
-  dev: React-based programmatic video framework (4.0.540); renders frames in headless Chromium.
+  eli5: A tool that builds videos out of web pages, one picture at a time. Video Forge keeps it as a second way to make the video.
+  english: A video-making tool that draws each frame like a web page. Video Forge uses a different one (HyperFrames) by default.
+  dev: React-based video framework (^4.0.540). The older render path, used only when a job says engine "remotion"; HyperFrames is the default.
+
+HyperFrames:
+  eli5: The tool that draws your video's pictures one by one and glues them into a video file.
+  english: The video-making tool Video Forge uses by default. It draws each frame in a hidden browser and uses your graphics card when there is one.
+  dev: Apache-2.0 renderer driven by electron/render/hyperframes/. Stages bg-track.mp4, banner.mp4, mix.wav and a bundled React page, then runs its CLI with --gpu --browser-gpu (VIDEOFORGE_RENDER_CPU=1 turns that off).
 
 headless browser:
   eli5: A web browser with no window, used by the app behind the scenes.
   english: A browser that runs without showing anything. The app uses one to draw the frames of your video.
-  dev: Chromium used for rendering; override its location with HYPERFRAMES_BROWSER_PATH.
+  dev: Chromium used for rendering; renderBrowser.ts looks in the usual places, HYPERFRAMES_BROWSER_PATH overrides.
+
+DPAPI:
+  eli5: A lock built into Windows that only opens for you.
+  english: Windows' own per-user encryption. Video Forge and Image Forge use it to share keys that only your Windows account can read.
+  dev: Windows Data Protection API, called through PowerShell for %APPDATA%\Forge\shared-keys.bin (tools/lib/forgeKeys.mjs). Off Windows there is no sharing.
+
+IPC:
+  eli5: The way the app's window asks the app's engine room to do things.
+  english: Messages between the app's window and its background part. The window cannot touch your files or keys directly; it asks.
+  dev: Electron ipcMain/ipcRenderer channels, exposed to the sandboxed window as window.byok by electron/preload.ts. There is deliberately no channel that returns a key.
 
 viseme:
   explainer: true

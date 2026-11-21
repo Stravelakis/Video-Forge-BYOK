@@ -9,6 +9,27 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Links written for GitHub (INSTALL.md, docs/x.md, LICENSE) would break on the
+// site: GUIDE/INSTALL go to their own sections here, anything else to GitHub.
+// The repo address comes from site.config.ts (repoUrl). Found on Video Forge, 18 Nov 2026.
+const repoUrl = (readFileSync(new URL("../site.config.ts", import.meta.url), "utf8").match(/repoUrl:\s*["']([^"']+)["']/) || [])[1];
+// "HEAD" is GitHub's own name for "whatever the default branch is", so this
+// works for repos on master and on main alike (the old fixed "main" broke every
+// link on Image Forge, which uses master; found 21 Nov 2026).
+const REPO_BLOB = repoUrl ? repoUrl.replace(/\/$/, "") + "/blob/HEAD/" : null;
+const siteBase = ((readFileSync(new URL("../astro.config.mjs", import.meta.url), "utf8").match(/base:\s*["']([^"']*)["']/) || [])[1] ?? "").replace(/\/$/, "");
+const fixLinks = (md) =>
+  md
+    // Screenshots written for GitHub (site/public/x.png) live at <base>/x.png on the site.
+    .replace(/(!\[[^\]]*\]\()(?:\.?\/)?(?:site\/)?public\/([^)\s]+)\)/g, (m, head, file) => `${head}${siteBase}/${file})`)
+    .replace(/(?<!!)\[([^\]]*)\]\((?!https?:|#|mailto:)([^)\s]+)\)/g, (m, text, target) => {
+      const [file, hash] = target.split("#");
+      if (/^GUIDE\.md$/i.test(file)) return `[${text}](#${hash || "guide"})`;
+      if (/^INSTALL\.md$/i.test(file)) return `[${text}](#${hash || "install"})`;
+      return REPO_BLOB ? `[${text}](${REPO_BLOB}${file}${hash ? `#${hash}` : ""})` : m;
+    });
+
+
 const themeDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(themeDir, process.env.DOCS_SOURCE_ROOT ?? '..');
 const outDocs = join(themeDir, 'src', 'docs', 'source');
@@ -17,18 +38,6 @@ const outData = join(themeDir, 'src', 'data');
 rmSync(outDocs, { recursive: true, force: true });
 mkdirSync(outDocs, { recursive: true });
 mkdirSync(outData, { recursive: true });
-
-// Video Forge addition: links written for GitHub (INSTALL.md, docs/MOVE-TAGS.md,
-// LICENSE) would break on the site, so they are pointed at the right place:
-// GUIDE/INSTALL to their own sections on this page, anything else to GitHub.
-const REPO_BLOB = 'https://github.com/Stravelakis/Video-Forge-BYOK/blob/main/';
-const fixLinks = (md) =>
-  md.replace(/\]\((?!https?:|#|mailto:)([^)\s]+)\)/g, (_m, target) => {
-    const [file, hash] = target.split('#');
-    if (/^GUIDE\.md$/i.test(file)) return `](#${hash || 'guide'})`;
-    if (/^INSTALL\.md$/i.test(file)) return `](#${hash || 'install'})`;
-    return `](${REPO_BLOB}${file}${hash ? `#${hash}` : ''})`;
-  });
 
 const copied = [];
 for (const [file, slug] of [['GUIDE.md', 'guide'], ['INSTALL.md', 'install']]) {
