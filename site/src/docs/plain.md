@@ -1,3 +1,8 @@
+---
+checkedAgainst: v0.4.0-beta.1
+checkedOn: 2026-11-21
+---
+
 ## What Video Forge is
 
 A Windows app for making videos where **characters talk**. You write what each one says, pick a voice for each, and the app builds the video: the mouths move with the words, subtitles light up word by word, and it works in Greek or English.
