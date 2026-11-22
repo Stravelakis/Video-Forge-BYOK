@@ -1,3 +1,8 @@
+---
+checkedAgainst: v0.4.0-beta.1
+checkedOn: 2026-11-21
+---
+
 ## Orientation
 
 Video Forge is a **Windows desktop app that renders narrated, subtitled, character-driven video locally**. A script of `Name: words` lines goes through a voice engine, becomes timed audio, mouth shapes and subtitles, and is rendered to MP4 on the user's own machine. Online services (voices, LLMs, stock media) are reached with the user's own keys.

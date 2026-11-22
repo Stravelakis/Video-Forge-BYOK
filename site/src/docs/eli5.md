@@ -1,3 +1,8 @@
+---
+checkedAgainst: v0.4.0-beta.1
+checkedOn: 2026-11-21
+---
+
 ## Start here
 
 This page takes you from "I have never made a video like this" to "I made a video where two characters talk". Go slowly. Nothing here can break your computer, and every step says what you should see, so you always know if it worked.
